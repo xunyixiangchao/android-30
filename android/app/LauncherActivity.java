@@ -62,7 +62,7 @@ public abstract class LauncherActivity extends ListActivity {
     Intent mIntent;
     PackageManager mPackageManager;
     IconResizer mIconResizer;
-    
+
     /**
      * An item in the list
      */
@@ -73,7 +73,7 @@ public abstract class LauncherActivity extends ListActivity {
         public String packageName;
         public String className;
         public Bundle extras;
-        
+
         ListItem(PackageManager pm, ResolveInfo resolveInfo, IconResizer resizer) {
             this.resolveInfo = resolveInfo;
             label = resolveInfo.loadLabel(pm);
@@ -82,7 +82,7 @@ public abstract class LauncherActivity extends ListActivity {
             if (label == null && ci != null) {
                 label = resolveInfo.activityInfo.name;
             }
-            
+
             if (resizer != null) {
                 icon = resizer.createIconThumbnail(resolveInfo.loadIcon(pm));
             }
@@ -108,7 +108,7 @@ public abstract class LauncherActivity extends ListActivity {
 
         private Filter mFilter;
         private final boolean mShowIcons;
-        
+
         public ActivityAdapter(IconResizer resizer) {
             mIconResizer = resizer;
             mInflater = (LayoutInflater) LauncherActivity.this.getSystemService(
@@ -180,7 +180,7 @@ public abstract class LauncherActivity extends ListActivity {
             }
             return mFilter;
         }
-        
+
         /**
          * An array filters constrains the content of the array adapter with a prefix. Each
          * item that does not start with the supplied prefix is removed from the list.
@@ -245,22 +245,22 @@ public abstract class LauncherActivity extends ListActivity {
             }
         }
     }
-        
+
     /**
-     * Utility class to resize icons to match default icon size.  
+     * Utility class to resize icons to match default icon size.
      */
     public class IconResizer {
-        // Code is borrowed from com.android.launcher.Utilities. 
+        // Code is borrowed from com.android.launcher.Utilities.
         private int mIconWidth = -1;
         private int mIconHeight = -1;
 
         private final Rect mOldBounds = new Rect();
         private Canvas mCanvas = new Canvas();
-        
+
         public IconResizer() {
             mCanvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG,
                     Paint.FILTER_BITMAP_FLAG));
-            
+
             final Resources resources = LauncherActivity.this.getResources();
             mIconWidth = mIconHeight = (int) resources.getDimension(
                     android.R.dimen.app_icon_size);
@@ -276,7 +276,7 @@ public abstract class LauncherActivity extends ListActivity {
          * @param icon The icon to get a thumbnail of.
          *
          * @return A thumbnail for the specified icon or the icon itself if the
-         *         thumbnail could not be created. 
+         *         thumbnail could not be created.
          */
         public Drawable createIconThumbnail(Drawable icon) {
             int width = mIconWidth;
@@ -342,7 +342,7 @@ public abstract class LauncherActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
+
         mPackageManager = getPackageManager();
 
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WATCH)) {
@@ -352,7 +352,7 @@ public abstract class LauncherActivity extends ListActivity {
         onSetContentView();
 
         mIconResizer = new IconResizer();
-        
+
         mIntent = new Intent(getTargetIntent());
         mIntent.setComponent(null);
         mAdapter = new ActivityAdapter(mIconResizer);
@@ -409,9 +409,10 @@ public abstract class LauncherActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Intent intent = intentForPosition(position);
+        // todo: 桌面startActivity流程
         startActivity(intent);
     }
-    
+
     /**
      * Return the actual Intent for a specific position in our
      * {@link android.widget.ListView}.
@@ -421,7 +422,7 @@ public abstract class LauncherActivity extends ListActivity {
         ActivityAdapter adapter = (ActivityAdapter) mAdapter;
         return adapter.intentForPosition(position);
     }
-    
+
     /**
      * Return the {@link ListItem} for a specific position in our
      * {@link android.widget.ListView}.
@@ -431,7 +432,7 @@ public abstract class LauncherActivity extends ListActivity {
         ActivityAdapter adapter = (ActivityAdapter) mAdapter;
         return adapter.itemForPosition(position);
     }
-    
+
     /**
      * Get the base intent to use when running
      * {@link PackageManager#queryIntentActivities(Intent, int)}.

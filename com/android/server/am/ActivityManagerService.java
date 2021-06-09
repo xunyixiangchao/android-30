@@ -3167,6 +3167,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             ApplicationInfo info, boolean knownToBeDead, int intentFlags,
             HostingRecord hostingRecord, int zygotePolicyFlags, boolean allowWhileBooting,
             boolean isolated, boolean keepIfLarge) {
+        // todo: 桌面startActivity流程
         return mProcessList.startProcessLocked(processName, info, knownToBeDead, intentFlags,
                 hostingRecord, zygotePolicyFlags, allowWhileBooting, isolated, 0 /* isolatedUid */,
                 keepIfLarge, null /* ABI override */, null /* entryPoint */,
@@ -3637,6 +3638,7 @@ public class ActivityManagerService extends IActivityManager.Stub
      * @deprecated use {@link #startActivityWithFeature} instead
      */
     @Deprecated
+    // todo: 桌面startActivity流程
     @Override
     public int startActivity(IApplicationThread caller, String callingPackage,
             Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,
@@ -5018,7 +5020,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             Slog.w(TAG, "Spurious process start timeout - pid not known for " + app);
         }
     }
-
+    // todo: 桌面startActivity流程
     @GuardedBy("this")
     private boolean attachApplicationLocked(@NonNull IApplicationThread thread,
             int pid, int callingUid, long startSeq) {
@@ -5327,6 +5329,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                         buildSerial, autofillOptions, contentCaptureOptions,
                         app.mDisabledCompatChanges);
             } else {
+                // todo: 桌面startActivity流程,进入是创建Application
                 thread.bindApplication(processName, appInfo, providerList, null, profilerInfo,
                         null, null, null, testMode,
                         mBinderTransactionTrackingEnabled, enableTrackAllocation,
@@ -5344,6 +5347,7 @@ public class ActivityManagerService extends IActivityManager.Stub
 
             // Make app active after binding application or client may be running requests (e.g
             // starting activities) before it is ready.
+
             app.makeActive(thread, mProcessStats);
             checkTime(startTime, "attachApplicationLocked: immediately after bindApplication");
             mProcessList.updateLruProcessLocked(app, false, null);
@@ -5371,6 +5375,8 @@ public class ActivityManagerService extends IActivityManager.Stub
         // See if the top visible activity is waiting to run in this process...
         if (normalMode) {
             try {
+// todo: 桌面startActivity流程-->ActivityTaskManagerInternal继承类ActivityTaskManagerService$LocalService#attachApplication
+                //然后调用RootWindowContainer的attachApplication
                 didSomething = mAtmInternal.attachApplication(app.getWindowProcessController());
             } catch (Exception e) {
                 Slog.wtf(TAG, "Exception thrown launching activities in " + app, e);
@@ -5381,6 +5387,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         // Find any services that should be running in this process...
         if (!badApp) {
             try {
+
                 didSomething |= mServices.attachApplicationLocked(app, processName);
                 checkTime(startTime, "attachApplicationLocked: after mServices.attachApplicationLocked");
             } catch (Exception e) {
@@ -5441,7 +5448,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 (app.hostingRecord.getName() != null ? app.hostingRecord.getName() : ""));
         return true;
     }
-
+    // todo: 桌面startActivity流程
     @Override
     public final void attachApplication(IApplicationThread thread, long startSeq) {
         if (thread == null) {
@@ -5451,6 +5458,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             int callingPid = Binder.getCallingPid();
             final int callingUid = Binder.getCallingUid();
             final long origId = Binder.clearCallingIdentity();
+            // todo: 桌面startActivity流程
             attachApplicationLocked(thread, callingPid, callingUid, startSeq);
             Binder.restoreCallingIdentity(origId);
         }
@@ -19621,7 +19629,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                         minTargetSdk, maxProcState);
             }
         }
-
+        // todo: 桌面startActivity流程
         @Override
         public void startProcess(String processName, ApplicationInfo info, boolean knownToBeDead,
                 boolean isTop, String hostingType, ComponentName hostingName) {
@@ -19634,6 +19642,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                     // If the process is known as top app, set a hint so when the process is
                     // started, the top priority can be applied immediately to avoid cpu being
                     // preempted by other processes before attaching the process of top app.
+                    // todo: 桌面startActivity流程
                     startProcessLocked(processName, info, knownToBeDead, 0 /* intentFlags */,
                             new HostingRecord(hostingType, hostingName, isTop),
                             ZYGOTE_POLICY_FLAG_LATENCY_SENSITIVE, false /* allowWhileBooting */,

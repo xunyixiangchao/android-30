@@ -714,7 +714,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
         final ResolveInfo rInfo = resolveIntent(intent, resolvedType, userId, 0, filterCallingUid);
         return resolveActivity(intent, rInfo, startFlags, profilerInfo);
     }
-
+    // todo: 桌面startActivity流程
     boolean realStartActivityLocked(ActivityRecord r, WindowProcessController proc,
             boolean andResume, boolean checkConfig) throws RemoteException {
 
@@ -860,6 +860,12 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                 clientTransaction.setLifecycleStateRequest(lifecycleItem);
 
                 // Schedule transaction.
+                // todo: 桌面startActivity流程
+                //mService.getLifecycleManager().scheduleTransaction-->
+                // ActivityThread父类ClientTransactionHandler#scheduleTransaction-->
+                // EXECUTE_TRANSACTION--》TransactionExecutor.execute--》executeCallbacks--》
+                // ClientTransactionItem子类LaunchActivityItem#execute--》
+                // ClientTransactionHandler子类ActivityThread#handleLaunchActivity
                 mService.getLifecycleManager().scheduleTransaction(clientTransaction);
 
                 if ((proc.mInfo.privateFlags & ApplicationInfo.PRIVATE_FLAG_CANT_SAVE_STATE) != 0
@@ -959,15 +965,17 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                     + ", icicle size: " + icicleSize);
         }
     }
-
+// todo: 桌面startActivity流程
     void startSpecificActivity(ActivityRecord r, boolean andResume, boolean checkConfig) {
         // Is this activity's application already running?
         final WindowProcessController wpc =
                 mService.getProcessController(r.processName, r.info.applicationInfo.uid);
 
         boolean knownToBeDead = false;
+        //进程存在
         if (wpc != null && wpc.hasThread()) {
             try {
+                // todo: 桌面startActivity流程
                 realStartActivityLocked(r, wpc, andResume, checkConfig);
                 return;
             } catch (RemoteException e) {
@@ -983,6 +991,8 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
         r.notifyUnknownVisibilityLaunchedForKeyguardTransition();
 
         final boolean isTop = andResume && r.isTopRunningActivity();
+        //进程不存在
+        // todo: 桌面startActivity流程
         mService.startProcessAsync(r, knownToBeDead, isTop, isTop ? "top-activity" : "activity");
     }
 
@@ -2122,13 +2132,11 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
         mHandler.sendMessageDelayed(mHandler.obtainMessage(RESTART_ACTIVITY_PROCESS_TIMEOUT_MSG, r),
                 WindowManagerService.WINDOW_FREEZE_TIMEOUT_DURATION);
     }
-
     void handleNonResizableTaskIfNeeded(Task task, int preferredWindowingMode,
             TaskDisplayArea preferredTaskDisplayArea, ActivityStack actualStack) {
         handleNonResizableTaskIfNeeded(task, preferredWindowingMode, preferredTaskDisplayArea,
                 actualStack, false /* forceNonResizable */);
     }
-
     void handleNonResizableTaskIfNeeded(Task task, int preferredWindowingMode,
             TaskDisplayArea preferredTaskDisplayArea, ActivityStack actualStack,
             boolean forceNonResizable) {

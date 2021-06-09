@@ -1031,7 +1031,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         public final void scheduleStopService(IBinder token) {
             sendMessage(H.STOP_SERVICE, token);
         }
-
+        // todo: 桌面startActivity流程
         @Override
         public final void bindApplication(String processName, ApplicationInfo appInfo,
                 ProviderInfoList providerList, ComponentName instrumentationName,
@@ -1091,6 +1091,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             data.autofillOptions = autofillOptions;
             data.contentCaptureOptions = contentCaptureOptions;
             data.disabledCompatChanges = disabledCompatChanges;
+            // todo: 桌面startActivity流程
             sendMessage(H.BIND_APPLICATION, data);
         }
 
@@ -1910,6 +1911,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 case BIND_APPLICATION:
                     Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "bindApplication");
                     AppBindData data = (AppBindData)msg.obj;
+                    // todo: 桌面startActivity流程
                     handleBindApplication(data);
                     Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
                     break;
@@ -2061,6 +2063,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                     handleRunIsolatedEntryPoint((String) ((SomeArgs) msg.obj).arg1,
                             (String[]) ((SomeArgs) msg.obj).arg2);
                     break;
+                // todo: 桌面startActivity流程
                 case EXECUTE_TRANSACTION:
                     final ClientTransaction transaction = (ClientTransaction) msg.obj;
                     mTransactionExecutor.execute(transaction);
@@ -3350,6 +3353,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         Activity activity = null;
         try {
             java.lang.ClassLoader cl = appContext.getClassLoader();
+// todo: 桌面startActivity流程
             activity = mInstrumentation.newActivity(
                     cl, component.getClassName(), r.intent);
             StrictMode.incrementExpectedActivityCount(activity.getClass());
@@ -3367,6 +3371,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         }
 
         try {
+            // todo: 桌面startActivity流程-->拿之前创建的Application
             Application app = r.packageInfo.makeApplication(false, mInstrumentation);
 
             if (localLOGV) Slog.v(TAG, "Performing launch of " + r);
@@ -3398,6 +3403,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                         app.getResources().getLoaders().toArray(new ResourcesLoader[0]));
 
                 appContext.setOuterContext(activity);
+                // todo: 桌面startActivity流程-->里面会创建PhoneWindow
                 activity.attach(appContext, this, getInstrumentation(), r.token,
                         r.ident, app, r.intent, r.activityInfo, title, r.parent,
                         r.embeddedID, r.lastNonConfigurationInstances, config,
@@ -3419,6 +3425,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 if (r.isPersistable()) {
                     mInstrumentation.callActivityOnCreate(activity, r.state, r.persistentState);
                 } else {
+                    // todo: 桌面startActivity流程--调用activity#oncreate
                     mInstrumentation.callActivityOnCreate(activity, r.state);
                 }
                 if (!activity.mCalled) {
@@ -3569,6 +3576,7 @@ public final class ActivityThread extends ClientTransactionHandler {
     /**
      * Extended implementation of activity launch. Used when server requests a launch or relaunch.
      */
+    // todo: 桌面startActivity流程
     @Override
     public Activity handleLaunchActivity(ActivityClientRecord r,
             PendingTransactionActions pendingActions, Intent customIntent) {
@@ -3597,7 +3605,7 @@ public final class ActivityThread extends ClientTransactionHandler {
 
         // Hint the GraphicsEnvironment that an activity is launching on the process.
         GraphicsEnvironment.hintActivityLaunch();
-
+// todo: 桌面startActivity流程
         final Activity a = performLaunchActivity(r, customIntent);
 
         if (a != null) {
@@ -4431,6 +4439,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 deliverResults(r, r.pendingResults, reason);
                 r.pendingResults = null;
             }
+            // todo: 桌面startActivity流程
             r.activity.performResume(r.startsNotResumed, reason);
 
             r.state = null;
@@ -4463,7 +4472,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         r.mPendingRemoveWindow = null;
         r.mPendingRemoveWindowManager = null;
     }
-
+    // todo: 桌面startActivity流程
     @Override
     public void handleResumeActivity(IBinder token, boolean finalStateRequest, boolean isForward,
             String reason) {
@@ -4473,6 +4482,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         mSomeActivitiesChanged = true;
 
         // TODO Push resumeArgs into the activity for consideration
+        // todo: 桌面startActivity流程
         final ActivityClientRecord r = performResumeActivity(token, finalStateRequest, reason);
         if (r == null) {
             // We didn't actually resume the activity, so skipping any follow-up actions.
@@ -7322,7 +7332,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         // The process will be empty after this method returns; exit the VM now.
         System.exit(0);
     }
-
+    // todo: 桌面startActivity流程
     @UnsupportedAppUsage
     private void attach(boolean system, long startSeq) {
         sCurrentActivityThread = this;
@@ -7333,6 +7343,9 @@ public final class ActivityThread extends ClientTransactionHandler {
             RuntimeInit.setApplicationObject(mAppThread.asBinder());
             final IActivityManager mgr = ActivityManager.getService();
             try {
+                // todo: 桌面startActivity流程
+                //这里mgr就是AMS
+                // mAppThread就是ApplicationThread，即 AIDL 反向回调
                 mgr.attachApplication(mAppThread, startSeq);
             } catch (RemoteException ex) {
                 throw ex.rethrowFromSystemServer();
@@ -7603,7 +7616,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             }
         }
     }
-
+    // todo: 桌面startActivity流程
     public static void main(String[] args) {
         Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "ActivityThreadMain");
 
@@ -7625,7 +7638,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         initializeMainlineModules();
 
         Process.setArgV0("<pre-initialized>");
-
+        //主线程looper
         Looper.prepareMainLooper();
 
         // Find the value for {@link #PROC_START_SEQ_IDENT} if provided on the command line.
@@ -7640,6 +7653,8 @@ public final class ActivityThread extends ClientTransactionHandler {
             }
         }
         ActivityThread thread = new ActivityThread();
+        // todo: 桌面startActivity流程
+        //这个方法最后就是为了发送出创建Application的消息
         thread.attach(false, startSeq);
 
         if (sMainThreadHandler == null) {

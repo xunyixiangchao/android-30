@@ -342,6 +342,7 @@ public class ZygoteProcess {
      * @return An object that describes the result of the attempt to start the process.
      * @throws RuntimeException on fatal start failure
      */
+    // todo: 桌面startActivity流程
     public final Process.ProcessStartResult start(@NonNull final String processClass,
                                                   final String niceName,
                                                   int uid, int gid, @Nullable int[] gids,
@@ -369,6 +370,7 @@ public class ZygoteProcess {
         }
 
         try {
+            // todo: 桌面startActivity流程
             return startViaZygote(processClass, niceName, uid, gid, gids,
                     runtimeFlags, mountExternal, targetSdkVersion, seInfo,
                     abi, instructionSet, appDataDir, invokeWith, /*startChildZygote=*/ false,
@@ -456,7 +458,8 @@ public class ZygoteProcess {
                         + ex.getMessage());
             }
         }
-
+// todo: 桌面startActivity流程-->socket通信进入
+// zygoteServer.runSelectLoop
         return attemptZygoteSendArgsAndGetResult(zygoteState, msgStr);
     }
 
@@ -792,6 +795,8 @@ public class ZygoteProcess {
         synchronized(mLock) {
             // The USAP pool can not be used if the application will not use the systems graphics
             // driver.  If that driver is requested use the Zygote application start path.
+
+            // todo: 桌面startActivity流程
             return zygoteSendArgsAndGetResult(openZygoteSocketIfNeeded(abi),
                                               zygotePolicyFlags,
                                               argsForZygote);

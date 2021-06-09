@@ -118,6 +118,7 @@ class ZygoteConnection {
      * If the client closes the socket, an {@code EOF} condition is set, which callers can test
      * for by calling {@code ZygoteConnection.isClosedByPeer}.
      */
+    // todo: 桌面startActivity流程
     Runnable processOneCommand(ZygoteServer zygoteServer) {
         String[] args;
 
@@ -253,7 +254,7 @@ class ZygoteConnection {
         if (fd != null) {
             fdsToClose[1] = fd.getInt$();
         }
-
+// todo: 桌面startActivity流程 fork出进程，往下走
         pid = Zygote.forkAndSpecialize(parsedArgs.mUid, parsedArgs.mGid, parsedArgs.mGids,
                 parsedArgs.mRuntimeFlags, rlimits, parsedArgs.mMountExternal, parsedArgs.mSeInfo,
                 parsedArgs.mNiceName, fdsToClose, fdsToIgnore, parsedArgs.mStartChildZygote,
@@ -269,7 +270,7 @@ class ZygoteConnection {
                 zygoteServer.closeServerSocket();
                 IoUtils.closeQuietly(serverPipeFd);
                 serverPipeFd = null;
-
+// todo: 桌面startActivity流程
                 return handleChildProc(parsedArgs, childPipeFd, parsedArgs.mStartChildZygote);
             } else {
                 // In the parent. A pid < 0 indicates a failure and will be handled in
@@ -477,6 +478,7 @@ class ZygoteConnection {
      * @param pipeFd null-ok; pipe for communication back to Zygote.
      * @param isZygote whether this new child process is itself a new Zygote.
      */
+    // todo: 桌面startActivity流程
     private Runnable handleChildProc(ZygoteArguments parsedArgs,
             FileDescriptor pipeFd, boolean isZygote) {
         /*
@@ -492,6 +494,7 @@ class ZygoteConnection {
         // End of the postFork event.
         Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
         if (parsedArgs.mInvokeWith != null) {
+            // todo: 桌面startActivity流程--使用execShell执行的 WrapperInit#main方法
             WrapperInit.execApplication(parsedArgs.mInvokeWith,
                     parsedArgs.mNiceName, parsedArgs.mTargetSdkVersion,
                     VMRuntime.getCurrentInstructionSet(),

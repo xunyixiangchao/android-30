@@ -421,6 +421,7 @@ class ZygoteServer {
      * they happen, and reads commands from connections one spawn-request's
      * worth at a time.
      */
+    // todo: 桌面startActivity流程
     Runnable runSelectLoop(String abiList) {
         ArrayList<FileDescriptor> socketFDs = new ArrayList<>();
         ArrayList<ZygoteConnection> peers = new ArrayList<>();
@@ -543,6 +544,7 @@ class ZygoteServer {
 
                         try {
                             ZygoteConnection connection = peers.get(pollIndex);
+                            // todo: 桌面startActivity流程
                             final Runnable command = connection.processOneCommand(this);
 
                             // TODO (chriswailes): Is this extra check necessary?

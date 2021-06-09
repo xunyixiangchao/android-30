@@ -1925,7 +1925,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
             mService.mPreviousProcessVisibleTime = r.lastVisibleTime;
         }
     }
-
+    // todo: 桌面startActivity流程
     boolean attachApplication(WindowProcessController app) throws RemoteException {
         final String processName = app.mName;
         boolean didSomething = false;
@@ -1938,6 +1938,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
 
             mTmpRemoteException = null;
             mTmpBoolean = false; // Set to true if an activity was started.
+            // todo: 桌面startActivity流程
             final PooledFunction c = PooledLambda.obtainFunction(
                     RootWindowContainer::startActivityForAttachedApplicationIfNeeded, this,
                     PooledLambda.__(ActivityRecord.class), app, stack.topRunningActivity());
@@ -1953,7 +1954,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         }
         return didSomething;
     }
-
+    // todo: 桌面startActivity流程
     private boolean startActivityForAttachedApplicationIfNeeded(ActivityRecord r,
             WindowProcessController app, ActivityRecord top) {
         if (r.finishing || !r.okToShowLocked() || !r.visibleIgnoringKeyguard || r.app != null
@@ -1962,6 +1963,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         }
 
         try {
+            // todo: 桌面startActivity流程
             if (mStackSupervisor.realStartActivityLocked(r, app, top == r /*andResume*/,
                     true /*checkConfig*/)) {
                 mTmpBoolean = true;
@@ -2285,7 +2287,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
     boolean resumeFocusedStacksTopActivities() {
         return resumeFocusedStacksTopActivities(null, null, null);
     }
-
+    // todo: 桌面startActivity流程
     boolean resumeFocusedStacksTopActivities(
             ActivityStack targetStack, ActivityRecord target, ActivityOptions targetOptions) {
 
@@ -2296,6 +2298,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         boolean result = false;
         if (targetStack != null && (targetStack.isTopStackInDisplayArea()
                 || getTopDisplayFocusedStack() == targetStack)) {
+            // todo: 桌面startActivity流程
             result = targetStack.resumeTopActivityUncheckedLocked(target, targetOptions);
         }
 

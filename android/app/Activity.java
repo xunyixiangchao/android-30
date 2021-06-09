@@ -1899,6 +1899,7 @@ public class Activity extends ContextThemeWrapper
      * @see #onPause
      * @see #onTopResumedActivityChanged(boolean)
      */
+    // todo: 桌面startActivity流程
     @CallSuper
     protected void onResume() {
         if (DEBUG_LIFECYCLE) Slog.v(TAG, "onResume " + this);
@@ -5276,6 +5277,7 @@ public class Activity extends ContextThemeWrapper
      * @see #startActivity
      */
     public void startActivityForResult(@RequiresPermission Intent intent, int requestCode) {
+        // todo: 桌面startActivity流程
         startActivityForResult(intent, requestCode, null);
     }
 
@@ -5317,6 +5319,7 @@ public class Activity extends ContextThemeWrapper
             @Nullable Bundle options) {
         if (mParent == null) {
             options = transferSpringboardActivityOptions(options);
+            // todo: 桌面startActivity流程
             Instrumentation.ActivityResult ar =
                 mInstrumentation.execStartActivity(
                     this, mMainThread.getApplicationThread(), mToken, this,
@@ -5615,6 +5618,7 @@ public class Activity extends ContextThemeWrapper
      */
     @Override
     public void startActivity(Intent intent) {
+        // todo: 桌面startActivity流程
         this.startActivity(intent, null);
     }
 
@@ -5662,6 +5666,8 @@ public class Activity extends ContextThemeWrapper
         } else {
             // Note we want to go through this call for compatibility with
             // applications that may have overridden the method.
+
+            // todo: 桌面startActivity流程
             startActivityForResult(intent, -1);
         }
     }
@@ -7900,7 +7906,7 @@ public class Activity extends ContextThemeWrapper
         attachBaseContext(context);
 
         mFragments.attachHost(null /*parent*/);
-
+// todo: 桌面startActivity流程
         mWindow = new PhoneWindow(this, window, activityConfigCallback);
         mWindow.setWindowControllerCallback(mWindowControllerCallback);
         mWindow.setCallback(this);
@@ -7980,8 +7986,9 @@ public class Activity extends ContextThemeWrapper
     public final ActivityThread getActivityThread() {
         return mMainThread;
     }
-
+    // todo: 桌面startActivity流程
     final void performCreate(Bundle icicle) {
+        // todo: 桌面startActivity流程
         performCreate(icicle, null);
     }
 
@@ -7998,6 +8005,7 @@ public class Activity extends ContextThemeWrapper
         if (persistentState != null) {
             onCreate(icicle, persistentState);
         } else {
+// todo: 桌面startActivity流程
             onCreate(icicle);
         }
         EventLogTags.writeWmOnCreateCalled(mIdent, getComponentName().getClassName(),
@@ -8112,7 +8120,7 @@ public class Activity extends ContextThemeWrapper
             }
         }
     }
-
+    // todo: 桌面startActivity流程
     final void performResume(boolean followedByPause, String reason) {
         dispatchActivityPreResumed();
         performRestart(true /* start */, reason);
@@ -8133,6 +8141,7 @@ public class Activity extends ContextThemeWrapper
 
         mCalled = false;
         // mResumed is set by the instrumentation
+        // todo: 桌面startActivity流程
         mInstrumentation.callActivityOnResume(this);
         EventLogTags.writeWmOnResumeCalled(mIdent, getComponentName().getClassName(), reason);
         if (!mCalled) {

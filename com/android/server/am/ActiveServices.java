@@ -2999,6 +2999,7 @@ public final class ActiveServices {
      * The "start" here means bring up the instance in the client, and this method is called
      * from bindService() as well.
      */
+
     private final void realStartServiceLocked(ServiceRecord r,
             ProcessRecord app, boolean execInFg) throws RemoteException {
         if (app.thread == null) {
@@ -3696,6 +3697,7 @@ public final class ActiveServices {
                     i--;
                     proc.addPackage(sr.appInfo.packageName, sr.appInfo.longVersionCode,
                             mAm.mProcessStats);
+// todo: 桌面startActivity流程
                     realStartServiceLocked(sr, proc, sr.createdFromFg);
                     didSomething = true;
                     if (!isServiceNeededLocked(sr, false, false)) {

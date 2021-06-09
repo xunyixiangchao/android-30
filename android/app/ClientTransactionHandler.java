@@ -43,8 +43,10 @@ public abstract class ClientTransactionHandler {
     // Schedule phase related logic and handlers.
 
     /** Prepare and schedule transaction for execution. */
+    // todo: 桌面startActivity流程
     void scheduleTransaction(ClientTransaction transaction) {
         transaction.preExecute(this);
+        // todo: 桌面startActivity流程
         sendMessage(ActivityThread.H.EXECUTE_TRANSACTION, transaction);
     }
 

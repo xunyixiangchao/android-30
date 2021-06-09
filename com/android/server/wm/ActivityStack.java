@@ -1497,6 +1497,7 @@ class ActivityStack extends Task {
      *       Use {@link RootWindowContainer#resumeFocusedStacksTopActivities} to resume the
      *       right activity for the current system state.
      */
+// todo: 桌面startActivity流程
     @GuardedBy("mService")
     boolean resumeTopActivityUncheckedLocked(ActivityRecord prev, ActivityOptions options) {
         if (mInResumeTopActivity) {
@@ -1508,6 +1509,7 @@ class ActivityStack extends Task {
         try {
             // Protect against recursion.
             mInResumeTopActivity = true;
+            // todo: 桌面startActivity流程
             result = resumeTopActivityInnerLocked(prev, options);
 
             // When resuming the top activity, it may be necessary to pause the top activity (for
@@ -1527,7 +1529,7 @@ class ActivityStack extends Task {
 
         return result;
     }
-
+    // todo: 桌面startActivity流程
     @GuardedBy("mService")
     private boolean resumeTopActivityInnerLocked(ActivityRecord prev, ActivityOptions options) {
         if (!mAtmService.isBooting() && !mAtmService.isBooted()) {
@@ -1958,6 +1960,7 @@ class ActivityStack extends Task {
                 if (DEBUG_SWITCH) Slog.v(TAG_SWITCH, "Restarting: " + next);
             }
             if (DEBUG_STATES) Slog.d(TAG_STATES, "resumeTopActivityLocked: Restarting " + next);
+// todo: 桌面startActivity流程
             mStackSupervisor.startSpecificActivity(next, true, true);
         }
 
@@ -1993,7 +1996,7 @@ class ActivityStack extends Task {
                 "resumeNextFocusableActivityWhenStackIsEmpty: " + reason + ", go home");
         return mRootWindowContainer.resumeHomeActivity(prev, reason, getDisplayArea());
     }
-
+// todo: 桌面startActivity流程
     void startActivityLocked(ActivityRecord r, ActivityRecord focusedTopActivity,
             boolean newTask, boolean keepCurTransition, ActivityOptions options) {
         Task rTask = r.getTask();

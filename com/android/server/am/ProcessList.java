@@ -1939,7 +1939,7 @@ public final class ProcessList {
             // Start the process.  It will either succeed and return a result containing
             // the PID of the new process, or else throw a RuntimeException.
             final String entryPoint = "android.app.ActivityThread";
-
+// todo: 桌面startActivity流程
             return startProcessLocked(hostingRecord, entryPoint, app, uid, gids,
                     runtimeFlags, zygotePolicyFlags, mountExternal, seInfo, requiredAbi,
                     instructionSet, invokeWith, startTime);
@@ -1957,7 +1957,7 @@ public final class ProcessList {
             return false;
         }
     }
-
+    // todo: 桌面startActivity流程
     @GuardedBy("mService")
     boolean startProcessLocked(HostingRecord hostingRecord, String entryPoint, ProcessRecord app,
             int uid, int[] gids, int runtimeFlags, int zygotePolicyFlags, int mountExternal,
@@ -1994,6 +1994,7 @@ public final class ProcessList {
             return true;
         } else {
             try {
+                // todo: 桌面startActivity流程
                 final Process.ProcessStartResult startResult = startProcess(hostingRecord,
                         entryPoint, app,
                         uid, gids, runtimeFlags, zygotePolicyFlags, mountExternal, seInfo,
@@ -2197,7 +2198,7 @@ public final class ProcessList {
                 && app.mountMode != Zygote.MOUNT_EXTERNAL_PASS_THROUGH
                 && app.mountMode != Zygote.MOUNT_EXTERNAL_INSTALLER;
     }
-
+    // todo: 桌面startActivity流程
     private Process.ProcessStartResult startProcess(HostingRecord hostingRecord, String entryPoint,
             ProcessRecord app, int uid, int[] gids, int runtimeFlags, int zygotePolicyFlags,
             int mountExternal, String seInfo, String requiredAbi, String instructionSet,
@@ -2293,6 +2294,7 @@ public final class ProcessList {
                         false, false,
                         new String[]{PROC_START_SEQ_IDENT + app.startSeq});
             } else {
+// todo: 桌面startActivity流程
                 startResult = Process.start(entryPoint,
                         app.processName, uid, uid, gids, runtimeFlags, mountExternal,
                         app.info.targetSdkVersion, seInfo, requiredAbi, instructionSet,
@@ -2316,11 +2318,12 @@ public final class ProcessList {
     @GuardedBy("mService")
     final boolean startProcessLocked(ProcessRecord app, HostingRecord hostingRecord,
             int zygotePolicyFlags, String abiOverride) {
+        // todo: 桌面startActivity流程
         return startProcessLocked(app, hostingRecord, zygotePolicyFlags,
                 false /* disableHiddenApiChecks */, false /* disableTestApiChecks */,
                 false /* mountExtStorageFull */, abiOverride);
     }
-
+    // todo: 桌面startActivity流程
     @GuardedBy("mService")
     final ProcessRecord startProcessLocked(String processName, ApplicationInfo info,
             boolean knownToBeDead, int intentFlags, HostingRecord hostingRecord,
@@ -2437,6 +2440,7 @@ public final class ProcessList {
         }
 
         checkSlow(startTime, "startProcess: stepping in to startProcess");
+        // todo: 桌面startActivity流程
         final boolean success =
                 startProcessLocked(app, hostingRecord, zygotePolicyFlags, abiOverride);
         checkSlow(startTime, "startProcess: done starting proc!");

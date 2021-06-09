@@ -1233,6 +1233,7 @@ public final class LoadedApk {
             // The network security config needs to be aware of multiple
             // applications in the same process to handle discrepancies
             NetworkSecurityConfigProvider.handleNewApplication(appContext);
+            // todo: 桌面startActivity流程
             app = mActivityThread.mInstrumentation.newApplication(
                     cl, appClass, appContext);
             appContext.setOuterContext(app);

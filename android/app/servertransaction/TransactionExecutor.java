@@ -66,6 +66,7 @@ public class TransactionExecutor {
      * Then the client will cycle to the final lifecycle state if provided. Otherwise, it will
      * either remain in the initial state, or last state needed by a callback.
      */
+    // todo: 桌面startActivity流程
     public void execute(ClientTransaction transaction) {
         if (DEBUG_RESOLVER) Slog.d(TAG, tId(transaction) + "Start resolving transaction");
 
@@ -91,7 +92,7 @@ public class TransactionExecutor {
         }
 
         if (DEBUG_RESOLVER) Slog.d(TAG, transactionToString(transaction, mTransactionHandler));
-
+// todo: 桌面startActivity流程
         executeCallbacks(transaction);
 
         executeLifecycleState(transaction);
@@ -100,6 +101,7 @@ public class TransactionExecutor {
     }
 
     /** Cycle through all states requested by callbacks and execute them at proper times. */
+    // todo: 桌面startActivity流程
     @VisibleForTesting
     public void executeCallbacks(ClientTransaction transaction) {
         final List<ClientTransactionItem> callbacks = transaction.getCallbacks();
@@ -131,7 +133,7 @@ public class TransactionExecutor {
             if (closestPreExecutionState != UNDEFINED) {
                 cycleToPath(r, closestPreExecutionState, transaction);
             }
-
+// todo: 桌面startActivity流程
             item.execute(mTransactionHandler, token, mPendingActions);
             item.postExecute(mTransactionHandler, token, mPendingActions);
             if (r == null) {

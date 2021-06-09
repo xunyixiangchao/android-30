@@ -73,7 +73,7 @@ public class LaunchActivityItem extends ClientTransactionItem {
         client.updateProcessState(mProcState, false);
         client.updatePendingConfiguration(mCurConfig);
     }
-
+    // todo: 桌面startActivity流程
     @Override
     public void execute(ClientTransactionHandler client, IBinder token,
             PendingTransactionActions pendingActions) {
@@ -82,6 +82,7 @@ public class LaunchActivityItem extends ClientTransactionItem {
                 mOverrideConfig, mCompatInfo, mReferrer, mVoiceInteractor, mState, mPersistentState,
                 mPendingResults, mPendingNewIntents, mIsForward,
                 mProfilerInfo, client, mAssistToken, mFixedRotationAdjustments);
+        // todo: 桌面startActivity流程
         client.handleLaunchActivity(r, pendingActions, null /* customIntent */);
         Trace.traceEnd(TRACE_TAG_ACTIVITY_MANAGER);
     }

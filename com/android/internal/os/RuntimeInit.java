@@ -342,6 +342,7 @@ public class RuntimeInit {
      * @param argv Argument vector for main()
      * @param classLoader the classLoader to load {@className} with
      */
+    // todo: 桌面startActivity流程
     protected static Runnable findStaticMain(String className, String[] argv,
             ClassLoader classLoader) {
         Class<?> cl;
@@ -356,6 +357,7 @@ public class RuntimeInit {
 
         Method m;
         try {
+            // todo: 桌面startActivity流程--》ActivtyThread.main()
             m = cl.getMethod("main", new Class[] { String[].class });
         } catch (NoSuchMethodException ex) {
             throw new RuntimeException(
@@ -400,7 +402,7 @@ public class RuntimeInit {
 
         if (DEBUG) Slog.d(TAG, "Leaving RuntimeInit!");
     }
-
+    // todo: 桌面startActivity流程
     protected static Runnable applicationInit(int targetSdkVersion, long[] disabledCompatChanges,
             String[] argv, ClassLoader classLoader) {
         // If the application calls System.exit(), terminate the process
@@ -419,6 +421,7 @@ public class RuntimeInit {
         Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
 
         // Remaining arguments are passed to the start class's static main
+        // todo: 桌面startActivity流程
         return findStaticMain(args.startClass, args.startArgs, classLoader);
     }
 

@@ -61,6 +61,7 @@ public class WrapperInit {
      *
      * @param args The command-line arguments.
      */
+    // todo: 桌面startActivity流程
     public static void main(String[] args) {
         // Parse our mandatory arguments.
         int fdNum = Integer.parseInt(args[0], 10);
@@ -88,6 +89,7 @@ public class WrapperInit {
         // Launch the application.
         String[] runtimeArgs = new String[args.length - 2];
         System.arraycopy(args, 2, runtimeArgs, 0, runtimeArgs.length);
+        // todo: 桌面startActivity流程
         Runnable r = wrapperInit(targetSdkVersion, runtimeArgs);
 
         r.run();
@@ -149,6 +151,7 @@ public class WrapperInit {
      * @param targetSdkVersion target SDK version
      * @param argv arg strings
      */
+    // todo: 桌面startActivity流程
     private static Runnable wrapperInit(int targetSdkVersion, String[] argv) {
         if (RuntimeInit.DEBUG) {
             Slog.d(RuntimeInit.TAG, "RuntimeInit: Starting application from wrapper");
@@ -170,6 +173,7 @@ public class WrapperInit {
         }
         // Perform the same initialization that would happen after the Zygote forks.
         Zygote.nativePreApplicationInit();
+        // todo: 桌面startActivity流程
         return RuntimeInit.applicationInit(targetSdkVersion, /*disabledCompatChanges*/ null,
                 argv, classLoader);
     }
