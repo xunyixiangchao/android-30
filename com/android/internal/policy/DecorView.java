@@ -438,10 +438,12 @@ public class DecorView extends FrameLayout implements RootViewSurfaceTaker, Wind
         }
         return false;
     }
-
+    // TODO: 获取事件
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         final Window.Callback cb = mWindow.getCallback();
+        // TODO: 获取事件--此处的Window.Callback是在Activity.attach()中进行赋值
+        //因此回调的是Activity#dispatchTouchEvent，至此事件获取流程结束到了Activity的分发过程
         return cb != null && !mWindow.isDestroyed() && mFeatureId < 0
                 ? cb.dispatchTouchEvent(ev) : super.dispatchTouchEvent(ev);
     }

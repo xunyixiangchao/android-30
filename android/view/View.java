@@ -14601,9 +14601,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @return True if the event was handled by the view, false otherwise.
      * @hide
      */
+    // TODO: 获取事件
     @UnsupportedAppUsage
     public final boolean dispatchPointerEvent(MotionEvent event) {
         if (event.isTouchEvent()) {
+            // TODO: 获取事件--DecorView#dispatchTouchEvent
             return dispatchTouchEvent(event);
         } else {
             return dispatchGenericMotionEvent(event);

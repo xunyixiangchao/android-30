@@ -5298,6 +5298,7 @@ public final class ViewRootImpl implements ViewParent,
         /**
          * Delivers an event to be processed.
          */
+        // TODO: 获取事件
         public final void deliver(QueuedInputEvent q) {
             if ((q.mFlags & QueuedInputEvent.FLAG_FINISHED) != 0) {
                 forward(q);
@@ -5307,6 +5308,7 @@ public final class ViewRootImpl implements ViewParent,
                 traceEvent(q, Trace.TRACE_TAG_VIEW);
                 final int result;
                 try {
+                    // TODO: 获取事件-->ViewRootImp$ViewPostImeInputStage#onProcess()
                     result = onProcess(q);
                 } finally {
                     Trace.traceEnd(Trace.TRACE_TAG_VIEW);
@@ -5816,6 +5818,7 @@ public final class ViewRootImpl implements ViewParent,
             } else {
                 final int source = q.mEvent.getSource();
                 if ((source & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+                    // TODO: 获取事件
                     return processPointerEvent(q);
                 } else if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
                     return processTrackballEvent(q);
@@ -6007,12 +6010,13 @@ public final class ViewRootImpl implements ViewParent,
             }
             return FORWARD;
         }
-
+        // TODO: 获取事件
         private int processPointerEvent(QueuedInputEvent q) {
             final MotionEvent event = (MotionEvent)q.mEvent;
 
             mAttachInfo.mUnbufferedDispatchRequested = false;
             mAttachInfo.mHandlingPointerEvent = true;
+            // TODO: 获取事件-->（DecorView）View#dispatchPointerEvent()
             boolean handled = mView.dispatchPointerEvent(event);
             maybeUpdatePointerIcon(event);
             maybeUpdateTooltip(event);
@@ -7989,6 +7993,7 @@ public final class ViewRootImpl implements ViewParent,
                 mPendingInputEventCount);
 
         if (processImmediately) {
+            // TODO: 获取事件
             doProcessInputEvents();
         } else {
             scheduleProcessInputEvents();
@@ -8027,7 +8032,7 @@ public final class ViewRootImpl implements ViewParent,
                 }
             }
             mChoreographer.mFrameInfo.updateInputEventTime(eventTime, oldestEventTime);
-
+// TODO: 获取事件
             deliverInputEvent(q);
         }
 
@@ -8077,6 +8082,7 @@ public final class ViewRootImpl implements ViewParent,
 
             if (stage != null) {
                 handleWindowFocusChanged();
+                // TODO: 获取事件
                 stage.deliver(q);
             } else {
                 finishInputEvent(q);
@@ -8177,12 +8183,13 @@ public final class ViewRootImpl implements ViewParent,
         public WindowInputEventReceiver(InputChannel inputChannel, Looper looper) {
             super(inputChannel, looper);
         }
-
+        // TODO: 获取事件
         @Override
         public void onInputEvent(InputEvent event) {
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, "processInputEventForCompatibility");
             List<InputEvent> processedEvents;
             try {
+
                 processedEvents =
                     mInputCompatProcessor.processInputEventForCompatibility(event);
             } finally {
@@ -8200,6 +8207,7 @@ public final class ViewRootImpl implements ViewParent,
                     }
                 }
             } else {
+                // TODO: 获取事件
                 enqueueInputEvent(event, this, 0, true);
             }
         }

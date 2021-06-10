@@ -7909,6 +7909,7 @@ public class Activity extends ContextThemeWrapper
 // todo: 桌面startActivity流程
         mWindow = new PhoneWindow(this, window, activityConfigCallback);
         mWindow.setWindowControllerCallback(mWindowControllerCallback);
+        //传入Window.Callback这里是Activity
         mWindow.setCallback(this);
         mWindow.setOnWindowDismissedCallback(this);
         mWindow.getLayoutInflater().setPrivateFactory(this);

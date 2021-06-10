@@ -213,10 +213,15 @@ public abstract class InputEventReceiver {
     }
 
     // Called from native code.
+    //捕获并保存到dev/input节点下
+    //组装成KeyEvent/MotionEvent对象
+    //经过Native进入Java的InputEventReceiver
+    // TODO: 从native获取事件
     @SuppressWarnings("unused")
     @UnsupportedAppUsage
     private void dispatchInputEvent(int seq, InputEvent event) {
         mSeqMap.put(event.getSequenceNumber(), seq);
+        // TODO: 获取事件-->VewRootImp$WindowInputEventReceiver#onInputEvent()
         onInputEvent(event);
     }
 
