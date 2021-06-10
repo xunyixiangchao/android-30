@@ -1151,11 +1151,14 @@ public class Instrumentation {
      *
      * @return The newly instantiated Application object.
      */
+    // todo: 桌面startActivity流程
     public Application newApplication(ClassLoader cl, String className, Context context)
             throws InstantiationException, IllegalAccessException,
             ClassNotFoundException {
+        // todo: 桌面startActivity流程
         Application app = getFactory(context.getPackageName())
                 .instantiateApplication(cl, className);
+        //调用attach方法
         app.attach(context);
         return app;
     }

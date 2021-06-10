@@ -1233,7 +1233,7 @@ public final class LoadedApk {
             // The network security config needs to be aware of multiple
             // applications in the same process to handle discrepancies
             NetworkSecurityConfigProvider.handleNewApplication(appContext);
-            // todo: 桌面startActivity流程
+// todo: 桌面startActivity流程--》//创建Application
             app = mActivityThread.mInstrumentation.newApplication(
                     cl, appClass, appContext);
             appContext.setOuterContext(app);
@@ -1247,7 +1247,7 @@ public final class LoadedApk {
         }
         mActivityThread.mAllApplications.add(app);
         mApplication = app;
-
+        //这里mInstrumentation传的是null，所以下面这个不走
         if (instrumentation != null) {
             try {
                 instrumentation.callApplicationOnCreate(app);

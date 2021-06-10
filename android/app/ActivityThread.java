@@ -6573,6 +6573,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         final InstrumentationInfo ii;
         if (data.instrumentationName != null) {
             try {
+                //创建mInstrumentation 实例
                 ii = new ApplicationPackageManager(
                         null, getPackageManager(), getPermissionManager())
                         .getInstrumentationInfo(data.instrumentationName, 0);
@@ -6626,6 +6627,7 @@ public final class ActivityThread extends ClientTransactionHandler {
 
         // Continue loading instrumentation.
         if (ii != null) {
+            //创建ApplicationInfo
             ApplicationInfo instrApp;
             try {
                 instrApp = getPackageManager().getApplicationInfo(ii.packageName, 0,
@@ -6638,6 +6640,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             }
             ii.copyTo(instrApp);
             instrApp.initForUser(UserHandle.myUserId());
+            //创建LoadedApk
             final LoadedApk pi = getPackageInfo(instrApp, data.compatInfo,
                     appContext.getClassLoader(), false, true, false);
 
@@ -6690,6 +6693,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         try {
             // If the app is being launched for full backup or restore, bring it up in
             // a restricted environment with the base application class.
+//创建Application
             app = data.info.makeApplication(data.restrictedBackupMode, null);
 
             // Propagate autofill compat state
@@ -6719,6 +6723,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                     + data.instrumentationName + ": " + e.toString(), e);
             }
             try {
+//调用Application的onCreate
                 mInstrumentation.callApplicationOnCreate(app);
             } catch (Exception e) {
                 if (!mInstrumentation.onException(app, e)) {

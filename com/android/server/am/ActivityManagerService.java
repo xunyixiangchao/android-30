@@ -3643,6 +3643,7 @@ public class ActivityManagerService extends IActivityManager.Stub
     public int startActivity(IApplicationThread caller, String callingPackage,
             Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,
             int startFlags, ProfilerInfo profilerInfo, Bundle bOptions) {
+        // todo: 桌面startActivity流程
         return mActivityTaskManager.startActivity(caller, callingPackage, null, intent,
                 resolvedType, resultTo, resultWho, requestCode, startFlags, profilerInfo, bOptions);
     }
@@ -5329,7 +5330,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                         buildSerial, autofillOptions, contentCaptureOptions,
                         app.mDisabledCompatChanges);
             } else {
-                // todo: 桌面startActivity流程,进入是创建Application
+// todo: 桌面startActivity流程,进入是创建Application----->下面有创建Activity的过程
                 thread.bindApplication(processName, appInfo, providerList, null, profilerInfo,
                         null, null, null, testMode,
                         mBinderTransactionTrackingEnabled, enableTrackAllocation,

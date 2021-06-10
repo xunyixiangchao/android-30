@@ -420,6 +420,7 @@ public class ZygoteProcess {
      *
      * @throws ZygoteStartFailedEx if process start failed for any reason
      */
+    // todo: 桌面startActivity流程
     @GuardedBy("mLock")
     private Process.ProcessStartResult zygoteSendArgsAndGetResult(
             ZygoteState zygoteState, int zygotePolicyFlags, @NonNull ArrayList<String> args)
@@ -462,7 +463,7 @@ public class ZygoteProcess {
 // zygoteServer.runSelectLoop
         return attemptZygoteSendArgsAndGetResult(zygoteState, msgStr);
     }
-
+    //试图发送参数孵化进程并获得结果
     private Process.ProcessStartResult attemptZygoteSendArgsAndGetResult(
             ZygoteState zygoteState, String msgStr) throws ZygoteStartFailedEx {
         try {
@@ -796,7 +797,7 @@ public class ZygoteProcess {
             // The USAP pool can not be used if the application will not use the systems graphics
             // driver.  If that driver is requested use the Zygote application start path.
 
-            // todo: 桌面startActivity流程
+            // todo: 桌面startActivity流程-->openZygoteSocketIfNeeded打开zygote的Socket连接（主次）
             return zygoteSendArgsAndGetResult(openZygoteSocketIfNeeded(abi),
                                               zygotePolicyFlags,
                                               argsForZygote);

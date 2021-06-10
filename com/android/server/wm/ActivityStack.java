@@ -1509,7 +1509,7 @@ class ActivityStack extends Task {
         try {
             // Protect against recursion.
             mInResumeTopActivity = true;
-            // todo: 桌面startActivity流程
+// todo: 桌面startActivity流程
             result = resumeTopActivityInnerLocked(prev, options);
 
             // When resuming the top activity, it may be necessary to pause the top activity (for

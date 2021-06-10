@@ -1143,7 +1143,7 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
                 Binder.getCallingPid(), Binder.getCallingUid(), "startActivityAsUser");
 
         // TODO: Switch to user app stacks here.
-        // todo: 桌面startActivity流程
+        // todo: 桌面startActivity流程-->ActivityStarter.execute()
         return getActivityStartController().obtainStarter(intent, "startActivityAsUser")
                 .setCaller(caller)
                 .setCallingPackage(callingPackage)
@@ -5700,10 +5700,12 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
             }
             // Post message to start process to avoid possible deadlock of calling into AMS with the
             // ATMS lock held.
+
+            //todo: AMS$LocalService extends ActivityManagerInternal
             final Message m = PooledLambda.obtainMessage(ActivityManagerInternal::startProcess,
                     mAmInternal, activity.processName, activity.info.applicationInfo, knownToBeDead,
                     isTop, hostingType, activity.intent.getComponent());
-            // todo: 桌面startActivity流程-->AMS#startProcess()
+            // todo: 桌面startActivity流程-->AMS$LocalService#startProcess()
             mH.sendMessage(m);
         } finally {
             Trace.traceEnd(TRACE_TAG_WINDOW_MANAGER);
