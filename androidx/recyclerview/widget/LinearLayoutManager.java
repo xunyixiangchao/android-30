@@ -1119,12 +1119,14 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
     /**
      * {@inheritDoc}
      */
+    // TODO: RecyclerView复用 - 滑动过程
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler,
             RecyclerView.State state) {
         if (mOrientation == HORIZONTAL) {
             return 0;
         }
+        // TODO: RecyclerView复用 - 滑动过程
         return scrollBy(dy, recycler, state);
     }
 
@@ -1377,7 +1379,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         updateLayoutState(layoutDirection, absDelta, true, state);
         collectPrefetchPositionsForLayoutState(state, mLayoutState, layoutPrefetchRegistry);
     }
-
+    // TODO: RecyclerView复用 - 滑动过程
     int scrollBy(int delta, RecyclerView.Recycler recycler, RecyclerView.State state) {
         if (getChildCount() == 0 || delta == 0) {
             return 0;
@@ -1388,6 +1390,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         final int absDelta = Math.abs(delta);
         updateLayoutState(layoutDirection, absDelta, true, state);
         final int consumed = mLayoutState.mScrollingOffset
+         // TODO: RecyclerView复用 - 滑动过程
                 + fill(recycler, mLayoutState, state, false);
         if (consumed < 0) {
             if (DEBUG) {
@@ -1566,6 +1569,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
      * @param stopOnFocusable If true, filling stops in the first focusable new child
      * @return Number of pixels that it added. Useful for scroll functions.
      */
+    // TODO: RecyclerView复用 - 滑动过程
     int fill(RecyclerView.Recycler recycler, LayoutState layoutState,
             RecyclerView.State state, boolean stopOnFocusable) {
         // max offset we should set is mFastScroll + available
@@ -1584,6 +1588,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             if (RecyclerView.VERBOSE_TRACING) {
                 TraceCompat.beginSection("LLM LayoutChunk");
             }
+            // TODO: RecyclerView复用 - 滑动过程--》循环调用加载布局
             layoutChunk(recycler, state, layoutState, layoutChunkResult);
             if (RecyclerView.VERBOSE_TRACING) {
                 TraceCompat.endSection();
@@ -1621,9 +1626,10 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         }
         return start - layoutState.mAvailable;
     }
-
+    // TODO: RecyclerView复用 - 滑动过程
     void layoutChunk(RecyclerView.Recycler recycler, RecyclerView.State state,
             LayoutState layoutState, LayoutChunkResult result) {
+        // TODO: RecyclerView复用 - 滑动过程
         View view = layoutState.next(recycler);
         if (view == null) {
             if (DEBUG && layoutState.mScrapList == null) {
@@ -1638,6 +1644,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         if (layoutState.mScrapList == null) {
             if (mShouldReverseLayout == (layoutState.mLayoutDirection
                     == LayoutState.LAYOUT_START)) {
+                // TODO: RecyclerView复用 - 滑动过程--》添加View就结束了
                 addView(view);
             } else {
                 addView(view, 0);
@@ -2296,10 +2303,12 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
          *
          * @return The next element that we should layout.
          */
+        // TODO: RecyclerView复用 - 滑动过程
         View next(RecyclerView.Recycler recycler) {
             if (mScrapList != null) {
                 return nextViewFromScrapList();
             }
+            // TODO: RecyclerView复用 - 滑动过程
             final View view = recycler.getViewForPosition(mCurrentPosition);
             mCurrentPosition += mItemDirection;
             return view;
