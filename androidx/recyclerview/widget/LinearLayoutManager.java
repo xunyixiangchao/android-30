@@ -522,6 +522,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
     /**
      * {@inheritDoc}
      */
+    //todo: RecyclerView的复用-布局
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         // layout algorithm:
@@ -627,6 +628,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         }
 
         onAnchorReady(recycler, state, mAnchorInfo, firstLayoutDirection);
+        //todo: RecyclerView的回收
         detachAndScrapAttachedViews(recycler);
         mLayoutState.mInfinite = resolveIsInfinite();
         mLayoutState.mIsPreLayout = state.isPreLayout();
@@ -637,6 +639,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             // fill towards start
             updateLayoutStateToFillStart(mAnchorInfo);
             mLayoutState.mExtraFillSpace = extraForStart;
+            //todo: RecyclerView的复用
             fill(recycler, mLayoutState, state, false);
             startOffset = mLayoutState.mOffset;
             final int firstElement = mLayoutState.mCurrentPosition;
@@ -1579,6 +1582,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             if (layoutState.mAvailable < 0) {
                 layoutState.mScrollingOffset += layoutState.mAvailable;
             }
+            //回收
             recycleByLayoutState(recycler, layoutState);
         }
         int remainingSpace = layoutState.mAvailable + layoutState.mExtraFillSpace;
@@ -1689,6 +1693,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         }
         // We calculate everything with View's bounding box (which includes decor and margins)
         // To calculate correct layout position, we subtract margins.
+        //布局view，根据itemdecoration和margin
         layoutDecoratedWithMargins(view, left, top, right, bottom);
         if (DEBUG) {
             Log.d(TAG, "laid out child at position " + getPosition(view) + ", with l:"

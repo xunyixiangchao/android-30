@@ -3875,6 +3875,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
      * and changed views are animated via
      * {@link ItemAnimator#animateChange(ViewHolder, ViewHolder, ItemHolderInfo, ItemHolderInfo)}.
      */
+    //todo: RecyclerView的复用-布局
     void dispatchLayout() {
         if (mAdapter == null) {
             Log.e(TAG, "No adapter attached; skipping layout");
@@ -3896,6 +3897,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             // First 2 steps are done in onMeasure but looks like we have to run again due to
             // changed size.
             mLayout.setExactMeasureSpecsFrom(this);
+            //todo: RecyclerView的复用-布局
             dispatchLayoutStep2();
         } else {
             // always make sure we sync them (to ensure mode is exact)
@@ -4175,6 +4177,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
 
         // Step 2: Run layout
         mState.mInPreLayout = false;
+        //todo: RecyclerView的复用-布局->LinearLayoutManager#onLayoutChildren
         mLayout.onLayoutChildren(mRecycler, mState);
 
         mState.mStructureChanged = false;
@@ -4448,9 +4451,11 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         }
     }
 
+    //todo: RecyclerView的复用-布局
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         TraceCompat.beginSection(TRACE_ON_LAYOUT_TAG);
+        //todo: RecyclerView的复用-布局
         dispatchLayout();
         TraceCompat.endSection();
         mFirstLayoutComplete = true;
@@ -6557,6 +6562,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                                                    + holder + exceptionLabel());
             }
             if (forceRecycle || holder.isRecyclable()) {
+                //viewholder没有发生改变时走这个if
                 if (mViewCacheMax > 0
                     && !holder.hasAnyOfTheFlags(ViewHolder.FLAG_INVALID
                                                 | ViewHolder.FLAG_REMOVED
@@ -6564,6 +6570,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                                                 | ViewHolder.FLAG_ADAPTER_POSITION_UNKNOWN)) {
                     // Retire oldest cached view
                     int cachedViewSize = mCachedViews.size();
+                    //cacheview集合size>=mViewCacheMax时，将第0个的缓存放进RecyclerViewPool中，减小cacheview大小
                     if (cachedViewSize >= mViewCacheMax && cachedViewSize > 0) {
                         recycleCachedViewAt(0);
                         cachedViewSize--;
@@ -9282,10 +9289,12 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          *
          * @param recycler Recycler to scrap views into
          */
+        //todo: RecyclerView的回收
         public void detachAndScrapAttachedViews(@NonNull Recycler recycler) {
             final int childCount = getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
                 final View v = getChildAt(i);
+                //todo: RecyclerView的回收
                 scrapOrRecycleView(recycler, i, v);
             }
         }
