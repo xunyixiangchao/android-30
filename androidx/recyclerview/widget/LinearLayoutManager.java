@@ -522,7 +522,11 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
     /**
      * {@inheritDoc}
      */
+<<<<<<< HEAD
     //todo: RecyclerView的复用-布局
+=======
+    // TODO: RecyclerView回收复用 - onLayoutChildren
+>>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         // layout algorithm:
@@ -628,7 +632,11 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         }
 
         onAnchorReady(recycler, state, mAnchorInfo, firstLayoutDirection);
+<<<<<<< HEAD
         //todo: RecyclerView的回收
+=======
+        // TODO: RecyclerView回收
+>>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
         detachAndScrapAttachedViews(recycler);
         mLayoutState.mInfinite = resolveIsInfinite();
         mLayoutState.mIsPreLayout = state.isPreLayout();
@@ -639,7 +647,11 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             // fill towards start
             updateLayoutStateToFillStart(mAnchorInfo);
             mLayoutState.mExtraFillSpace = extraForStart;
+<<<<<<< HEAD
             //todo: RecyclerView的复用
+=======
+            // TODO: RecyclerView回收复用
+>>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
             fill(recycler, mLayoutState, state, false);
             startOffset = mLayoutState.mOffset;
             final int firstElement = mLayoutState.mCurrentPosition;
@@ -665,6 +677,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             // fill towards end
             updateLayoutStateToFillEnd(mAnchorInfo);
             mLayoutState.mExtraFillSpace = extraForEnd;
+            // TODO: RecyclerView回收复用
             fill(recycler, mLayoutState, state, false);
             endOffset = mLayoutState.mOffset;
             final int lastElement = mLayoutState.mCurrentPosition;
@@ -1423,6 +1436,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
      * @param startIndex inclusive
      * @param endIndex   exclusive
      */
+    // TODO: RecyclerView回收
     private void recycleChildren(RecyclerView.Recycler recycler, int startIndex, int endIndex) {
         if (startIndex == endIndex) {
             return;
@@ -1432,6 +1446,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         }
         if (endIndex > startIndex) {
             for (int i = endIndex - 1; i >= startIndex; i--) {
+                // TODO: RecyclerView回收--RecyclerView#removeAndRecycleViewAt
                 removeAndRecycleViewAt(i, recycler);
             }
         } else {
@@ -1472,6 +1487,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
                 if (mOrientationHelper.getDecoratedEnd(child) > limit
                         || mOrientationHelper.getTransformedEndWithDecoration(child) > limit) {
                     // stop here
+                    // TODO: RecyclerView回收
                     recycleChildren(recycler, childCount - 1, i);
                     return;
                 }
@@ -1555,8 +1571,10 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         int scrollingOffset = layoutState.mScrollingOffset;
         int noRecycleSpace = layoutState.mNoRecycleSpace;
         if (layoutState.mLayoutDirection == LayoutState.LAYOUT_START) {
+            // TODO: RecyclerView回收-下滑，缓存底部处的布局
             recycleViewsFromEnd(recycler, scrollingOffset, noRecycleSpace);
         } else {
+            // TODO: RecyclerView回收-上滑，缓存头部处的布局
             recycleViewsFromStart(recycler, scrollingOffset, noRecycleSpace);
         }
     }
@@ -1582,7 +1600,11 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
             if (layoutState.mAvailable < 0) {
                 layoutState.mScrollingOffset += layoutState.mAvailable;
             }
+<<<<<<< HEAD
             //回收
+=======
+            // TODO: RecyclerView回收
+>>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
             recycleByLayoutState(recycler, layoutState);
         }
         int remainingSpace = layoutState.mAvailable + layoutState.mExtraFillSpace;
