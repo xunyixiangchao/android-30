@@ -5786,16 +5786,22 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          *
          * @param scrap ViewHolder to be added to the pool.
          */
+        // TODO: RecyclerView回收-添加到RecyclerViewPool中
         public void putRecycledView(ViewHolder scrap) {
+            //获取ViewHolder的viewType
             final int viewType = scrap.getItemViewType();
+            //根据viewType获取到对应的ViewHolder集合
             final ArrayList<ViewHolder> scrapHeap = getScrapDataForType(viewType).mScrapHeap;
+            //如果ViewHolder集合大小>=最大值，默认5，就跳过（抛弃）
             if (mScrap.get(viewType).mMaxScrap <= scrapHeap.size()) {
                 return;
             }
             if (DEBUG && scrapHeap.contains(scrap)) {
                 throw new IllegalArgumentException("this scrap item already exists");
             }
+            //viewHolder重置
             scrap.resetInternal();
+            //添加到ViewHolder集合
             scrapHeap.add(scrap);
         }
 
@@ -6236,6 +6242,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             }
             // 1) Find by position from scrap/hidden list/cache
             if (holder == null) {
+
                 // TODO: RecyclerView复用 - 滑动过程--》从mAttachedScrap,mHiddenViews,mCachedViews获取holder
                 holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
                 if (holder != null) {
@@ -6284,6 +6291,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                 if (holder == null && mViewCacheExtension != null) {
                     // We are NOT sending the offsetPosition because LayoutManager does not
                     // know it.
+
                     // TODO: RecyclerView复用 - 滑动过程--》从用户自定义缓存中取holder
                     final View view = mViewCacheExtension
                                               .getViewForPositionAndType(this, position, type);
@@ -6450,6 +6458,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          * @param view Removed view for recycling
          * @see LayoutManager#removeAndRecycleView(View, Recycler)
          */
+        // TODO: RecyclerView回收
         public void recycleView(@NonNull View view) {
             // This public recycle method tries to make view recycle-able since layout manager
             // intended to recycle this view (e.g. even if it is in scrap or change cache)
@@ -6462,6 +6471,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             } else if (holder.wasReturnedFromScrap()) {
                 holder.clearReturnedFromScrapFlag();
             }
+            // TODO: RecyclerView回收
             recycleViewHolderInternal(holder);
             // In most cases we dont need call endAnimation() because when view is detached,
             // ViewPropertyAnimation will end. But if the animation is based on ObjectAnimator or
@@ -6504,6 +6514,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          *
          * @param cachedViewIndex The index of the view in cached views list
          */
+        // TODO: RecyclerView回收
         void recycleCachedViewAt(int cachedViewIndex) {
             if (DEBUG) {
                 Log.d(TAG, "Recycling cached view at index " + cachedViewIndex);
@@ -6512,7 +6523,9 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             if (DEBUG) {
                 Log.d(TAG, "CachedViewHolder to be recycled: " + viewHolder);
             }
+            // TODO: RecyclerView回收-添加到RecyclerViewPool中
             addViewHolderToRecycledViewPool(viewHolder, true);
+            // TODO: RecyclerView回收-从mCacheViews中移除
             mCachedViews.remove(cachedViewIndex);
         }
 
@@ -6521,6 +6534,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          * if so.
          * Public version un-scraps before calling recycle.
          */
+        // TODO: RecyclerView回收
         void recycleViewHolderInternal(ViewHolder holder) {
             if (holder.isScrap() || holder.itemView.getParent() != null) {
                 throw new IllegalArgumentException(
@@ -6564,6 +6578,10 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                                                 | ViewHolder.FLAG_ADAPTER_POSITION_UNKNOWN)) {
                     // Retire oldest cached view
                     int cachedViewSize = mCachedViews.size();
+                    // TODO: RecyclerView回收-如果mCachedViews的大小大于默认值2时
+                    //将mCachedViews第0个添加到RecyclerViewPool中，并从mCachedViews中移除
+                    //mCachedViews大小减1
+                    //todo:这里保存的ViewHolder是binder后的ViewHolder,有数据
                     if (cachedViewSize >= mViewCacheMax && cachedViewSize > 0) {
                         recycleCachedViewAt(0);
                         cachedViewSize--;
@@ -6584,6 +6602,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                         }
                         targetCacheIndex = cacheIndex + 1;
                     }
+                    //mCachedViews大小<2，将Viewholder添加到mCachedViews中
                     mCachedViews.add(targetCacheIndex, holder);
                     cached = true;
                 }
@@ -6620,6 +6639,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          * @param holder           Holder to be added to the pool.
          * @param dispatchRecycled True to dispatch View recycled callbacks.
          */
+        // TODO: RecyclerView回收-添加到RecyclerViewPool中
         void addViewHolderToRecycledViewPool(@NonNull ViewHolder holder, boolean dispatchRecycled) {
             clearNestedRecyclerViewIfNotNested(holder);
             View itemView = holder.itemView;
@@ -6638,6 +6658,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                 dispatchViewRecycled(holder);
             }
             holder.mOwnerRecyclerView = null;
+            // TODO: RecyclerView回收-添加到RecyclerViewPool中
             getRecycledViewPool().putRecycledView(holder);
         }
 
@@ -9002,9 +9023,11 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          * @param index    Index of child to remove and recycle
          * @param recycler Recycler to use to recycle child
          */
+        // TODO: RecyclerView回收
         public void removeAndRecycleViewAt(int index, @NonNull Recycler recycler) {
             final View view = getChildAt(index);
             removeViewAt(index);
+            // TODO: RecyclerView回收
             recycler.recycleView(view);
         }
 
@@ -9282,10 +9305,12 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          *
          * @param recycler Recycler to scrap views into
          */
+        // TODO: RecyclerView回收
         public void detachAndScrapAttachedViews(@NonNull Recycler recycler) {
             final int childCount = getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
                 final View v = getChildAt(i);
+                // TODO: RecyclerView回收
                 scrapOrRecycleView(recycler, i, v);
             }
         }
@@ -9301,9 +9326,11 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             if (viewHolder.isInvalid() && !viewHolder.isRemoved()
                 && !mRecyclerView.mAdapter.hasStableIds()) {
                 removeViewAt(index);
+                // TODO: RecyclerView回收
                 recycler.recycleViewHolderInternal(viewHolder);
             } else {
                 detachViewAt(index);
+                // TODO: RecyclerView回收-mAttachedScrap,mChangedScrap
                 recycler.scrapView(view);
                 mRecyclerView.mViewInfoStore.onViewDetached(viewHolder);
             }
