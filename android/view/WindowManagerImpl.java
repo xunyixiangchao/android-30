@@ -103,9 +103,11 @@ public final class WindowManagerImpl implements WindowManager {
         mDefaultToken = token;
     }
 
+    // TODO: View绘制流程-》ActivityThread#handleResumeActivity方法中调用
     @Override
     public void addView(@NonNull View view, @NonNull ViewGroup.LayoutParams params) {
         applyDefaultToken(params);
+        // TODO: View绘制流程
         mGlobal.addView(view, params, mContext.getDisplayNoVerify(), mParentWindow,
                 mContext.getUserId());
     }

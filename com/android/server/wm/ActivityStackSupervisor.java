@@ -839,6 +839,8 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                         proc.getThread(), r.appToken);
 
                 final DisplayContent dc = r.getDisplay().mDisplayContent;
+
+                // todo: 桌面startActivity流程-添加LaunchActivityItem
                 clientTransaction.addCallback(LaunchActivityItem.obtain(new Intent(r.intent),
                         System.identityHashCode(r), r.info,
                         // TODO: Have this take the merged configuration instead of separate global
@@ -851,6 +853,9 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                         r.assistToken, r.createFixedRotationAdjustmentsIfNeeded()));
 
                 // Set desired final state.
+
+                // todo: 桌面startActivity流程-添加生命周期的ActivityLifecycleItem，
+                //这里是添加了ResumeActivityItem
                 final ActivityLifecycleItem lifecycleItem;
                 if (andResume) {
                     lifecycleItem = ResumeActivityItem.obtain(dc.isNextTransitionForward());
@@ -860,6 +865,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
                 clientTransaction.setLifecycleStateRequest(lifecycleItem);
 
                 // Schedule transaction.
+
                 // todo: 桌面startActivity流程
                 //mService.getLifecycleManager().scheduleTransaction-->
                 // ActivityThread父类ClientTransactionHandler#scheduleTransaction-->

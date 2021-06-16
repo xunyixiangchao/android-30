@@ -3329,6 +3329,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         mInitialApplication.getResources().overrideDisplayAdjustments(appOverride);
     }
 
+    // todo: 桌面startActivity流程
     /**  Core implementation of activity launch. */
     private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent) {
         ActivityInfo aInfo = r.activityInfo;
@@ -4542,6 +4543,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             if (a.mVisibleFromClient) {
                 if (!a.mWindowAdded) {
                     a.mWindowAdded = true;
+// TODO: View绘制流程 这里？还是下面
                     wm.addView(decor, l);
                 } else {
                     // The activity will get a callback for this {@link LayoutParams} change
@@ -4594,6 +4596,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             r.activity.mVisibleFromServer = true;
             mNumVisibleActivities++;
             if (r.activity.mVisibleFromClient) {
+// TODO: View绘制流程 这里？
                 r.activity.makeVisible();
             }
         }

@@ -45,6 +45,7 @@ public class ResumeActivityItem extends ActivityLifecycleItem {
         }
     }
 
+    // todo: 桌面startActivity流程
     @Override
     public void execute(ClientTransactionHandler client, IBinder token,
             PendingTransactionActions pendingActions) {

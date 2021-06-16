@@ -94,7 +94,7 @@ public class TransactionExecutor {
         if (DEBUG_RESOLVER) Slog.d(TAG, transactionToString(transaction, mTransactionHandler));
 // todo: 桌面startActivity流程
         executeCallbacks(transaction);
-
+    // todo: Activity生命周期流程
         executeLifecycleState(transaction);
         mPendingActions.clear();
         if (DEBUG_RESOLVER) Slog.d(TAG, tId(transaction) + "End resolving transaction");
@@ -133,7 +133,7 @@ public class TransactionExecutor {
             if (closestPreExecutionState != UNDEFINED) {
                 cycleToPath(r, closestPreExecutionState, transaction);
             }
-// todo: 桌面startActivity流程
+// todo: 桌面startActivity流程-》LaunchActivityItem.execute
             item.execute(mTransactionHandler, token, mPendingActions);
             item.postExecute(mTransactionHandler, token, mPendingActions);
             if (r == null) {
@@ -172,9 +172,11 @@ public class TransactionExecutor {
         }
 
         // Cycle to the state right before the final requested state.
+        // 很重要的一个方法，生命周期切换
         cycleToPath(r, lifecycleItem.getTargetState(), true /* excludeLastState */, transaction);
 
         // Execute the final transition with proper parameters.
+        // todo: Activity生命周期流程-》ResumeActivityItem.execute
         lifecycleItem.execute(mTransactionHandler, token, mPendingActions);
         lifecycleItem.postExecute(mTransactionHandler, token, mPendingActions);
     }
