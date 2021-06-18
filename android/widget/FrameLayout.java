@@ -174,7 +174,7 @@ public class FrameLayout extends ViewGroup {
         return isForegroundInsidePadding() ? Math.max(mPaddingBottom, mForegroundPaddingBottom) :
             mPaddingBottom + mForegroundPaddingBottom;
     }
-
+// TODO: View绘制流程-onMeasure
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int count = getChildCount();
@@ -191,6 +191,7 @@ public class FrameLayout extends ViewGroup {
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (mMeasureAllChildren || child.getVisibility() != GONE) {
+// TODO: View绘制流程-ViewGroup
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 maxWidth = Math.max(maxWidth,
@@ -264,12 +265,12 @@ public class FrameLayout extends ViewGroup {
             }
         }
     }
-
+    // TODO: View绘制流程-onLayout
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         layoutChildren(left, top, right, bottom, false /* no force left gravity */);
     }
-
+    // TODO: View绘制流程-onLayout
     void layoutChildren(int left, int top, int right, int bottom, boolean forceLeftGravity) {
         final int count = getChildCount();
 
@@ -328,7 +329,7 @@ public class FrameLayout extends ViewGroup {
                     default:
                         childTop = parentTop + lp.topMargin;
                 }
-
+// TODO: View绘制流程-LinearLayout-因为系统默认布局父布局为LinearLayout
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
         }

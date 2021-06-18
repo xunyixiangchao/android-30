@@ -395,7 +395,8 @@ public final class WindowManagerGlobal {
                     }
                 }
             }
-
+            //创建ViewRootImpl实例,
+            // viewrootImpl中创建了mAttachInfo实例
             root = new ViewRootImpl(view.getContext(), display);
 
             view.setLayoutParams(wparams);

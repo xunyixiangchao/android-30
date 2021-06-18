@@ -475,7 +475,9 @@ public abstract class LayoutInflater {
      *         this is the root View; otherwise it is the root of the inflated
      *         XML file.
      */
+    //todo 加载布局layout
     public View inflate(@LayoutRes int resource, @Nullable ViewGroup root) {
+        //todo 加载布局layout
         return inflate(resource, root, root != null);
     }
 
@@ -516,6 +518,7 @@ public abstract class LayoutInflater {
      *         attachToRoot is true, this is root; otherwise it is the root of
      *         the inflated XML file.
      */
+    //todo 加载布局layout
     public View inflate(@LayoutRes int resource, @Nullable ViewGroup root, boolean attachToRoot) {
         final Resources res = getContext().getResources();
         if (DEBUG) {
@@ -529,6 +532,7 @@ public abstract class LayoutInflater {
         }
         XmlResourceParser parser = res.getLayout(resource);
         try {
+            //todo 加载布局layout
             return inflate(parser, root, attachToRoot);
         } finally {
             parser.close();
@@ -624,6 +628,7 @@ public abstract class LayoutInflater {
      *         attachToRoot is true, this is root; otherwise it is the root of
      *         the inflated XML file.
      */
+    //todo 加载布局layout
     public View inflate(XmlPullParser parser, @Nullable ViewGroup root, boolean attachToRoot) {
         synchronized (mConstructorArgs) {
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, "inflate");
@@ -654,6 +659,7 @@ public abstract class LayoutInflater {
                     rInflate(parser, root, inflaterContext, attrs, false);
                 } else {
                     // Temp is the root view that was found in the xml
+//todo 加载布局-反射创建View
                     final View temp = createViewFromTag(root, name, inflaterContext, attrs);
 
                     ViewGroup.LayoutParams params = null;
@@ -792,6 +798,7 @@ public abstract class LayoutInflater {
      *
      * @return View The newly instantiated view, or null.
      */
+    //todo 加载布局
     @Nullable
     public final View createView(@NonNull Context viewContext, @NonNull String name,
             @Nullable String prefix, @Nullable AttributeSet attrs)
@@ -847,7 +854,7 @@ public abstract class LayoutInflater {
             mConstructorArgs[0] = viewContext;
             Object[] args = mConstructorArgs;
             args[1] = attrs;
-
+            //todo 加载布局-反射创建View
             try {
                 final View view = constructor.newInstance(args);
                 if (view instanceof ViewStub) {
@@ -955,6 +962,7 @@ public abstract class LayoutInflater {
      * tag parsing.
      */
     @UnsupportedAppUsage
+    //todo 加载布局-反射创建View
     private View createViewFromTag(View parent, String name, Context context, AttributeSet attrs) {
         return createViewFromTag(parent, name, context, attrs, false);
     }
@@ -975,6 +983,7 @@ public abstract class LayoutInflater {
      *                        {@code false} otherwise
      */
     @UnsupportedAppUsage
+    //todo 加载布局-反射创建View
     View createViewFromTag(View parent, String name, Context context, AttributeSet attrs,
             boolean ignoreThemeAttr) {
         if (name.equals("view")) {
@@ -992,6 +1001,7 @@ public abstract class LayoutInflater {
         }
 
         try {
+            //todo 加载布局-Factory
             View view = tryCreateView(parent, name, context, attrs);
 
             if (view == null) {
@@ -999,8 +1009,10 @@ public abstract class LayoutInflater {
                 mConstructorArgs[0] = context;
                 try {
                     if (-1 == name.indexOf('.')) {
+                        //todo 加载布局--自定义View-也会走到createView
                         view = onCreateView(context, parent, name, attrs);
                     } else {
+                        //todo 加载布局-自带view
                         view = createView(context, name, null, attrs);
                     }
                 } finally {

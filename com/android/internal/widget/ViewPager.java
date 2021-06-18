@@ -927,7 +927,7 @@ public class ViewPager extends ViewGroup {
         if (getWindowToken() == null) {
             return;
         }
-
+        // TODO: ViewPager缓存和预加载
         mAdapter.startUpdate(this);
 
         final int pageLimit = mOffscreenPageLimit;

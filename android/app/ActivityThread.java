@@ -4543,7 +4543,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             if (a.mVisibleFromClient) {
                 if (!a.mWindowAdded) {
                     a.mWindowAdded = true;
-// TODO: View绘制流程 这里？还是下面
+// TODO: View绘制流程 这里？还是下面-->WindowManagerImpl.addView
                     wm.addView(decor, l);
                 } else {
                     // The activity will get a callback for this {@link LayoutParams} change
