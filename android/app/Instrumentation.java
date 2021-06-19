@@ -95,7 +95,10 @@ public class Instrumentation {
      */
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({0, UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES})
-    public @interface UiAutomationFlags {};
+    public @interface UiAutomationFlags {
+    }
+
+    ;
 
 
     private final Object mSync = new Object();
@@ -185,11 +188,10 @@ public class Instrumentation {
      *
      * @param obj The client object that generated the exception.  May be an
      *            Application, Activity, BroadcastReceiver, Service, or null.
-     * @param e The exception that was thrown.
-     *
+     * @param e   The exception that was thrown.
      * @return To allow normal system exception process to occur, return false.
-     *         If true is returned, the system will proceed as if the exception
-     *         didn't happen.
+     * If true is returned, the system will proceed as if the exception
+     * didn't happen.
      */
     public boolean onException(Object obj, Throwable e) {
         return false;
@@ -199,14 +201,13 @@ public class Instrumentation {
      * Provide a status report about the application.
      *
      * @param resultCode Current success/failure of instrumentation.
-     * @param results Any results to send back to the code that started the instrumentation.
+     * @param results    Any results to send back to the code that started the instrumentation.
      */
     public void sendStatus(int resultCode, Bundle results) {
         if (mWatcher != null) {
             try {
                 mWatcher.instrumentationStatus(mComponent, resultCode, results);
-            }
-            catch (RemoteException e) {
+            } catch (RemoteException e) {
                 mWatcher = null;
             }
         }
@@ -232,8 +233,8 @@ public class Instrumentation {
      * for this instrumentation, all of those processes will be killed.
      *
      * @param resultCode Overall success/failure of instrumentation.
-     * @param results Any results to send back to the code that started the
-     *                instrumentation.
+     * @param results    Any results to send back to the code that started the
+     *                   instrumentation.
      */
     public void finish(int resultCode, Bundle results) {
         if (mAutomaticPerformanceSnapshots) {
@@ -285,7 +286,6 @@ public class Instrumentation {
      * application.
      *
      * @return The instrumentation's package context.
-     *
      * @see #getTargetContext
      */
     public Context getContext() {
@@ -309,7 +309,6 @@ public class Instrumentation {
      * {@link #getContext} to retrieve a Context for the instrumentation code.
      *
      * @return A Context in the target application.
-     *
      * @see #getContext
      */
     public Context getTargetContext() {
@@ -365,7 +364,7 @@ public class Instrumentation {
      * when it starts.
      *
      * @param inTouch Set to true to be in touch mode, false to be in
-     * focus mode.
+     *                focus mode.
      */
     public void setInTouchMode(boolean inTouch) {
         try {
@@ -419,7 +418,9 @@ public class Instrumentation {
         }
     }
 
-    /** @hide */
+    /**
+     * @hide
+     */
     public void onEnterAnimationComplete() {
         synchronized (mAnimationCompleteLock) {
             mAnimationCompleteLock.notifyAll();
@@ -457,7 +458,6 @@ public class Instrumentation {
      * drawn and displayed its initial window.
      *
      * @param intent Description of the activity to start.
-     *
      * @see Context#startActivity
      * @see #startActivitySync(Intent, Bundle)
      */
@@ -481,12 +481,11 @@ public class Instrumentation {
      * through the full initialization including {@link Activity#onResume} and
      * drawn and displayed its initial window.
      *
-     * @param intent Description of the activity to start.
+     * @param intent  Description of the activity to start.
      * @param options Additional options for how the Activity should be started.
-     * May be null if there are no options.  See {@link android.app.ActivityOptions}
-     * for how to build the Bundle supplied here; there are no supported definitions
-     * for building it manually.
-     *
+     *                May be null if there are no options.  See {@link android.app.ActivityOptions}
+     *                for how to build the Bundle supplied here; there are no supported definitions
+     *                for building it manually.
      * @see Context#startActivity(Intent, Bundle)
      */
     @NonNull
@@ -498,7 +497,7 @@ public class Instrumentation {
             intent = new Intent(intent);
 
             ActivityInfo ai = intent.resolveActivityInfo(
-                getTargetContext().getPackageManager(), 0);
+                    getTargetContext().getPackageManager(), 0);
             if (ai == null) {
                 throw new RuntimeException("Unable to resolve activity for: " + intent);
             }
@@ -572,17 +571,16 @@ public class Instrumentation {
          * Create a new ActivityMonitor that looks for a particular kind of
          * intent to be started.
          *
-         * @param which The set of intents this monitor is responsible for.
+         * @param which  The set of intents this monitor is responsible for.
          * @param result A canned result to return if the monitor is hit; can
          *               be null.
-         * @param block Controls whether the monitor should block the activity
-         *              start (returning its canned result) or let the call
-         *              proceed.
-         *
+         * @param block  Controls whether the monitor should block the activity
+         *               start (returning its canned result) or let the call
+         *               proceed.
          * @see Instrumentation#addMonitor
          */
         public ActivityMonitor(
-            IntentFilter which, ActivityResult result, boolean block) {
+                IntentFilter which, ActivityResult result, boolean block) {
             mWhich = which;
             mClass = null;
             mResult = result;
@@ -594,17 +592,16 @@ public class Instrumentation {
          * Create a new ActivityMonitor that looks for a specific activity
          * class to be started.
          *
-         * @param cls The activity class this monitor is responsible for.
+         * @param cls    The activity class this monitor is responsible for.
          * @param result A canned result to return if the monitor is hit; can
          *               be null.
-         * @param block Controls whether the monitor should block the activity
-         *              start (returning its canned result) or let the call
-         *              proceed.
-         *
+         * @param block  Controls whether the monitor should block the activity
+         *               start (returning its canned result) or let the call
+         *               proceed.
          * @see Instrumentation#addMonitor
          */
         public ActivityMonitor(
-            String cls, ActivityResult result, boolean block) {
+                String cls, ActivityResult result, boolean block) {
             mWhich = null;
             mClass = cls;
             mResult = result;
@@ -631,9 +628,9 @@ public class Instrumentation {
 
         /**
          * @return true if this monitor is used for intercepting any started activity by calling
-         *         into {@link #onStartActivity(Intent)}, false if this monitor is only used
-         *         for specific intents corresponding to the intent filter or activity class
-         *         passed in the constructor.
+         * into {@link #onStartActivity(Intent)}, false if this monitor is only used
+         * for specific intents corresponding to the intent filter or activity class
+         * passed in the constructor.
          */
         final boolean ignoreMatchingSpecificIntents() {
             return mIgnoreMatchingSpecificIntents;
@@ -703,7 +700,6 @@ public class Instrumentation {
          * If the timeOut expires before the activity is started, return null.
          *
          * @param timeOut Time to wait in milliseconds before the activity is created.
-         *
          * @return Activity
          */
         public final Activity waitForActivityWithTimeout(long timeOut) {
@@ -750,8 +746,8 @@ public class Instrumentation {
             }
             synchronized (this) {
                 if (mWhich != null
-                    && mWhich.match(who.getContentResolver(), intent,
-                                    true, "Instrumentation") < 0) {
+                        && mWhich.match(who.getContentResolver(), intent,
+                        true, "Instrumentation") < 0) {
                     return false;
                 }
                 if (mClass != null) {
@@ -781,7 +777,6 @@ public class Instrumentation {
      * existing monitors can themselves handle the Intent.
      *
      * @param monitor The new ActivityMonitor to see.
-     *
      * @see #addMonitor(IntentFilter, ActivityResult, boolean)
      * @see #checkMonitorHit
      */
@@ -802,17 +797,15 @@ public class Instrumentation {
      * @param filter The set of intents this monitor is responsible for.
      * @param result A canned result to return if the monitor is hit; can
      *               be null.
-     * @param block Controls whether the monitor should block the activity
-     *              start (returning its canned result) or let the call
-     *              proceed.
-     *
+     * @param block  Controls whether the monitor should block the activity
+     *               start (returning its canned result) or let the call
+     *               proceed.
      * @return The newly created and added activity monitor.
-     *
      * @see #addMonitor(ActivityMonitor)
      * @see #checkMonitorHit
      */
     public ActivityMonitor addMonitor(
-        IntentFilter filter, ActivityResult result, boolean block) {
+            IntentFilter filter, ActivityResult result, boolean block) {
         ActivityMonitor am = new ActivityMonitor(filter, result, block);
         addMonitor(am);
         return am;
@@ -822,20 +815,18 @@ public class Instrumentation {
      * A convenience wrapper for {@link #addMonitor(ActivityMonitor)} that
      * creates a class matching {@link ActivityMonitor} for you and returns it.
      *
-     * @param cls The activity class this monitor is responsible for.
+     * @param cls    The activity class this monitor is responsible for.
      * @param result A canned result to return if the monitor is hit; can
      *               be null.
-     * @param block Controls whether the monitor should block the activity
-     *              start (returning its canned result) or let the call
-     *              proceed.
-     *
+     * @param block  Controls whether the monitor should block the activity
+     *               start (returning its canned result) or let the call
+     *               proceed.
      * @return The newly created and added activity monitor.
-     *
      * @see #addMonitor(ActivityMonitor)
      * @see #checkMonitorHit
      */
     public ActivityMonitor addMonitor(
-        String cls, ActivityResult result, boolean block) {
+            String cls, ActivityResult result, boolean block) {
         ActivityMonitor am = new ActivityMonitor(cls, result, block);
         addMonitor(am);
         return am;
@@ -849,9 +840,7 @@ public class Instrumentation {
      *
      * @param monitor The ActivityMonitor to check.
      * @param minHits The minimum number of hits required.
-     *
      * @return True if the hit count has been reached, else false.
-     *
      * @see #addMonitor
      */
     public boolean checkMonitorHit(ActivityMonitor monitor, int minHits) {
@@ -871,7 +860,6 @@ public class Instrumentation {
      * the first created Activity object that matched it is returned.
      *
      * @param monitor The ActivityMonitor to wait for.
-     *
      * @return The Activity object that matched the monitor.
      */
     public Activity waitForMonitor(ActivityMonitor monitor) {
@@ -890,7 +878,6 @@ public class Instrumentation {
      *
      * @param monitor The ActivityMonitor to wait for.
      * @param timeOut The timeout value in milliseconds.
-     *
      * @return The Activity object that matched the monitor.
      */
     public Activity waitForMonitorWithTimeout(ActivityMonitor monitor, long timeOut) {
@@ -906,7 +893,6 @@ public class Instrumentation {
      * {@link #addMonitor}.
      *
      * @param monitor The monitor to remove.
-     *
      * @see #addMonitor
      */
     public void removeMonitor(ActivityMonitor monitor) {
@@ -919,13 +905,13 @@ public class Instrumentation {
      * Execute a particular menu item.
      *
      * @param targetActivity The activity in question.
-     * @param id The identifier associated with the menu item.
-     * @param flag Additional flags, if any.
+     * @param id             The identifier associated with the menu item.
+     * @param flag           Additional flags, if any.
      * @return Whether the invocation was successful (for example, it could be
-     *         false if item is disabled).
+     * false if item is disabled).
      */
     public boolean invokeMenuActionSync(Activity targetActivity,
-                                    int id, int flag) {
+                                        int id, int flag) {
         class MenuRunnable implements Runnable {
             private final Activity activity;
             private final int identifier;
@@ -933,7 +919,7 @@ public class Instrumentation {
             boolean returnValue;
 
             public MenuRunnable(Activity _activity, int _identifier,
-                                    int _flags) {
+                                int _flags) {
                 activity = _activity;
                 identifier = _identifier;
                 flags = _flags;
@@ -943,9 +929,9 @@ public class Instrumentation {
                 Window win = activity.getWindow();
 
                 returnValue = win.performPanelIdentifierAction(
-                            Window.FEATURE_OPTIONS_PANEL,
-                            identifier,
-                            flags);
+                        Window.FEATURE_OPTIONS_PANEL,
+                        identifier,
+                        flags);
             }
 
         }
@@ -959,10 +945,10 @@ public class Instrumentation {
      * particular context menu item.
      *
      * @param targetActivity The activity in question.
-     * @param id The identifier associated with the context menu item.
-     * @param flag Additional flags, if any.
+     * @param id             The identifier associated with the context menu item.
+     * @param flag           Additional flags, if any.
      * @return Whether the invocation was successful (for example, it could be
-     *         false if item is disabled).
+     * false if item is disabled).
      */
     public boolean invokeContextMenuAction(Activity targetActivity, int id, int flag) {
         validateNotAppThread();
@@ -996,7 +982,7 @@ public class Instrumentation {
             boolean returnValue;
 
             public ContextMenuRunnable(Activity _activity, int _identifier,
-                                    int _flags) {
+                                       int _flags) {
                 activity = _activity;
                 identifier = _identifier;
                 flags = _flags;
@@ -1005,8 +991,8 @@ public class Instrumentation {
             public void run() {
                 Window win = activity.getWindow();
                 returnValue = win.performContextMenuIdentifierAction(
-                            identifier,
-                            flags);
+                        identifier,
+                        flags);
             }
 
         }
@@ -1105,8 +1091,8 @@ public class Instrumentation {
      * doing that.
      *
      * @param event A motion event describing the pointer action.  (As noted in
-     * {@link MotionEvent#obtain(long, long, int, float, float, int)}, be sure to use
-     * {@link SystemClock#uptimeMillis()} as the timebase.
+     *              {@link MotionEvent#obtain(long, long, int, float, float, int)}, be sure to use
+     *              {@link SystemClock#uptimeMillis()} as the timebase.
      */
     public void sendPointerSync(MotionEvent event) {
         validateNotAppThread();
@@ -1128,8 +1114,8 @@ public class Instrumentation {
      * doing that.
      *
      * @param event A motion event describing the trackball action.  (As noted in
-     * {@link MotionEvent#obtain(long, long, int, float, float, int)}, be sure to use
-     * {@link SystemClock#uptimeMillis()} as the timebase.
+     *              {@link MotionEvent#obtain(long, long, int, float, float, int)}, be sure to use
+     *              {@link SystemClock#uptimeMillis()} as the timebase.
      */
     public void sendTrackballEventSync(MotionEvent event) {
         validateNotAppThread();
@@ -1144,11 +1130,10 @@ public class Instrumentation {
      * Perform instantiation of the process's {@link Application} object.  The
      * default implementation provides the normal system behavior.
      *
-     * @param cl The ClassLoader with which to instantiate the object.
+     * @param cl        The ClassLoader with which to instantiate the object.
      * @param className The name of the class implementing the Application
      *                  object.
-     * @param context The context to initialize the application with
-     *
+     * @param context   The context to initialize the application with
      * @return The newly instantiated Application object.
      */
     // todo: 桌面startActivity流程
@@ -1167,15 +1152,14 @@ public class Instrumentation {
      * Perform instantiation of the process's {@link Application} object.  The
      * default implementation provides the normal system behavior.
      *
-     * @param clazz The class used to create an Application object from.
+     * @param clazz   The class used to create an Application object from.
      * @param context The context to initialize the application with
-     *
      * @return The newly instantiated Application object.
      */
     static public Application newApplication(Class<?> clazz, Context context)
             throws InstantiationException, IllegalAccessException,
             ClassNotFoundException {
-        Application app = (Application)clazz.newInstance();
+        Application app = (Application) clazz.newInstance();
         app.attach(context);
         return app;
     }
@@ -1200,28 +1184,28 @@ public class Instrumentation {
      * unit tests, such as android.test.ActivityUnitTestCase.  The activity will be useable
      * locally but will be missing some of the linkages necessary for use within the system.
      *
-     * @param clazz The Class of the desired Activity
-     * @param context The base context for the activity to use
-     * @param token The token for this activity to communicate with
-     * @param application The application object (if any)
-     * @param intent The intent that started this Activity
-     * @param info ActivityInfo from the manifest
-     * @param title The title, typically retrieved from the ActivityInfo record
-     * @param parent The parent Activity (if any)
-     * @param id The embedded Id (if any)
+     * @param clazz                        The Class of the desired Activity
+     * @param context                      The base context for the activity to use
+     * @param token                        The token for this activity to communicate with
+     * @param application                  The application object (if any)
+     * @param intent                       The intent that started this Activity
+     * @param info                         ActivityInfo from the manifest
+     * @param title                        The title, typically retrieved from the ActivityInfo record
+     * @param parent                       The parent Activity (if any)
+     * @param id                           The embedded Id (if any)
      * @param lastNonConfigurationInstance Arbitrary object that will be
-     * available via {@link Activity#getLastNonConfigurationInstance()
-     * Activity.getLastNonConfigurationInstance()}.
+     *                                     available via {@link Activity#getLastNonConfigurationInstance()
+     *                                     Activity.getLastNonConfigurationInstance()}.
      * @return Returns the instantiated activity
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     public Activity newActivity(Class<?> clazz, Context context,
-            IBinder token, Application application, Intent intent, ActivityInfo info,
-            CharSequence title, Activity parent, String id,
-            Object lastNonConfigurationInstance) throws InstantiationException,
+                                IBinder token, Application application, Intent intent, ActivityInfo info,
+                                CharSequence title, Activity parent, String id,
+                                Object lastNonConfigurationInstance) throws InstantiationException,
             IllegalAccessException {
-        Activity activity = (Activity)clazz.newInstance();
+        Activity activity = (Activity) clazz.newInstance();
         ActivityThread aThread = null;
         // Activity.attach expects a non-null Application Object.
         if (application == null) {
@@ -1229,7 +1213,7 @@ public class Instrumentation {
         }
         activity.attach(context, aThread, this, token, 0 /* ident */, application, intent,
                 info, title, parent, id,
-                (Activity.NonConfigurationInstances)lastNonConfigurationInstance,
+                (Activity.NonConfigurationInstances) lastNonConfigurationInstance,
                 new Configuration(), null /* referrer */, null /* voiceInteractor */,
                 null /* window */, null /* activityConfigCallback */, null /*assistToken*/);
         return activity;
@@ -1239,16 +1223,15 @@ public class Instrumentation {
      * Perform instantiation of the process's {@link Activity} object.  The
      * default implementation provides the normal system behavior.
      *
-     * @param cl The ClassLoader with which to instantiate the object.
+     * @param cl        The ClassLoader with which to instantiate the object.
      * @param className The name of the class implementing the Activity
      *                  object.
-     * @param intent The Intent object that specified the activity class being
-     *               instantiated.
-     *
+     * @param intent    The Intent object that specified the activity class being
+     *                  instantiated.
      * @return The newly instantiated Activity object.
      */
     public Activity newActivity(ClassLoader cl, String className,
-            Intent intent)
+                                Intent intent)
             throws InstantiationException, IllegalAccessException,
             ClassNotFoundException {
         String pkg = intent != null && intent.getComponent() != null
@@ -1276,7 +1259,7 @@ public class Instrumentation {
         if (mWaitingActivities != null) {
             synchronized (mSync) {
                 final int N = mWaitingActivities.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityWaiter aw = mWaitingActivities.get(i);
                     final Intent intent = aw.intent;
                     if (intent.filterEquals(activity.getIntent())) {
@@ -1292,7 +1275,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     am.match(activity, activity, activity.getIntent());
                 }
@@ -1305,7 +1288,7 @@ public class Instrumentation {
      * method.  The default implementation simply calls through to that method.
      *
      * @param activity The activity being created.
-     * @param icicle The previously frozen state (or null) to pass through to onCreate().
+     * @param icicle   The previously frozen state (or null) to pass through to onCreate().
      */
     public void callActivityOnCreate(Activity activity, Bundle icicle) {
         prePerformCreate(activity);
@@ -1317,20 +1300,21 @@ public class Instrumentation {
     /**
      * Perform calling of an activity's {@link Activity#onCreate}
      * method.  The default implementation simply calls through to that method.
-     *  @param activity The activity being created.
-     * @param icicle The previously frozen state (or null) to pass through to
+     *
+     * @param activity        The activity being created.
+     * @param icicle          The previously frozen state (or null) to pass through to
      * @param persistentState The previously persisted state (or null)
      */
     public void callActivityOnCreate(Activity activity, Bundle icicle,
-            PersistableBundle persistentState) {
+                                     PersistableBundle persistentState) {
         prePerformCreate(activity);
         activity.performCreate(icicle, persistentState);
         postPerformCreate(activity);
     }
 
     public void callActivityOnDestroy(Activity activity) {
-      // TODO: the following block causes intermittent hangs when using startActivity
-      // temporarily comment out until root cause is fixed (bug 2630683)
+        // TODO: the following block causes intermittent hangs when using startActivity
+        // temporarily comment out until root cause is fixed (bug 2630683)
 //      if (mWaitingActivities != null) {
 //          synchronized (mSync) {
 //              final int N = mWaitingActivities.size();
@@ -1345,18 +1329,18 @@ public class Instrumentation {
 //          }
 //      }
 
-      activity.performDestroy();
-  }
+        activity.performDestroy();
+    }
 
     /**
      * Perform calling of an activity's {@link Activity#onRestoreInstanceState}
      * method.  The default implementation simply calls through to that method.
      *
-     * @param activity The activity being restored.
+     * @param activity           The activity being restored.
      * @param savedInstanceState The previously saved state being restored.
      */
     public void callActivityOnRestoreInstanceState(@NonNull Activity activity,
-            @NonNull Bundle savedInstanceState) {
+                                                   @NonNull Bundle savedInstanceState) {
         activity.performRestoreInstanceState(savedInstanceState);
     }
 
@@ -1364,13 +1348,13 @@ public class Instrumentation {
      * Perform calling of an activity's {@link Activity#onRestoreInstanceState}
      * method.  The default implementation simply calls through to that method.
      *
-     * @param activity The activity being restored.
+     * @param activity           The activity being restored.
      * @param savedInstanceState The previously saved state being restored (or null).
-     * @param persistentState The previously persisted state (or null)
+     * @param persistentState    The previously persisted state (or null)
      */
     public void callActivityOnRestoreInstanceState(@NonNull Activity activity,
-            @Nullable Bundle savedInstanceState,
-            @Nullable PersistableBundle persistentState) {
+                                                   @Nullable Bundle savedInstanceState,
+                                                   @Nullable PersistableBundle persistentState) {
         activity.performRestoreInstanceState(savedInstanceState, persistentState);
     }
 
@@ -1378,12 +1362,12 @@ public class Instrumentation {
      * Perform calling of an activity's {@link Activity#onPostCreate} method.
      * The default implementation simply calls through to that method.
      *
-     * @param activity The activity being created.
+     * @param activity           The activity being created.
      * @param savedInstanceState The previously saved state (or null) to pass through to
-     *               onPostCreate().
+     *                           onPostCreate().
      */
     public void callActivityOnPostCreate(@NonNull Activity activity,
-            @Nullable Bundle savedInstanceState) {
+                                         @Nullable Bundle savedInstanceState) {
         activity.onPostCreate(savedInstanceState);
     }
 
@@ -1391,14 +1375,14 @@ public class Instrumentation {
      * Perform calling of an activity's {@link Activity#onPostCreate} method.
      * The default implementation simply calls through to that method.
      *
-     * @param activity The activity being created.
+     * @param activity           The activity being created.
      * @param savedInstanceState The previously frozen state (or null) to pass through to
-     *               onPostCreate().
-     * @param persistentState The previously persisted state (or null)
+     *                           onPostCreate().
+     * @param persistentState    The previously persisted state (or null)
      */
     public void callActivityOnPostCreate(@NonNull Activity activity,
-            @Nullable Bundle savedInstanceState,
-            @Nullable PersistableBundle persistentState) {
+                                         @Nullable Bundle savedInstanceState,
+                                         @Nullable PersistableBundle persistentState) {
         activity.onPostCreate(savedInstanceState, persistentState);
     }
 
@@ -1407,7 +1391,7 @@ public class Instrumentation {
      * method.  The default implementation simply calls through to that method.
      *
      * @param activity The activity receiving a new Intent.
-     * @param intent The new intent being received.
+     * @param intent   The new intent being received.
      */
     public void callActivityOnNewIntent(Activity activity, Intent intent) {
         activity.performNewIntent(intent);
@@ -1463,7 +1447,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     am.match(activity, activity, activity.getIntent());
                 }
@@ -1489,19 +1473,20 @@ public class Instrumentation {
      * @param outState The bundle to pass to the call.
      */
     public void callActivityOnSaveInstanceState(@NonNull Activity activity,
-            @NonNull Bundle outState) {
+                                                @NonNull Bundle outState) {
         activity.performSaveInstanceState(outState);
     }
 
     /**
      * Perform calling of an activity's {@link Activity#onSaveInstanceState}
      * method.  The default implementation simply calls through to that method.
-     *  @param activity The activity being saved.
-     * @param outState The bundle to pass to the call.
+     *
+     * @param activity           The activity being saved.
+     * @param outState           The bundle to pass to the call.
      * @param outPersistentState The persistent bundle to pass to the call.
      */
     public void callActivityOnSaveInstanceState(@NonNull Activity activity,
-            @NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+                                                @NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         activity.performSaveInstanceState(outState, outPersistentState);
     }
 
@@ -1621,9 +1606,9 @@ public class Instrumentation {
          * more information.
          *
          * @param resultCode The result code to propagate back to the
-         * originating activity, often RESULT_CANCELED or RESULT_OK
+         *                   originating activity, often RESULT_CANCELED or RESULT_OK
          * @param resultData The data to propagate back to the originating
-         * activity.
+         *                   activity.
          */
         public ActivityResult(int resultCode, Intent resultData) {
             mResultCode = resultCode;
@@ -1667,28 +1652,25 @@ public class Instrumentation {
      * <p>This method throws {@link android.content.ActivityNotFoundException}
      * if there was no Activity found to run the given Intent.
      *
-     * @param who The Context from which the activity is being started.
+     * @param who           The Context from which the activity is being started.
      * @param contextThread The main thread of the Context from which the activity
      *                      is being started.
-     * @param token Internal token identifying to the system who is starting
-     *              the activity; may be null.
-     * @param target Which activity is performing the start (and thus receiving
-     *               any result); may be null if this call is not being made
-     *               from an activity.
-     * @param intent The actual Intent to start.
-     * @param requestCode Identifier for this request's result; less than zero
-     *                    if the caller is not expecting a result.
-     * @param options Addition options.
-     *
+     * @param token         Internal token identifying to the system who is starting
+     *                      the activity; may be null.
+     * @param target        Which activity is performing the start (and thus receiving
+     *                      any result); may be null if this call is not being made
+     *                      from an activity.
+     * @param intent        The actual Intent to start.
+     * @param requestCode   Identifier for this request's result; less than zero
+     *                      if the caller is not expecting a result.
+     * @param options       Addition options.
      * @return To force the return of a particular result, return an
-     *         ActivityResult object containing the desired data; otherwise
-     *         return null.  The default implementation always returns null.
-     *
+     * ActivityResult object containing the desired data; otherwise
+     * return null.  The default implementation always returns null.
      * @throws android.content.ActivityNotFoundException
-     *
      * @see Activity#startActivity(Intent)
      * @see Activity#startActivityForResult(Intent, int)
-     *
+     * <p>
      * {@hide}
      */
     // todo: 桌面startActivity流程
@@ -1704,7 +1686,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -1743,12 +1725,12 @@ public class Instrumentation {
      * but accepts an array of activities to be started.  Note that active
      * {@link ActivityMonitor} objects only match against the first activity in
      * the array.
-     *
+     * <p>
      * {@hide}
      */
     @UnsupportedAppUsage
     public void execStartActivities(Context who, IBinder contextThread,
-            IBinder token, Activity target, Intent[] intents, Bundle options) {
+                                    IBinder token, Activity target, Intent[] intents, Bundle options) {
         execStartActivitiesAsUser(who, contextThread, token, target, intents, options,
                 who.getUserId());
     }
@@ -1760,20 +1742,20 @@ public class Instrumentation {
      * the array.
      *
      * @return The corresponding flag {@link ActivityManager#START_CANCELED},
-     *         {@link ActivityManager#START_SUCCESS} etc. indicating whether the launch was
-     *         successful.
-     *
+     * {@link ActivityManager#START_SUCCESS} etc. indicating whether the launch was
+     * successful.
+     * <p>
      * {@hide}
      */
     @UnsupportedAppUsage
     public int execStartActivitiesAsUser(Context who, IBinder contextThread,
-            IBinder token, Activity target, Intent[] intents, Bundle options,
-            int userId) {
+                                         IBinder token, Activity target, Intent[] intents, Bundle options,
+                                         int userId) {
         IApplicationThread whoThread = (IApplicationThread) contextThread;
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -1794,7 +1776,7 @@ public class Instrumentation {
         }
         try {
             String[] resolvedTypes = new String[intents.length];
-            for (int i=0; i<intents.length; i++) {
+            for (int i = 0; i < intents.length; i++) {
                 intents[i].migrateExtraStreamToClipData(who);
                 intents[i].prepareToLeaveProcess(who);
                 resolvedTypes[i] = intents[i].resolveTypeIfNeeded(who.getContentResolver());
@@ -1814,37 +1796,34 @@ public class Instrumentation {
      * android.os.IBinder, String, android.content.Intent, int, android.os.Bundle)},
      * but for calls from a {@link Fragment}.
      *
-     * @param who The Context from which the activity is being started.
+     * @param who           The Context from which the activity is being started.
      * @param contextThread The main thread of the Context from which the activity
      *                      is being started.
-     * @param token Internal token identifying to the system who is starting
-     *              the activity; may be null.
-     * @param target Which element is performing the start (and thus receiving
-     *               any result).
-     * @param intent The actual Intent to start.
-     * @param requestCode Identifier for this request's result; less than zero
-     *                    if the caller is not expecting a result.
-     *
+     * @param token         Internal token identifying to the system who is starting
+     *                      the activity; may be null.
+     * @param target        Which element is performing the start (and thus receiving
+     *                      any result).
+     * @param intent        The actual Intent to start.
+     * @param requestCode   Identifier for this request's result; less than zero
+     *                      if the caller is not expecting a result.
      * @return To force the return of a particular result, return an
-     *         ActivityResult object containing the desired data; otherwise
-     *         return null.  The default implementation always returns null.
-     *
+     * ActivityResult object containing the desired data; otherwise
+     * return null.  The default implementation always returns null.
      * @throws android.content.ActivityNotFoundException
-     *
      * @see Activity#startActivity(Intent)
      * @see Activity#startActivityForResult(Intent, int)
-     *
+     * <p>
      * {@hide}
      */
     @UnsupportedAppUsage
     public ActivityResult execStartActivity(
-        Context who, IBinder contextThread, IBinder token, String target,
-        Intent intent, int requestCode, Bundle options) {
+            Context who, IBinder contextThread, IBinder token, String target,
+            Intent intent, int requestCode, Bundle options) {
         IApplicationThread whoThread = (IApplicationThread) contextThread;
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -1881,26 +1860,23 @@ public class Instrumentation {
      * Like {@link #execStartActivity(Context, IBinder, IBinder, Activity, Intent, int, Bundle)},
      * but for starting as a particular user.
      *
-     * @param who The Context from which the activity is being started.
+     * @param who           The Context from which the activity is being started.
      * @param contextThread The main thread of the Context from which the activity
      *                      is being started.
-     * @param token Internal token identifying to the system who is starting
-     *              the activity; may be null.
-     * @param target Which fragment is performing the start (and thus receiving
-     *               any result).
-     * @param intent The actual Intent to start.
-     * @param requestCode Identifier for this request's result; less than zero
-     *                    if the caller is not expecting a result.
-     *
+     * @param token         Internal token identifying to the system who is starting
+     *                      the activity; may be null.
+     * @param target        Which fragment is performing the start (and thus receiving
+     *                      any result).
+     * @param intent        The actual Intent to start.
+     * @param requestCode   Identifier for this request's result; less than zero
+     *                      if the caller is not expecting a result.
      * @return To force the return of a particular result, return an
-     *         ActivityResult object containing the desired data; otherwise
-     *         return null.  The default implementation always returns null.
-     *
+     * ActivityResult object containing the desired data; otherwise
+     * return null.  The default implementation always returns null.
      * @throws android.content.ActivityNotFoundException
-     *
      * @see Activity#startActivity(Intent)
      * @see Activity#startActivityForResult(Intent, int)
-     *
+     * <p>
      * {@hide}
      */
     @UnsupportedAppUsage
@@ -1911,7 +1887,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -1946,6 +1922,7 @@ public class Instrumentation {
 
     /**
      * Special version!
+     *
      * @hide
      */
     @UnsupportedAppUsage
@@ -1957,7 +1934,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -1980,11 +1957,11 @@ public class Instrumentation {
             intent.migrateExtraStreamToClipData(who);
             intent.prepareToLeaveProcess(who);
             int result = ActivityTaskManager.getService()
-                .startActivityAsCaller(whoThread, who.getBasePackageName(), intent,
-                        intent.resolveTypeIfNeeded(who.getContentResolver()),
-                        token, target != null ? target.mEmbeddedID : null,
-                        requestCode, 0, null, options, permissionToken,
-                        ignoreTargetSecurity, userId);
+                    .startActivityAsCaller(whoThread, who.getBasePackageName(), intent,
+                            intent.resolveTypeIfNeeded(who.getContentResolver()),
+                            token, target != null ? target.mEmbeddedID : null,
+                            requestCode, 0, null, options, permissionToken,
+                            ignoreTargetSecurity, userId);
             checkStartActivityResult(result, intent);
         } catch (RemoteException e) {
             throw new RuntimeException("Failure from system", e);
@@ -1994,6 +1971,7 @@ public class Instrumentation {
 
     /**
      * Special version!
+     *
      * @hide
      */
     @UnsupportedAppUsage
@@ -2004,7 +1982,7 @@ public class Instrumentation {
         if (mActivityMonitors != null) {
             synchronized (mSync) {
                 final int N = mActivityMonitors.size();
-                for (int i=0; i<N; i++) {
+                for (int i = 0; i < N; i++) {
                     final ActivityMonitor am = mActivityMonitors.get(i);
                     ActivityResult result = null;
                     if (am.ignoreMatchingSpecificIntents()) {
@@ -2036,9 +2014,10 @@ public class Instrumentation {
         return;
     }
 
-    /*package*/ final void init(ActivityThread thread,
-            Context instrContext, Context appContext, ComponentName component,
-            IInstrumentationWatcher watcher, IUiAutomationConnection uiAutomationConnection) {
+    /*package*/
+    final void init(ActivityThread thread,
+                    Context instrContext, Context appContext, ComponentName component,
+                    IInstrumentationWatcher watcher, IUiAutomationConnection uiAutomationConnection) {
         mThread = thread;
         mMessageQueue = mThread.getLooper().myQueue();
         mInstrContext = instrContext;
@@ -2056,7 +2035,9 @@ public class Instrumentation {
         mThread = thread;
     }
 
-    /** @hide */
+    /**
+     * @hide
+     */
     @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.P, trackingBug = 115609023)
     public static void checkStartActivityResult(int res, Object intent) {
         if (!ActivityManager.isStartResultFatalError(res)) {
@@ -2066,11 +2047,11 @@ public class Instrumentation {
         switch (res) {
             case ActivityManager.START_INTENT_NOT_RESOLVED:
             case ActivityManager.START_CLASS_NOT_FOUND:
-                if (intent instanceof Intent && ((Intent)intent).getComponent() != null)
+                if (intent instanceof Intent && ((Intent) intent).getComponent() != null)
                     throw new ActivityNotFoundException(
                             "Unable to find explicit activity class "
-                            + ((Intent)intent).getComponent().toShortString()
-                            + "; have you declared this activity in your AndroidManifest.xml?");
+                                    + ((Intent) intent).getComponent().toShortString()
+                                    + "; have you declared this activity in your AndroidManifest.xml?");
                 throw new ActivityNotFoundException(
                         "No Activity found to handle " + intent);
             case ActivityManager.START_PERMISSION_DENIED:
@@ -2109,7 +2090,7 @@ public class Instrumentation {
     private final void validateNotAppThread() {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException(
-                "This method can not be called from the main application thread");
+                    "This method can not be called from the main application thread");
         }
     }
 
@@ -2132,8 +2113,8 @@ public class Instrumentation {
      * Equivalent to {@code getUiAutomation(0)}. If a {@link UiAutomation} exists with different
      * flags, the flags on that instance will be changed, and then it will be returned.
      * </p>
-     * @return The UI automation instance.
      *
+     * @return The UI automation instance.
      * @see UiAutomation
      */
     public UiAutomation getUiAutomation() {
@@ -2161,10 +2142,8 @@ public class Instrumentation {
      * </p>
      *
      * @param flags The flags to be passed to the UiAutomation, for example
-     *        {@link UiAutomation#FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES}.
-     *
+     *              {@link UiAutomation#FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES}.
      * @return The UI automation instance.
-     *
      * @see UiAutomation
      */
     public UiAutomation getUiAutomation(@UiAutomationFlags int flags) {
@@ -2199,6 +2178,7 @@ public class Instrumentation {
         public InstrumentationThread(String name) {
             super(name);
         }
+
         public void run() {
             try {
                 Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);

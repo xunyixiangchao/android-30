@@ -1052,6 +1052,7 @@ public final class ViewRootImpl implements ViewParent,
                     mAttachInfo.mRecomputeGlobalAttributes = true;
                     collectViewAttributes();
                     adjustLayoutParamsForCompatibility(mWindowAttributes);
+                    //对应的类为android/service/wms/Session.java
                     res = mWindowSession.addToDisplayAsUser(mWindow, mSeq, mWindowAttributes,
                             getHostVisibility(), mDisplay.getDisplayId(), userId, mTmpFrame,
                             mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,
@@ -1977,15 +1978,17 @@ public final class ViewRootImpl implements ViewParent,
     void scheduleTraversals() {
         if (!mTraversalScheduled) {
             mTraversalScheduled = true;
+            // todo:同步屏障 标记-获取异步消息刷新UI
             mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();
             // TODO: View绘制流程-->执行mTraversalRunnable这个runnalbe
+            // TODO:发送异步消息
             mChoreographer.postCallback(
                     Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);
             notifyRendererOfFramePending();
             pokeDrawLockIfNeeded();
         }
     }
-
+    // todo:同步屏障-移除同步屏障标记和消息
     void unscheduleTraversals() {
         if (mTraversalScheduled) {
             mTraversalScheduled = false;
@@ -1999,6 +2002,7 @@ public final class ViewRootImpl implements ViewParent,
     void doTraversal() {
         if (mTraversalScheduled) {
             mTraversalScheduled = false;
+            // TODO:移除同步屏障 标记-但没有移除异步消息
             mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);
 
             if (mProfile) {

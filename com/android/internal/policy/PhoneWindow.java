@@ -2630,8 +2630,9 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
         mDecor.startChanging();
         // todo: 添加系统默认布局到Decor
+        //mContentRoot为系统默认布局
         mDecor.onResourcesLoaded(mLayoutInflater, layoutResource);
-
+        // todo: 获得默认布局的content作为contentParent
         ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);
         if (contentParent == null) {
             throw new RuntimeException("Window couldn't find content container view");
@@ -2695,6 +2696,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         }
         if (mContentParent == null) {
             // todo: 加载系统默认布局
+            //mContentParent为系统默认布局的content布局
             mContentParent = generateLayout(mDecor);
 
             // Set up decor part of UI to ignore fitsSystemWindows if appropriate.

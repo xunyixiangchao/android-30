@@ -339,6 +339,7 @@ public final class MessageQueue {
                 final long now = SystemClock.uptimeMillis();
                 Message prevMsg = null;
                 Message msg = mMessages;
+                // todo:同步屏障-target为空
                 if (msg != null && msg.target == null) {
                     // Stalled by a barrier.  Find the next asynchronous message in the queue.
                     do {
@@ -469,10 +470,11 @@ public final class MessageQueue {
      */
     @UnsupportedAppUsage
     @TestApi
+    // todo:同步屏障 标记
     public int postSyncBarrier() {
         return postSyncBarrier(SystemClock.uptimeMillis());
     }
-
+    // todo:同步屏障 标记
     private int postSyncBarrier(long when) {
         // Enqueue a new sync barrier token.
         // We don't need to wake the queue because the purpose of a barrier is to stall it.
@@ -482,7 +484,7 @@ public final class MessageQueue {
             msg.markInUse();
             msg.when = when;
             msg.arg1 = token;
-
+// todo:同步屏障 标记这里没有给target赋值
             Message prev = null;
             Message p = mMessages;
             if (when != 0) {

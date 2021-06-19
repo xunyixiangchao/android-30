@@ -417,7 +417,9 @@ public final class Choreographer {
      */
     @UnsupportedAppUsage
     @TestApi
+    // TODO:发送异步消息
     public void postCallback(int callbackType, Runnable action, Object token) {
+        // TODO:发送异步消息
         postCallbackDelayed(callbackType, action, token, 0);
     }
 
@@ -437,6 +439,7 @@ public final class Choreographer {
      */
     @UnsupportedAppUsage
     @TestApi
+    // TODO:发送异步消息
     public void postCallbackDelayed(int callbackType,
             Runnable action, Object token, long delayMillis) {
         if (action == null) {
@@ -445,10 +448,10 @@ public final class Choreographer {
         if (callbackType < 0 || callbackType > CALLBACK_LAST) {
             throw new IllegalArgumentException("callbackType is invalid");
         }
-
+// TODO:发送异步消息
         postCallbackDelayedInternal(callbackType, action, token, delayMillis);
     }
-
+    // TODO:发送异步消息
     private void postCallbackDelayedInternal(int callbackType,
             Object action, Object token, long delayMillis) {
         if (DEBUG_FRAMES) {
@@ -463,8 +466,10 @@ public final class Choreographer {
             mCallbackQueues[callbackType].addCallbackLocked(dueTime, action, token);
 
             if (dueTime <= now) {
+                // TODO:发送异步消息
                 scheduleFrameLocked(now);
             } else {
+                // TODO:发送异步消息
                 Message msg = mHandler.obtainMessage(MSG_DO_SCHEDULE_CALLBACK, action);
                 msg.arg1 = callbackType;
                 msg.setAsynchronous(true);
@@ -622,7 +627,7 @@ public final class Choreographer {
             return USE_FRAME_TIME ? mLastFrameTimeNanos : System.nanoTime();
         }
     }
-
+    // TODO:发送异步消息
     private void scheduleFrameLocked(long now) {
         if (!mFrameScheduled) {
             mFrameScheduled = true;
