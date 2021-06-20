@@ -5114,8 +5114,10 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
      * @param child  the child view to add
      * @param params the layout parameters to set on the child
      */
+    // TODO: View绘制流程
     @Override
     public void addView(View child, LayoutParams params) {
+        // TODO: View绘制流程
         addView(child, -1, params);
     }
 
@@ -5142,6 +5144,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         // addViewInner() will call child.requestLayout() when setting the new LayoutParams
         // therefore, we call requestLayout() on ourselves before, so that the child's request
         // will be blocked at our level
+        // TODO: View绘制流程
         requestLayout();
         invalidate(true);
         addViewInner(child, index, params, false);

@@ -692,6 +692,7 @@ public abstract class LayoutInflater {
                     // We are supposed to attach all the views we found (int temp)
                     // to root. Do that now.
                     if (root != null && attachToRoot) {
+                        // TODO: View绘制流程,root是mContentParent
                         root.addView(temp, params);
                     }
 

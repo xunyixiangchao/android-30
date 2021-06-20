@@ -519,12 +519,14 @@ public final class SystemServer {
             BinderInternal.disableBackgroundScheduling(true);
 
             // Increase the number of binder threads in system_server
+            // TODO:Android启动流程-设置Binder最大线程数31
             BinderInternal.setMaxThreads(sMaxBinderThreads);
 
             // Prepare the main looper thread (this thread).
             android.os.Process.setThreadPriority(
                     android.os.Process.THREAD_PRIORITY_FOREGROUND);
             android.os.Process.setCanSelfBackground(false);
+ // TODO:设置MainLooper
             Looper.prepareMainLooper();
             Looper.getMainLooper().setSlowLogThresholdMs(
                     SLOW_DISPATCH_THRESHOLD_MS, SLOW_DELIVERY_THRESHOLD_MS);
@@ -532,6 +534,7 @@ public final class SystemServer {
             SystemServiceRegistry.sEnableServiceNotFoundWtf = true;
 
             // Initialize native services.
+            // TODO:加载native服务
             System.loadLibrary("android_servers");
 
             // Allow heap / perf profiling.
@@ -547,15 +550,18 @@ public final class SystemServer {
             performPendingShutdown();
 
             // Initialize the system context.
+// TODO:创建系统ActivityThread(调用attach())，mSystemContext,systemUiContext
             createSystemContext();
 
             // Call per-process mainline module initialization.
             ActivityThread.initializeMainlineModules();
 
             // Create the system service manager.
+    // TODO:Android启动流程-创建SSM
             mSystemServiceManager = new SystemServiceManager(mSystemContext);
             mSystemServiceManager.setStartInfo(mRuntimeRestart,
                     mRuntimeStartElapsedTime, mRuntimeStartUptime);
+            // TODO:将ssm添加到LocalServices中
             LocalServices.addService(SystemServiceManager.class, mSystemServiceManager);
             // Prepare the thread pool for init tasks that can be parallelized
             SystemServerInitThreadPool.start();
@@ -587,8 +593,14 @@ public final class SystemServer {
         // Start services.
         try {
             t.traceBegin("StartServices");
+// TODO:Android启动流程-创建各种服务
+            // TODO:引导服务包含 watchdog，Installer，Uri，AMS，PMS，PKMS。。。
             startBootstrapServices(t);
+            // TODO:核心服务包含webViewUpdateService,BatteryService(电池)，GpuService。。。
             startCoreServices(t);
+            // TODO:其他服务包含InputManagerService，WMS（并将wms传给AMS），BluetoothService，IP，Network
+            //  StorageManagerServiceLocationManagerService，。。。
+            // 其他服务超级多，除了引导和核心的一些服务，其他都在这里面
             startOtherServices(t);
         } catch (Throwable ex) {
             Slog.e("System", "******************************************");
@@ -617,7 +629,7 @@ public final class SystemServer {
         if (!VMRuntime.hasBootImageSpaces()) {
             Slog.wtf(TAG, "Runtime is not running with a boot image!");
         }
-
+// TODO:MainLooper循环
         // Loop forever.
         Looper.loop();
         throw new RuntimeException("Main thread loop unexpectedly exited");

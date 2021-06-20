@@ -4259,6 +4259,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * @see #getParent()
      */
     @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.P)
+    //mParent绘制流程中是ViewRootImpl
     protected ViewParent mParent;
 
     /**
@@ -25351,6 +25352,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      * <p>Subclasses which override this method should call the superclass method to
      * handle possible request-during-layout errors correctly.</p>
      */
+    // TODO: View绘制流程
     @CallSuper
     public void requestLayout() {
         if (mMeasureCache != null) mMeasureCache.clear();
@@ -25366,11 +25368,12 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             }
             mAttachInfo.mViewRequestingLayout = this;
         }
-
+// TODO: View绘制流程-设置了PFLAG_FORCE_LAYOUT标识
         mPrivateFlags |= PFLAG_FORCE_LAYOUT;
         mPrivateFlags |= PFLAG_INVALIDATED;
 
         if (mParent != null && !mParent.isLayoutRequested()) {
+// TODO: View绘制流程-ViewRootImpl.requestLayout()
             mParent.requestLayout();
         }
         if (mAttachInfo != null && mAttachInfo.mViewRequestingLayout == this) {
@@ -25471,7 +25474,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                                                 + " measured dimension by calling"
                                                 + " setMeasuredDimension()");
             }
-
+// TODO: View绘制流程-设置PFLAG_LAYOUT_REQUIRED标识
             mPrivateFlags |= PFLAG_LAYOUT_REQUIRED;
         }
 

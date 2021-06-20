@@ -929,7 +929,7 @@ public class ZygoteInit {
 
             Log.i(TAG, "Accepting command socket connections");
 
-            // The select loop returns early in the child process after a fork and
+            // The select loop returns early in the child process after a fork and loops forever in the zygote.
             // loops forever in the zygote.
             caller = zygoteServer.runSelectLoop(abiList);
         } catch (Throwable ex) {

@@ -1038,7 +1038,7 @@ public final class ViewRootImpl implements ViewParent,
                 // manager, to make sure we do the relayout before receiving
                 // any other events from the system.
 
-// TODO: View绘制流程
+// TODO: View绘制流程-->下面view.assignParent(this)所以View中mParent为ViewRootImpl
                 requestLayout();
                 InputChannel inputChannel = null;
                 if ((mWindowAttributes.inputFeatures
@@ -8352,6 +8352,7 @@ public final class ViewRootImpl implements ViewParent,
                     finishInputEvent(event, true);
                 } else {
                     for (int i = 0; i < processedEvents.size(); i++) {
+                        // TODO: 获取事件
                         enqueueInputEvent(
                                 processedEvents.get(i), this,
                                 QueuedInputEvent.FLAG_MODIFIED_FOR_COMPATIBILITY, true);
