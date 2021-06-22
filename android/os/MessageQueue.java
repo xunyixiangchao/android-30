@@ -90,6 +90,7 @@ public final class MessageQueue {
 
     // Disposes of the underlying message queue.
     // Must only be called on the looper thread or the finalizer.
+    //4.1 mPtr=0
     private void dispose() {
         if (mPtr != 0) {
             nativeDestroy(mPtr);
@@ -316,24 +317,34 @@ public final class MessageQueue {
     }
 
     @UnsupportedAppUsage
+        // TODO:获取消息
     Message next() {
         // Return here if the message loop has already quit and been disposed.
         // This can happen if the application tries to restart a looper after quit
         // which is not supported.
+        // TODO:这里正在退出时调用了dispose(),又重启loop()时，
+        // mPtr为0,退出next()循环，退出loop()
         final long ptr = mPtr;
+        // TODO:这里ptr为0返回null，则looper就结束了。
         if (ptr == 0) {
             return null;
         }
 
         int pendingIdleHandlerCount = -1; // -1 only during first iteration
         int nextPollTimeoutMillis = 0;
+        // TODO:轮循
         for (;;) {
+            //1.2第二次循环nextPollTimeoutMillis>0
+            //3.2第二次循环nextPollTimeoutMillis=-1
             if (nextPollTimeoutMillis != 0) {
                 Binder.flushPendingCommands();
             }
-
+            //1.2这里进入等待,等待时间为nextPollTimeoutMillis
+            //在此期间如果有消息添加到队列，并且处理时间小于队列头消息的时间
+            // 会调用nativeWake()
+            //3.2进入阻塞--看enqueueMessage()
             nativePollOnce(ptr, nextPollTimeoutMillis);
-
+            //加锁，取消息时不能放消息-生产者消费者模式-对应enqueueMessage()
             synchronized (this) {
                 // Try to retrieve the next message.  Return if found.
                 final long now = SystemClock.uptimeMillis();
@@ -348,30 +359,39 @@ public final class MessageQueue {
                     } while (msg != null && !msg.isAsynchronous());
                 }
                 if (msg != null) {
+                    //1.1队列消息还没到当前时间
                     if (now < msg.when) {
+                        //计算下次轮循时间
                         // Next message is not ready.  Set a timeout to wake up when it is ready.
                         nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
                     } else {
+                        //2.1获取一个消息，mBlocked此时为false
                         // Got a message.
                         mBlocked = false;
+                        //同步屏障的消息
                         if (prevMsg != null) {
                             prevMsg.next = msg.next;
                         } else {
                             mMessages = msg.next;
                         }
+                        //断开message下个节点
                         msg.next = null;
                         if (DEBUG) Log.v(TAG, "Returning message: " + msg);
+                        //标记inUse
                         msg.markInUse();
+                        //返回消息
                         return msg;
                     }
+                    // TODO:3.1消息队列没有消息
                 } else {
                     // No more messages.
                     nextPollTimeoutMillis = -1;
                 }
-
+                //4.1 mQuitting=true，走dispose()
                 // Process the quit message now that all pending messages have been handled.
                 if (mQuitting) {
                     dispose();
+                    //4.1返回null，结束looper
                     return null;
                 }
 
@@ -382,6 +402,9 @@ public final class MessageQueue {
                         && (mMessages == null || now < mMessages.when)) {
                     pendingIdleHandlerCount = mIdleHandlers.size();
                 }
+                //1.1这里假设没有idle，now < mMessages.when
+                //3.1也进入这里 mMessages == null
+                // mBlocked为true
                 if (pendingIdleHandlerCount <= 0) {
                     // No idle handlers to run.  Loop and wait some more.
                     mBlocked = true;
@@ -423,6 +446,7 @@ public final class MessageQueue {
         }
     }
 
+    // TODO:4.1退出时
     void quit(boolean safe) {
         if (!mQuitAllowed) {
             throw new IllegalStateException("Main thread not allowed to quit.");
@@ -432,15 +456,17 @@ public final class MessageQueue {
             if (mQuitting) {
                 return;
             }
+            //4.1 mQuitting为true了
             mQuitting = true;
-
+            //安全退出时，清理队列后面没到时间的消息
             if (safe) {
                 removeAllFutureMessagesLocked();
             } else {
+                //非安全，清理所有消息
                 removeAllMessagesLocked();
             }
-
             // We can assume mPtr != 0 because mQuitting was previously false.
+            //唤醒队列next()
             nativeWake(mPtr);
         }
     }
@@ -552,7 +578,7 @@ public final class MessageQueue {
         if (msg.target == null) {
             throw new IllegalArgumentException("Message must have a target.");
         }
-
+        //加锁，放消息时不能取消息-生产者消费者模式-对应next()
         synchronized (this) {
             if (msg.isInUse()) {
                 throw new IllegalStateException(msg + " This message is already in use.");
@@ -570,6 +596,9 @@ public final class MessageQueue {
             msg.when = when;
             Message p = mMessages;
             boolean needWake;
+            //next()1.1时，when < p.when
+            //next()3.1时，p==null
+            // mBlocked为true
             if (p == null || when == 0 || when < p.when) {
                 // New head, wake up the event queue if blocked.
                 msg.next = p;
@@ -579,6 +608,8 @@ public final class MessageQueue {
                 // Inserted within the middle of the queue.  Usually we don't have to wake
                 // up the event queue unless there is a barrier at the head of the queue
                 // and the message is the earliest asynchronous message in the queue.
+                // TODO:这里假设非异步消息，needWake为false
+                //这里消息是插入队列中间的消息，所以不用唤醒阻塞
                 needWake = mBlocked && p.target == null && msg.isAsynchronous();
                 Message prev;
                 for (;;) {
@@ -596,6 +627,7 @@ public final class MessageQueue {
             }
 
             // We can assume mPtr != 0 because mQuitting is false.
+            //1.1,3.1时needWake为true
             if (needWake) {
                 nativeWake(mPtr);
             }

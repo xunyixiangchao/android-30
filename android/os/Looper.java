@@ -180,7 +180,9 @@ public final class Looper {
         boolean slowDeliveryDetected = false;
 
         for (;;) {
+            //获取消息，有可能阻塞
             Message msg = queue.next(); // might block
+            // 没有消息则退出了轮循，looper结束，
             if (msg == null) {
                 // No message indicates that the message queue is quitting.
                 return;
@@ -220,6 +222,7 @@ public final class Looper {
             }
             long origWorkSource = ThreadLocalWorkSource.setUid(msg.workSourceUid);
             try {
+                // TODO:发送消息
                 msg.target.dispatchMessage(msg);
                 if (observer != null) {
                     observer.messageDispatched(token, msg);
@@ -268,7 +271,8 @@ public final class Looper {
                         + msg.target.getClass().getName() + " "
                         + msg.callback + " what=" + msg.what);
             }
-
+            //回收已发送的消息-不判断是否在使用
+            //享元模式-添加到消息池-最大50消息
             msg.recycleUnchecked();
         }
     }
