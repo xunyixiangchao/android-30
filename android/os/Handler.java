@@ -46,13 +46,13 @@ import java.lang.reflect.Modifier;
  * a {@link Message} object containing a bundle of data that will be
  * processed by the Handler's {@link #handleMessage} method (requiring that
  * you implement a subclass of Handler).
- * 
+ *
  * <p>When posting or sending to a Handler, you can either
  * allow the item to be processed as soon as the message queue is ready
  * to do so, or specify a delay before it gets processed or absolute time for
  * it to be processed.  The latter two allow you to implement timeouts,
  * ticks, and other timing-based behavior.
- * 
+ *
  * <p>When a
  * process is created for your application, its main thread is dedicated to
  * running a message queue that takes care of managing the top-level
@@ -77,6 +77,7 @@ public class Handler {
      * Callback interface you can use when instantiating a Handler to avoid
      * having to implement your own subclass of Handler.
      */
+    // TODO: 自定义接口,返回boolean,如果为true则不调用handleMessage方法
     public interface Callback {
         /**
          * @param msg A {@link android.os.Message Message} object
@@ -84,17 +85,24 @@ public class Handler {
          */
         boolean handleMessage(@NonNull Message msg);
     }
-    
+
     /**
      * Subclasses must implement this to receive messages.
      */
+    // TODO: handleMessage方法没有返回值,最后一个调用
     public void handleMessage(@NonNull Message msg) {
     }
-    
+
     /**
      * Handle system messages here.
      */
+    // TODO: 发送消息-消费
+    // TODO: 调用顺序: 1和2互斥
+    // 1.如果msg.callback!=null,调用msg.callback.run()结束 ,
+    // 2.1否则如果mCallback!=null,调用mCallback.handleMessage,返回为ture 则结束,
+    //2.2返回false,调用Handler#handleMessage方法
     public void dispatchMessage(@NonNull Message msg) {
+        //如果message有callback(Runnalbe)参数则调用callback.run()方法
         if (msg.callback != null) {
             handleCallback(msg);
         } else {
@@ -110,19 +118,18 @@ public class Handler {
     /**
      * Default constructor associates this handler with the {@link Looper} for the
      * current thread.
-     *
+     * <p>
      * If this thread does not have a looper, this handler won't be able to receive messages
      * so an exception is thrown.
      *
      * @deprecated Implicitly choosing a Looper during Handler construction can lead to bugs
-     *   where operations are silently lost (if the Handler is not expecting new tasks and quits),
-     *   crashes (if a handler is sometimes created on a thread without a Looper active), or race
-     *   conditions, where the thread a handler is associated with is not what the author
-     *   anticipated. Instead, use an {@link java.util.concurrent.Executor} or specify the Looper
-     *   explicitly, using {@link Looper#getMainLooper}, {link android.view.View#getHandler}, or
-     *   similar. If the implicit thread local behavior is required for compatibility, use
-     *   {@code new Handler(Looper.myLooper())} to make it clear to readers.
-     *
+     * where operations are silently lost (if the Handler is not expecting new tasks and quits),
+     * crashes (if a handler is sometimes created on a thread without a Looper active), or race
+     * conditions, where the thread a handler is associated with is not what the author
+     * anticipated. Instead, use an {@link java.util.concurrent.Executor} or specify the Looper
+     * explicitly, using {@link Looper#getMainLooper}, {link android.view.View#getHandler}, or
+     * similar. If the implicit thread local behavior is required for compatibility, use
+     * {@code new Handler(Looper.myLooper())} to make it clear to readers.
      */
     @Deprecated
     public Handler() {
@@ -133,20 +140,19 @@ public class Handler {
      * Constructor associates this handler with the {@link Looper} for the
      * current thread and takes a callback interface in which you can handle
      * messages.
-     *
+     * <p>
      * If this thread does not have a looper, this handler won't be able to receive messages
      * so an exception is thrown.
      *
      * @param callback The callback interface in which to handle messages, or null.
-     *
      * @deprecated Implicitly choosing a Looper during Handler construction can lead to bugs
-     *   where operations are silently lost (if the Handler is not expecting new tasks and quits),
-     *   crashes (if a handler is sometimes created on a thread without a Looper active), or race
-     *   conditions, where the thread a handler is associated with is not what the author
-     *   anticipated. Instead, use an {@link java.util.concurrent.Executor} or specify the Looper
-     *   explicitly, using {@link Looper#getMainLooper}, {link android.view.View#getHandler}, or
-     *   similar. If the implicit thread local behavior is required for compatibility, use
-     *   {@code new Handler(Looper.myLooper(), callback)} to make it clear to readers.
+     * where operations are silently lost (if the Handler is not expecting new tasks and quits),
+     * crashes (if a handler is sometimes created on a thread without a Looper active), or race
+     * conditions, where the thread a handler is associated with is not what the author
+     * anticipated. Instead, use an {@link java.util.concurrent.Executor} or specify the Looper
+     * explicitly, using {@link Looper#getMainLooper}, {link android.view.View#getHandler}, or
+     * similar. If the implicit thread local behavior is required for compatibility, use
+     * {@code new Handler(Looper.myLooper(), callback)} to make it clear to readers.
      */
     @Deprecated
     public Handler(@Nullable Callback callback) {
@@ -166,7 +172,7 @@ public class Handler {
      * Use the provided {@link Looper} instead of the default one and take a callback
      * interface in which to handle messages.
      *
-     * @param looper The looper, must not be null.
+     * @param looper   The looper, must not be null.
      * @param callback The callback interface in which to handle messages, or null.
      */
     public Handler(@NonNull Looper looper, @Nullable Callback callback) {
@@ -176,17 +182,16 @@ public class Handler {
     /**
      * Use the {@link Looper} for the current thread
      * and set whether the handler should be asynchronous.
-     *
+     * <p>
      * Handlers are synchronous by default unless this constructor is used to make
      * one that is strictly asynchronous.
-     *
+     * <p>
      * Asynchronous messages represent interrupts or events that do not require global ordering
      * with respect to synchronous messages.  Asynchronous messages are not subject to
      * the synchronization barriers introduced by {@link MessageQueue#enqueueSyncBarrier(long)}.
      *
      * @param async If true, the handler calls {@link Message#setAsynchronous(boolean)} for
-     * each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
-     *
+     *              each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
      * @hide
      */
     @UnsupportedAppUsage
@@ -197,35 +202,34 @@ public class Handler {
     /**
      * Use the {@link Looper} for the current thread with the specified callback interface
      * and set whether the handler should be asynchronous.
-     *
+     * <p>
      * Handlers are synchronous by default unless this constructor is used to make
      * one that is strictly asynchronous.
-     *
+     * <p>
      * Asynchronous messages represent interrupts or events that do not require global ordering
      * with respect to synchronous messages.  Asynchronous messages are not subject to
      * the synchronization barriers introduced by {@link MessageQueue#enqueueSyncBarrier(long)}.
      *
      * @param callback The callback interface in which to handle messages, or null.
-     * @param async If true, the handler calls {@link Message#setAsynchronous(boolean)} for
-     * each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
-     *
+     * @param async    If true, the handler calls {@link Message#setAsynchronous(boolean)} for
+     *                 each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
      * @hide
      */
     public Handler(@Nullable Callback callback, boolean async) {
         if (FIND_POTENTIAL_LEAKS) {
             final Class<? extends Handler> klass = getClass();
             if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &&
-                    (klass.getModifiers() & Modifier.STATIC) == 0) {
+                (klass.getModifiers() & Modifier.STATIC) == 0) {
                 Log.w(TAG, "The following Handler class should be static or leaks might occur: " +
-                    klass.getCanonicalName());
+                           klass.getCanonicalName());
             }
         }
 
         mLooper = Looper.myLooper();
         if (mLooper == null) {
             throw new RuntimeException(
-                "Can't create handler inside thread " + Thread.currentThread()
-                        + " that has not called Looper.prepare()");
+                    "Can't create handler inside thread " + Thread.currentThread()
+                    + " that has not called Looper.prepare()");
         }
         mQueue = mLooper.mQueue;
         mCallback = callback;
@@ -236,19 +240,18 @@ public class Handler {
      * Use the provided {@link Looper} instead of the default one and take a callback
      * interface in which to handle messages.  Also set whether the handler
      * should be asynchronous.
-     *
+     * <p>
      * Handlers are synchronous by default unless this constructor is used to make
      * one that is strictly asynchronous.
-     *
+     * <p>
      * Asynchronous messages represent interrupts or events that do not require global ordering
      * with respect to synchronous messages.  Asynchronous messages are not subject to
      * the synchronization barriers introduced by conditions such as display vsync.
      *
-     * @param looper The looper, must not be null.
+     * @param looper   The looper, must not be null.
      * @param callback The callback interface in which to handle messages, or null.
-     * @param async If true, the handler calls {@link Message#setAsynchronous(boolean)} for
-     * each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
-     *
+     * @param async    If true, the handler calls {@link Message#setAsynchronous(boolean)} for
+     *                 each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
      * @hide
      */
     @UnsupportedAppUsage
@@ -266,10 +269,9 @@ public class Handler {
      * <p>Messages sent to an async handler are guaranteed to be ordered with respect to one another,
      * but not necessarily with respect to messages from other Handlers.</p>
      *
-     * @see #createAsync(Looper, Callback) to create an async Handler with custom message handling.
-     *
      * @param looper the Looper that the new Handler should be bound to
      * @return a new async Handler instance
+     * @see #createAsync(Looper, Callback) to create an async Handler with custom message handling.
      */
     @NonNull
     public static Handler createAsync(@NonNull Looper looper) {
@@ -284,10 +286,9 @@ public class Handler {
      * <p>Messages sent to an async handler are guaranteed to be ordered with respect to one another,
      * but not necessarily with respect to messages from other Handlers.</p>
      *
-     * @see #createAsync(Looper) to create an async Handler without custom message handling.
-     *
      * @param looper the Looper that the new Handler should be bound to
      * @return a new async Handler instance
+     * @see #createAsync(Looper) to create an async Handler without custom message handling.
      */
     @NonNull
     public static Handler createAsync(@NonNull Looper looper, @NonNull Callback callback) {
@@ -296,7 +297,9 @@ public class Handler {
         return new Handler(looper, callback, true);
     }
 
-    /** @hide */
+    /**
+     * @hide
+     */
     @UnsupportedAppUsage
     @NonNull
     public static Handler getMain() {
@@ -306,13 +309,17 @@ public class Handler {
         return MAIN_THREAD_HANDLER;
     }
 
-    /** @hide */
+    /**
+     * @hide
+     */
     @NonNull
     public static Handler mainIfNull(@Nullable Handler handler) {
         return handler == null ? getMain() : handler;
     }
 
-    /** {@hide} */
+    /**
+     * {@hide}
+     */
     @NonNull
     public String getTraceName(@NonNull Message message) {
         if (message.callback instanceof TraceNameSupplier) {
@@ -334,8 +341,8 @@ public class Handler {
      * The default implementation will either return the class name of the
      * message callback if any, or the hexadecimal representation of the
      * message "what" field.
-     *  
-     * @param message The message whose name is being queried 
+     *
+     * @param message The message whose name is being queried
      */
     @NonNull
     public String getMessageName(@NonNull Message message) {
@@ -348,33 +355,30 @@ public class Handler {
     /**
      * Returns a new {@link android.os.Message Message} from the global message pool. More efficient than
      * creating and allocating new instances. The retrieved message has its handler set to this instance (Message.target == this).
-     *  If you don't want that facility, just call Message.obtain() instead.
+     * If you don't want that facility, just call Message.obtain() instead.
      */
     @NonNull
-    public final Message obtainMessage()
-    {
+    public final Message obtainMessage() {
         return Message.obtain(this);
     }
 
     /**
      * Same as {@link #obtainMessage()}, except that it also sets the what member of the returned Message.
-     * 
+     *
      * @param what Value to assign to the returned Message.what field.
      * @return A Message from the global message pool.
      */
     @NonNull
-    public final Message obtainMessage(int what)
-    {
+    public final Message obtainMessage(int what) {
         return Message.obtain(this, what);
     }
-    
+
     /**
-     * 
-     * Same as {@link #obtainMessage()}, except that it also sets the what and obj members 
+     * Same as {@link #obtainMessage()}, except that it also sets the what and obj members
      * of the returned Message.
-     * 
+     *
      * @param what Value to assign to the returned Message.what field.
-     * @param obj Value to assign to the returned Message.obj field.
+     * @param obj  Value to assign to the returned Message.obj field.
      * @return A Message from the global message pool.
      */
     @NonNull
@@ -383,28 +387,27 @@ public class Handler {
     }
 
     /**
-     * 
      * Same as {@link #obtainMessage()}, except that it also sets the what, arg1 and arg2 members of the returned
      * Message.
+     *
      * @param what Value to assign to the returned Message.what field.
      * @param arg1 Value to assign to the returned Message.arg1 field.
      * @param arg2 Value to assign to the returned Message.arg2 field.
      * @return A Message from the global message pool.
      */
     @NonNull
-    public final Message obtainMessage(int what, int arg1, int arg2)
-    {
+    public final Message obtainMessage(int what, int arg1, int arg2) {
         return Message.obtain(this, what, arg1, arg2);
     }
-    
+
     /**
-     * 
-     * Same as {@link #obtainMessage()}, except that it also sets the what, obj, arg1,and arg2 values on the 
+     * Same as {@link #obtainMessage()}, except that it also sets the what, obj, arg1,and arg2 values on the
      * returned Message.
+     *
      * @param what Value to assign to the returned Message.what field.
      * @param arg1 Value to assign to the returned Message.arg1 field.
      * @param arg2 Value to assign to the returned Message.arg2 field.
-     * @param obj Value to assign to the returned Message.obj field.
+     * @param obj  Value to assign to the returned Message.obj field.
      * @return A Message from the global message pool.
      */
     @NonNull
@@ -414,19 +417,18 @@ public class Handler {
 
     /**
      * Causes the Runnable r to be added to the message queue.
-     * The runnable will be run on the thread to which this handler is 
-     * attached. 
-     *  
+     * The runnable will be run on the thread to which this handler is
+     * attached.
+     *
      * @param r The Runnable that will be executed.
-     * 
-     * @return Returns true if the Runnable was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     * @return Returns true if the Runnable was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      */
     public final boolean post(@NonNull Runnable r) {
-       return  sendMessageDelayed(getPostMessage(r), 0);
+        return sendMessageDelayed(getPostMessage(r), 0);
     }
-    
+
     /**
      * Causes the Runnable r to be added to the message queue, to be run
      * at a specific time given by <var>uptimeMillis</var>.
@@ -434,21 +436,20 @@ public class Handler {
      * Time spent in deep sleep will add an additional delay to execution.
      * The runnable will be run on the thread to which this handler is attached.
      *
-     * @param r The Runnable that will be executed.
+     * @param r            The Runnable that will be executed.
      * @param uptimeMillis The absolute time at which the callback should run,
-     *         using the {@link android.os.SystemClock#uptimeMillis} time-base.
-     *  
-     * @return Returns true if the Runnable was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the Runnable will be processed -- if
-     *         the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
+     *                     using the {@link android.os.SystemClock#uptimeMillis} time-base.
+     * @return Returns true if the Runnable was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the Runnable will be processed -- if
+     * the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      */
     public final boolean postAtTime(@NonNull Runnable r, long uptimeMillis) {
         return sendMessageAtTime(getPostMessage(r), uptimeMillis);
     }
-    
+
     /**
      * Causes the Runnable r to be added to the message queue, to be run
      * at a specific time given by <var>uptimeMillis</var>.
@@ -456,26 +457,24 @@ public class Handler {
      * Time spent in deep sleep will add an additional delay to execution.
      * The runnable will be run on the thread to which this handler is attached.
      *
-     * @param r The Runnable that will be executed.
-     * @param token An instance which can be used to cancel {@code r} via
-     *         {@link #removeCallbacksAndMessages}.
+     * @param r            The Runnable that will be executed.
+     * @param token        An instance which can be used to cancel {@code r} via
+     *                     {@link #removeCallbacksAndMessages}.
      * @param uptimeMillis The absolute time at which the callback should run,
-     *         using the {@link android.os.SystemClock#uptimeMillis} time-base.
-     * 
-     * @return Returns true if the Runnable was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the Runnable will be processed -- if
-     *         the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
-     *         
+     *                     using the {@link android.os.SystemClock#uptimeMillis} time-base.
+     * @return Returns true if the Runnable was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the Runnable will be processed -- if
+     * the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      * @see android.os.SystemClock#uptimeMillis
      */
     public final boolean postAtTime(
             @NonNull Runnable r, @Nullable Object token, long uptimeMillis) {
         return sendMessageAtTime(getPostMessage(r, token), uptimeMillis);
     }
-    
+
     /**
      * Causes the Runnable r to be added to the message queue, to be run
      * after the specified amount of time elapses.
@@ -483,23 +482,24 @@ public class Handler {
      * is attached.
      * <b>The time-base is {@link android.os.SystemClock#uptimeMillis}.</b>
      * Time spent in deep sleep will add an additional delay to execution.
-     *  
-     * @param r The Runnable that will be executed.
+     *
+     * @param r           The Runnable that will be executed.
      * @param delayMillis The delay (in milliseconds) until the Runnable
-     *        will be executed.
-     *        
-     * @return Returns true if the Runnable was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the Runnable will be processed --
-     *         if the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
+     *                    will be executed.
+     * @return Returns true if the Runnable was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the Runnable will be processed --
+     * if the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      */
     public final boolean postDelayed(@NonNull Runnable r, long delayMillis) {
         return sendMessageDelayed(getPostMessage(r), delayMillis);
     }
-    
-    /** @hide */
+
+    /**
+     * @hide
+     */
     public final boolean postDelayed(Runnable r, int what, long delayMillis) {
         return sendMessageDelayed(getPostMessage(r).setWhat(what), delayMillis);
     }
@@ -512,18 +512,17 @@ public class Handler {
      * <b>The time-base is {@link android.os.SystemClock#uptimeMillis}.</b>
      * Time spent in deep sleep will add an additional delay to execution.
      *
-     * @param r The Runnable that will be executed.
-     * @param token An instance which can be used to cancel {@code r} via
-     *         {@link #removeCallbacksAndMessages}.
+     * @param r           The Runnable that will be executed.
+     * @param token       An instance which can be used to cancel {@code r} via
+     *                    {@link #removeCallbacksAndMessages}.
      * @param delayMillis The delay (in milliseconds) until the Runnable
-     *        will be executed.
-     *
+     *                    will be executed.
      * @return Returns true if the Runnable was successfully placed in to the
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the Runnable will be processed --
-     *         if the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the Runnable will be processed --
+     * if the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      */
     public final boolean postDelayed(
             @NonNull Runnable r, @Nullable Object token, long delayMillis) {
@@ -538,12 +537,11 @@ public class Handler {
      * <b>This method is only for use in very special circumstances -- it
      * can easily starve the message queue, cause ordering problems, or have
      * other unexpected side-effects.</b>
-     *  
+     *
      * @param r The Runnable that will be executed.
-     * 
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      */
     public final boolean postAtFrontOfQueue(@NonNull Runnable r) {
         return sendMessageAtFrontOfQueue(getPostMessage(r));
@@ -578,13 +576,11 @@ public class Handler {
      * (TODO: We should fix this by making MessageQueue aware of blocking runnables.)
      * </p>
      *
-     * @param r The Runnable that will be executed synchronously.
+     * @param r       The Runnable that will be executed synchronously.
      * @param timeout The timeout in milliseconds, or 0 to wait indefinitely.
-     *
      * @return Returns true if the Runnable was successfully executed.
-     *         Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
-     *
+     * Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      * @hide This method is prone to abuse and should probably not be in the API.
      * If we ever do make it part of the API, we might want to rename it to something
      * less funny like runUnsafe().
@@ -626,10 +622,10 @@ public class Handler {
      * Pushes a message onto the end of the message queue after all pending messages
      * before the current time. It will be received in {@link #handleMessage},
      * in the thread attached to this handler.
-     *  
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      */
     public final boolean sendMessage(@NonNull Message msg) {
         return sendMessageDelayed(msg, 0);
@@ -637,24 +633,23 @@ public class Handler {
 
     /**
      * Sends a Message containing only the what value.
-     *  
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      */
-    public final boolean sendEmptyMessage(int what)
-    {
+    public final boolean sendEmptyMessage(int what) {
         return sendEmptyMessageDelayed(what, 0);
     }
 
     /**
      * Sends a Message containing only the what value, to be delivered
      * after the specified amount of time elapses.
-     * @see #sendMessageDelayed(android.os.Message, long) 
-     * 
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
+     * @see #sendMessageDelayed(android.os.Message, long)
      */
     public final boolean sendEmptyMessageDelayed(int what, long delayMillis) {
         Message msg = Message.obtain();
@@ -663,13 +658,13 @@ public class Handler {
     }
 
     /**
-     * Sends a Message containing only the what value, to be delivered 
+     * Sends a Message containing only the what value, to be delivered
      * at a specific time.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      * @see #sendMessageAtTime(android.os.Message, long)
-     *  
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
      */
 
     public final boolean sendEmptyMessageAtTime(int what, long uptimeMillis) {
@@ -682,13 +677,13 @@ public class Handler {
      * Enqueue a message into the message queue after all pending messages
      * before (current time + delayMillis). You will receive it in
      * {@link #handleMessage}, in the thread attached to this handler.
-     *  
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the message will be processed -- if
-     *         the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the message will be processed -- if
+     * the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      */
     public final boolean sendMessageDelayed(@NonNull Message msg, long delayMillis) {
         if (delayMillis < 0) {
@@ -704,17 +699,16 @@ public class Handler {
      * Time spent in deep sleep will add an additional delay to execution.
      * You will receive it in {@link #handleMessage}, in the thread attached
      * to this handler.
-     * 
+     *
      * @param uptimeMillis The absolute time at which the message should be
-     *         delivered, using the
-     *         {@link android.os.SystemClock#uptimeMillis} time-base.
-     *         
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.  Note that a
-     *         result of true does not mean the message will be processed -- if
-     *         the looper is quit before the delivery time of the message
-     *         occurs then the message will be dropped.
+     *                     delivered, using the
+     *                     {@link android.os.SystemClock#uptimeMillis} time-base.
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.  Note that a
+     * result of true does not mean the message will be processed -- if
+     * the looper is quit before the delivery time of the message
+     * occurs then the message will be dropped.
      */
     public boolean sendMessageAtTime(@NonNull Message msg, long uptimeMillis) {
         MessageQueue queue = mQueue;
@@ -734,16 +728,16 @@ public class Handler {
      * <b>This method is only for use in very special circumstances -- it
      * can easily starve the message queue, cause ordering problems, or have
      * other unexpected side-effects.</b>
-     *  
-     * @return Returns true if the message was successfully placed in to the 
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     *
+     * @return Returns true if the message was successfully placed in to the
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      */
     public final boolean sendMessageAtFrontOfQueue(@NonNull Message msg) {
         MessageQueue queue = mQueue;
         if (queue == null) {
             RuntimeException e = new RuntimeException(
-                this + " sendMessageAtTime() called with no mQueue");
+                    this + " sendMessageAtTime() called with no mQueue");
             Log.w("Looper", e.getMessage(), e);
             return false;
         }
@@ -755,8 +749,8 @@ public class Handler {
      * or {@link #sendMessage pushes it to the queue} otherwise
      *
      * @return Returns true if the message was successfully ran or placed in to the
-     *         message queue.  Returns false on failure, usually because the
-     *         looper processing the message queue is exiting.
+     * message queue.  Returns false on failure, usually because the
+     * looper processing the message queue is exiting.
      * @hide
      */
     public final boolean executeOrSendMessage(@NonNull Message msg) {
@@ -768,7 +762,7 @@ public class Handler {
     }
 
     private boolean enqueueMessage(@NonNull MessageQueue queue, @NonNull Message msg,
-            long uptimeMillis) {
+                                   long uptimeMillis) {
         msg.target = this;
         msg.workSourceUid = ThreadLocalWorkSource.getUid();
 
@@ -800,7 +794,7 @@ public class Handler {
      * 'object' that are in the message queue.  If <var>object</var> is null,
      * all messages will be removed.
      *
-     *@hide
+     * @hide
      */
     public final void removeEqualMessages(int what, @Nullable Object object) {
         mQueue.removeEqualMessages(this, what, object);
@@ -820,11 +814,12 @@ public class Handler {
      * <var>obj</var> is <var>token</var>.  If <var>token</var> is null,
      * all callbacks and messages will be removed.
      *
-     *@hide
+     * @hide
      */
     public final void removeCallbacksAndEqualMessages(@Nullable Object token) {
         mQueue.removeCallbacksAndEqualMessages(this, token);
     }
+
     /**
      * Check if there are any pending posts of messages with code 'what' in
      * the message queue.
@@ -835,6 +830,7 @@ public class Handler {
 
     /**
      * Return whether there are any messages or callbacks currently scheduled on this handler.
+     *
      * @hide
      */
     public final boolean hasMessagesOrCallbacks() {
@@ -853,7 +849,7 @@ public class Handler {
      * Check if there are any pending posts of messages with code 'what' and
      * whose obj is 'object' in the message queue.
      *
-     *@hide
+     * @hide
      */
     public final boolean hasEqualMessages(int what, @Nullable Object object) {
         return mQueue.hasEqualMessages(this, what, object);
@@ -868,7 +864,7 @@ public class Handler {
     }
 
     // if we can get rid of this method, the handler need not remember its loop
-    // we could instead export a getMessageQueue() method... 
+    // we could instead export a getMessageQueue() method...
     @NonNull
     public final Looper getLooper() {
         return mLooper;
@@ -898,8 +894,8 @@ public class Handler {
     @Override
     public String toString() {
         return "Handler (" + getClass().getName() + ") {"
-        + Integer.toHexString(System.identityHashCode(this))
-        + "}";
+               + Integer.toHexString(System.identityHashCode(this))
+               + "}";
     }
 
     @UnsupportedAppUsage

@@ -476,6 +476,8 @@ public abstract class LayoutInflater {
      *         XML file.
      */
     //todo 加载布局layout
+    //root==null或者attachToRoot为false返回的是layout对应的view
+    //root不为空且attachToRoot为true 返回的是添加了layout布局的root
     public View inflate(@LayoutRes int resource, @Nullable ViewGroup root) {
         //todo 加载布局layout
         return inflate(resource, root, root != null);
@@ -629,6 +631,8 @@ public abstract class LayoutInflater {
      *         the inflated XML file.
      */
     //todo 加载布局layout
+    //root==null或者attachToRoot为false返回的是layout对应的view
+    //root不为空且attachToRoot为true 返回的是添加了layout布局的root
     public View inflate(XmlPullParser parser, @Nullable ViewGroup root, boolean attachToRoot) {
         synchronized (mConstructorArgs) {
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, "inflate");
@@ -649,7 +653,8 @@ public abstract class LayoutInflater {
                             + name);
                     System.out.println("**************************");
                 }
-
+//root不为空且attachToRoot为true 返回的是添加了layout布局的root
+                //因为Merge少一层布局,所以要返回添加Layout的root
                 if (TAG_MERGE.equals(name)) {
                     if (root == null || !attachToRoot) {
                         throw new InflateException("<merge /> can be used only with a valid "
