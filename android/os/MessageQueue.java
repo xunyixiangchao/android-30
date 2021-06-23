@@ -43,6 +43,7 @@ public final class MessageQueue {
     private static final boolean DEBUG = false;
 
     // True if the message queue can be quit.
+    // TODO:是否允许退出
     @UnsupportedAppUsage
     private final boolean mQuitAllowed;
 
@@ -50,11 +51,13 @@ public final class MessageQueue {
     @SuppressWarnings("unused")
     private long mPtr; // used by native code
 
+    // TODO:消息头
     @UnsupportedAppUsage
     Message mMessages;
     @UnsupportedAppUsage
     private final ArrayList<IdleHandler> mIdleHandlers = new ArrayList<IdleHandler>();
     private SparseArray<FileDescriptorRecord> mFileDescriptorRecords;
+    //待办
     private IdleHandler[] mPendingIdleHandlers;
     private boolean mQuitting;
 
@@ -79,6 +82,7 @@ public final class MessageQueue {
         mPtr = nativeInit();
     }
 
+    // TODO:垃圾回收前调用一下，调用native层销毁队列
     @Override
     protected void finalize() throws Throwable {
         try {
@@ -122,6 +126,7 @@ public final class MessageQueue {
      *
      * @param handler The IdleHandler to be added.
      */
+    // TODO:添加空闲handler
     public void addIdleHandler(@NonNull IdleHandler handler) {
         if (handler == null) {
             throw new NullPointerException("Can't add a null IdleHandler");
@@ -329,7 +334,7 @@ public final class MessageQueue {
         if (ptr == 0) {
             return null;
         }
-
+        // TODO:每次looper中调用next()取消息时为-1
         int pendingIdleHandlerCount = -1; // -1 only during first iteration
         int nextPollTimeoutMillis = 0;
         // TODO:轮循
@@ -398,6 +403,7 @@ public final class MessageQueue {
                 // If first time idle, then get the number of idlers to run.
                 // Idle handles only run if the queue is empty or if the first message
                 // in the queue (possibly a barrier) is due to be handled in the future.
+                // TODO:没有消息或头消息还没到执行时间
                 if (pendingIdleHandlerCount < 0
                         && (mMessages == null || now < mMessages.when)) {
                     pendingIdleHandlerCount = mIdleHandlers.size();
@@ -419,12 +425,14 @@ public final class MessageQueue {
 
             // Run the idle handlers.
             // We only ever reach this code block during the first iteration.
+            // TODO:循环执行空闲Handler
             for (int i = 0; i < pendingIdleHandlerCount; i++) {
                 final IdleHandler idler = mPendingIdleHandlers[i];
                 mPendingIdleHandlers[i] = null; // release the reference to the handler
 
                 boolean keep = false;
                 try {
+                    //这个返回false则清除，true就一直在，一直执行
                     keep = idler.queueIdle();
                 } catch (Throwable t) {
                     Log.wtf(TAG, "IdleHandler threw exception", t);
@@ -574,6 +582,7 @@ public final class MessageQueue {
         }
     }
 
+    // TODO:往队列里添加消息
     boolean enqueueMessage(Message msg, long when) {
         if (msg.target == null) {
             throw new IllegalArgumentException("Message must have a target.");
@@ -704,6 +713,7 @@ public final class MessageQueue {
         }
     }
 
+// TODO:为什么2次循环
     void removeMessages(Handler h, int what, Object object) {
         if (h == null) {
             return;

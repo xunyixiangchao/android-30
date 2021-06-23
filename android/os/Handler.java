@@ -215,6 +215,8 @@ public class Handler {
      *                 each {@link Message} that is sent to it or {@link Runnable} that is posted to it.
      * @hide
      */
+    // TODO:async为true表示异步消息，false是同步消息。默认是同步消息
+    // TODO:mLooper是使用Looper.myLooper()获取，mQueue是从mLooper中获取
     public Handler(@Nullable Callback callback, boolean async) {
         if (FIND_POTENTIAL_LEAKS) {
             final Class<? extends Handler> klass = getClass();
@@ -302,6 +304,7 @@ public class Handler {
      */
     @UnsupportedAppUsage
     @NonNull
+    // TODO:主线程Handler
     public static Handler getMain() {
         if (MAIN_THREAD_HANDLER == null) {
             MAIN_THREAD_HANDLER = new Handler(Looper.getMainLooper());
@@ -357,6 +360,7 @@ public class Handler {
      * creating and allocating new instances. The retrieved message has its handler set to this instance (Message.target == this).
      * If you don't want that facility, just call Message.obtain() instead.
      */
+    // TODO:创建一个消息，使用消息池消息，而不是new一个Message
     @NonNull
     public final Message obtainMessage() {
         return Message.obtain(this);
@@ -425,6 +429,7 @@ public class Handler {
      * message queue.  Returns false on failure, usually because the
      * looper processing the message queue is exiting.
      */
+    // TODO: post方法是创建message时，设置message的callback,并发送
     public final boolean post(@NonNull Runnable r) {
         return sendMessageDelayed(getPostMessage(r), 0);
     }
@@ -446,6 +451,7 @@ public class Handler {
      * the looper is quit before the delivery time of the message
      * occurs then the message will be dropped.
      */
+    // TODO:在特定时间发送消息
     public final boolean postAtTime(@NonNull Runnable r, long uptimeMillis) {
         return sendMessageAtTime(getPostMessage(r), uptimeMillis);
     }
@@ -627,6 +633,7 @@ public class Handler {
      * message queue.  Returns false on failure, usually because the
      * looper processing the message queue is exiting.
      */
+    // TODO:sendMessage发送的消息不带callback
     public final boolean sendMessage(@NonNull Message msg) {
         return sendMessageDelayed(msg, 0);
     }
@@ -638,6 +645,7 @@ public class Handler {
      * message queue.  Returns false on failure, usually because the
      * looper processing the message queue is exiting.
      */
+    // TODO:发送一个空消息
     public final boolean sendEmptyMessage(int what) {
         return sendEmptyMessageDelayed(what, 0);
     }
@@ -685,6 +693,7 @@ public class Handler {
      * the looper is quit before the delivery time of the message
      * occurs then the message will be dropped.
      */
+    // TODO:延迟delayMillis后发送消息，例如 2000后（2秒）
     public final boolean sendMessageDelayed(@NonNull Message msg, long delayMillis) {
         if (delayMillis < 0) {
             delayMillis = 0;
@@ -710,6 +719,7 @@ public class Handler {
      * the looper is quit before the delivery time of the message
      * occurs then the message will be dropped.
      */
+    // TODO:在特定的时间发送消息  例如  1624455533
     public boolean sendMessageAtTime(@NonNull Message msg, long uptimeMillis) {
         MessageQueue queue = mQueue;
         if (queue == null) {
@@ -761,14 +771,18 @@ public class Handler {
         return sendMessage(msg);
     }
 
+    // TODO:所有的发送消息都会调用到这里
     private boolean enqueueMessage(@NonNull MessageQueue queue, @NonNull Message msg,
                                    long uptimeMillis) {
+        //msg的target赋值
         msg.target = this;
+        //设置uid
         msg.workSourceUid = ThreadLocalWorkSource.getUid();
-
+        //异步消息
         if (mAsynchronous) {
             msg.setAsynchronous(true);
         }
+        // TODO:发送到MessageQueue
         return queue.enqueueMessage(msg, uptimeMillis);
     }
 
@@ -865,6 +879,7 @@ public class Handler {
 
     // if we can get rid of this method, the handler need not remember its loop
     // we could instead export a getMessageQueue() method...
+    // TODO:获取looper
     @NonNull
     public final Looper getLooper() {
         return mLooper;
@@ -916,6 +931,7 @@ public class Handler {
         }
     }
 
+    // TODO:获取一个带Runnable的消息
     private static Message getPostMessage(Runnable r) {
         Message m = Message.obtain();
         m.callback = r;

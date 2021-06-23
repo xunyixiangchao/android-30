@@ -40,6 +40,7 @@ public final class Message implements Parcelable {
      * for message codes, so you do not need to worry about yours conflicting
      * with other handlers.
      */
+    // TODO:用于定义消息类型
     public int what;
 
     /**
@@ -104,9 +105,11 @@ public final class Message implements Parcelable {
      *
      * It is an error to attempt to enqueue or recycle a message that is already in use.
      */
+    // TODO:标识1在使用
     /*package*/ static final int FLAG_IN_USE = 1 << 0;
 
     /** If set message is asynchronous */
+    // TODO:标识2 异步消息
     /*package*/ static final int FLAG_ASYNCHRONOUS = 1 << 1;
 
     /** Flags to clear in the copyFrom method */
@@ -122,8 +125,9 @@ public final class Message implements Parcelable {
      */
     @UnsupportedAppUsage
     @VisibleForTesting(visibility = VisibleForTesting.Visibility.PACKAGE)
+    // TODO:消息执行时间
     public long when;
-
+    // TODO:bundle型数据
     /*package*/ Bundle data;
 
     @UnsupportedAppUsage
@@ -138,10 +142,13 @@ public final class Message implements Parcelable {
 
 
     /** @hide */
+    // TODO:消息池同步时的锁对象
     public static final Object sPoolSync = new Object();
+    // TODO:消息池 头节点
     private static Message sPool;
+    // TODO:池存放的大小
     private static int sPoolSize = 0;
-
+    // TODO:最大值
     private static final int MAX_POOL_SIZE = 50;
 
     private static boolean gCheckRecycle = true;
@@ -150,6 +157,7 @@ public final class Message implements Parcelable {
      * Return a new Message instance from the global pool. Allows us to
      * avoid allocating new objects in many cases.
      */
+    // TODO:从池子取消息，如果没有消息就创建一个
     public static Message obtain() {
         synchronized (sPoolSync) {
             if (sPool != null) {
@@ -305,6 +313,7 @@ public final class Message implements Parcelable {
      * enqueued or that is in the process of being delivered to a Handler.
      * </p>
      */
+    // TODO:消息回收缓存
     public void recycle() {
         if (isInUse()) {
             if (gCheckRecycle) {
@@ -320,6 +329,7 @@ public final class Message implements Parcelable {
      * Recycles a Message that may be in-use.
      * Used internally by the MessageQueue and Looper when disposing of queued Messages.
      */
+    // TODO:消息回收缓存-不check
     @UnsupportedAppUsage
     void recycleUnchecked() {
         // Mark the message as in use while it remains in the recycled object pool.
@@ -421,6 +431,7 @@ public final class Message implements Parcelable {
      * @see #peekData()
      * @see #setData(Bundle)
      */
+    // TODO:获取data,如果不存在 就创建一个新对象
     public Bundle getData() {
         if (data == null) {
             data = new Bundle();
@@ -436,6 +447,7 @@ public final class Message implements Parcelable {
      * @see #getData()
      * @see #setData(Bundle)
      */
+    // TODO:获取data,如果不存在 返回null
     public Bundle peekData() {
         return data;
     }
@@ -464,6 +476,7 @@ public final class Message implements Parcelable {
      * Sends this Message to the Handler specified by {@link #getTarget}.
      * Throws a null pointer exception if this field has not been set.
      */
+    // TODO:消息必需有target才能发送，否则空指针
     public void sendToTarget() {
         target.sendMessage(this);
     }
@@ -476,6 +489,7 @@ public final class Message implements Parcelable {
      *
      * @see #setAsynchronous(boolean)
      */
+    // TODO:是否是异步消息
     public boolean isAsynchronous() {
         return (flags & FLAG_ASYNCHRONOUS) != 0;
     }
