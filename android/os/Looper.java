@@ -68,6 +68,7 @@ public final class Looper {
     private static final String TAG = "Looper";
 
     // sThreadLocal.get() will return null unless you've called prepare().
+    //静态常量,整个进程中只有一个sThreadLocal对象
     @UnsupportedAppUsage
     static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
     @UnsupportedAppUsage
@@ -100,14 +101,17 @@ public final class Looper {
       * {@link #loop()} after calling this method, and end it by calling
       * {@link #quit()}.
       */
+    // TODO: Looper初始化,允许退出
     public static void prepare() {
         prepare(true);
     }
 
     private static void prepare(boolean quitAllowed) {
+        //先判断是否已经存在,存在则报错
         if (sThreadLocal.get() != null) {
             throw new RuntimeException("Only one Looper may be created per thread");
         }
+        //创建一个Looper并放在ThreadLocal中
         sThreadLocal.set(new Looper(quitAllowed));
     }
 
@@ -118,13 +122,16 @@ public final class Looper {
      * @deprecated The main looper for your application is created by the Android environment,
      *   so you should never need to call this function yourself.
      */
+    // TODO: 初始化主线程的looper
     @Deprecated
     public static void prepareMainLooper() {
+        //不允许退出
         prepare(false);
         synchronized (Looper.class) {
             if (sMainLooper != null) {
                 throw new IllegalStateException("The main Looper has already been prepared.");
             }
+            //赋值主线程Looper
             sMainLooper = myLooper();
         }
     }
@@ -132,6 +139,7 @@ public final class Looper {
     /**
      * Returns the application's main looper, which lives in the main thread of the application.
      */
+    // TODO: 获取主线程Looper
     public static Looper getMainLooper() {
         synchronized (Looper.class) {
             return sMainLooper;
@@ -151,6 +159,7 @@ public final class Looper {
      * Run the message queue in this thread. Be sure to call
      * {@link #quit()} to end the loop.
      */
+    //loop()循环
     public static void loop() {
         final Looper me = myLooper();
         if (me == null) {
@@ -162,6 +171,7 @@ public final class Looper {
         }
 
         me.mInLoop = true;
+        //获取looper对应的MessageQueue
         final MessageQueue queue = me.mQueue;
 
         // Make sure the identity of this thread is that of the local process,
@@ -189,6 +199,7 @@ public final class Looper {
             }
 
             // This must be in a local variable, in case a UI event sets the logger
+            //打印日志
             final Printer logging = me.mLogging;
             if (logging != null) {
                 logging.println(">>>>> Dispatching to " + msg.target + " " +
@@ -222,7 +233,7 @@ public final class Looper {
             }
             long origWorkSource = ThreadLocalWorkSource.setUid(msg.workSourceUid);
             try {
-                // TODO:发送消息
+                // TODO:发送消息--消费消息
                 msg.target.dispatchMessage(msg);
                 if (observer != null) {
                     observer.messageDispatched(token, msg);
@@ -294,6 +305,7 @@ public final class Looper {
      * Return the Looper object associated with the current thread.  Returns
      * null if the calling thread is not associated with a Looper.
      */
+    //获取当前线程looper
     public static @Nullable Looper myLooper() {
         return sThreadLocal.get();
     }
@@ -307,14 +319,19 @@ public final class Looper {
         return myLooper().mQueue;
     }
 
+    // TODO: 私有方法,在prepare()方法中调用
+    //主线程不会走到这,因为主线程的Looper已经在SystemServer中创建
     private Looper(boolean quitAllowed) {
+        // TODO: 创建Looper对应的MessageQueue
         mQueue = new MessageQueue(quitAllowed);
+        // TODO: 获取当前所在线程
         mThread = Thread.currentThread();
     }
 
     /**
      * Returns true if the current thread is this looper's thread.
      */
+    // TODO: 当前线程是否是Looper对应的线程
     public boolean isCurrentThread() {
         return Thread.currentThread() == mThread;
     }
@@ -328,6 +345,7 @@ public final class Looper {
      * @param printer A Printer object that will receive log messages, or
      * null to disable message logging.
      */
+    // TODO: 给Looper设置日志打印
     public void setMessageLogging(@Nullable Printer printer) {
         mLogging = printer;
     }
@@ -363,6 +381,8 @@ public final class Looper {
      *
      * @see #quitSafely
      */
+    // TODO: 退出,调用MessageQueue的非安全退出
+    //清除所有的消息
     public void quit() {
         mQueue.quit(false);
     }
@@ -379,6 +399,8 @@ public final class Looper {
      * For example, the {@link Handler#sendMessage(Message)} method will return false.
      * </p>
      */
+    // TODO: 退出,调用MessageQueue的安全退出
+    //只清除当前时间之后的消息
     public void quitSafely() {
         mQueue.quit(true);
     }
@@ -388,6 +410,7 @@ public final class Looper {
      *
      * @return The looper's thread.
      */
+    // TODO: 获取线程
     public @NonNull Thread getThread() {
         return mThread;
     }
@@ -397,6 +420,7 @@ public final class Looper {
      *
      * @return The looper's message queue.
      */
+    //获取MessageQueue
     public @NonNull MessageQueue getQueue() {
         return mQueue;
     }

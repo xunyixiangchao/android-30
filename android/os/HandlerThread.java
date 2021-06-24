@@ -25,60 +25,71 @@ import android.annotation.Nullable;
  * <p>
  * Note that just like with a regular {@link Thread}, {@link #start()} must still be called.
  */
+// TODO: handlertrhead是个线程
 public class HandlerThread extends Thread {
     int mPriority;
     int mTid = -1;
     Looper mLooper;
     private @Nullable Handler mHandler;
 
+    //构造方法,优先级为默认
     public HandlerThread(String name) {
         super(name);
         mPriority = Process.THREAD_PRIORITY_DEFAULT;
     }
-    
+
     /**
      * Constructs a HandlerThread.
      * @param name
-     * @param priority The priority to run the thread at. The value supplied must be from 
+     * @param priority The priority to run the thread at. The value supplied must be from
      * {@link android.os.Process} and not from java.lang.Thread.
      */
+    //构造方法,带有优先级
     public HandlerThread(String name, int priority) {
         super(name);
         mPriority = priority;
     }
-    
+
     /**
      * Call back method that can be explicitly overridden if needed to execute some
      * setup before Looper loops.
      */
+    // TODO: 继承时,覆盖这个方法,来实现具体工作
     protected void onLooperPrepared() {
     }
 
     @Override
     public void run() {
+        //线程id
         mTid = Process.myTid();
+        //looper初始化
         Looper.prepare();
         synchronized (this) {
+            //上锁拿到looper后通知,防止调用getLooper()时获取不到
             mLooper = Looper.myLooper();
             notifyAll();
         }
+        //设置优先级
         Process.setThreadPriority(mPriority);
+        //具体业务
         onLooperPrepared();
+        //loop()循环起来
         Looper.loop();
         mTid = -1;
     }
-    
+
     /**
      * This method returns the Looper associated with this thread. If this thread not been started
      * or for any reason isAlive() returns false, this method will return null. If this thread
-     * has been started, this method will block until the looper has been initialized.  
+     * has been started, this method will block until the looper has been initialized.
      * @return The looper.
      */
+    //获取looper,如果还没创建好则等待,notifyall后会唤醒并返回looper
     public Looper getLooper() {
         if (!isAlive()) {
             return null;
         }
-        
+
         // If the thread has been started, wait until the looper has been created.
         synchronized (this) {
             while (isAlive() && mLooper == null) {
@@ -95,9 +106,11 @@ public class HandlerThread extends Thread {
      * @return a shared {@link Handler} associated with this thread
      * @hide
      */
+    // TODO: 获取thread对应的Hanlder
     @NonNull
     public Handler getThreadHandler() {
         if (mHandler == null) {
+            //设置当前线程对应的looper
             mHandler = new Handler(getLooper());
         }
         return mHandler;
@@ -122,6 +135,7 @@ public class HandlerThread extends Thread {
      *
      * @see #quitSafely
      */
+    //退出时,清理所有的消息
     public boolean quit() {
         Looper looper = getLooper();
         if (looper != null) {
@@ -149,6 +163,7 @@ public class HandlerThread extends Thread {
      * @return True if the looper looper has been asked to quit or false if the
      * thread had not yet started running.
      */
+    //安全退出,只清理当前时间之后的消息
     public boolean quitSafely() {
         Looper looper = getLooper();
         if (looper != null) {
@@ -161,6 +176,7 @@ public class HandlerThread extends Thread {
     /**
      * Returns the identifier of this thread. See Process.myTid().
      */
+    //获取线程id
     public int getThreadId() {
         return mTid;
     }

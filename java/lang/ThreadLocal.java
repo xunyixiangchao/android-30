@@ -157,9 +157,12 @@ public class ThreadLocal<T> {
      * @return the current thread's value of this thread-local
      */
     public T get() {
+        //获取当前线程
         Thread t = Thread.currentThread();
+        //获取当前线程的ThreadLocalMap
         ThreadLocalMap map = getMap(t);
         if (map != null) {
+            //根据当前threadLocal获取值-这里是Looper
             ThreadLocalMap.Entry e = map.getEntry(this);
             if (e != null) {
                 @SuppressWarnings("unchecked")
@@ -197,11 +200,15 @@ public class ThreadLocal<T> {
      *        this thread-local.
      */
     public void set(T value) {
+        //获取当前线程
         Thread t = Thread.currentThread();
+        //获取当前线程中ThreadLocalMap对象
         ThreadLocalMap map = getMap(t);
         if (map != null)
+            //以当前threadLoaal为key,存放looper
             map.set(this, value);
         else
+            //当前线程创建一个ThreadLocalMap对象
             createMap(t, value);
     }
 

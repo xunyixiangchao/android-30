@@ -4483,7 +4483,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         mSomeActivitiesChanged = true;
 
         // TODO Push resumeArgs into the activity for consideration
-        // todo: 桌面startActivity流程
+// todo: 桌面startActivity流程-onResume()流程---下面有显示布局流程
         final ActivityClientRecord r = performResumeActivity(token, finalStateRequest, reason);
         if (r == null) {
             // We didn't actually resume the activity, so skipping any follow-up actions.
@@ -4543,7 +4543,6 @@ public final class ActivityThread extends ClientTransactionHandler {
             if (a.mVisibleFromClient) {
                 if (!a.mWindowAdded) {
                     a.mWindowAdded = true;
-// TODO: View绘制流程 这里？还是下面-->WindowManagerImpl.addView
                     wm.addView(decor, l);
                 } else {
                     // The activity will get a callback for this {@link LayoutParams} change
@@ -4596,7 +4595,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             r.activity.mVisibleFromServer = true;
             mNumVisibleActivities++;
             if (r.activity.mVisibleFromClient) {
-// TODO: View绘制流程 这里？
+// TODO: View绘制流程-显示布局
                 r.activity.makeVisible();
             }
         }
