@@ -5147,6 +5147,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         // TODO: View绘制流程
         requestLayout();
         invalidate(true);
+        // TODO: View绘制流程
         addViewInner(child, index, params, false);
     }
 
@@ -5335,6 +5336,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         if (preventRequestLayout) {
             child.mLayoutParams = params;
         } else {
+            // TODO: View绘制流程
             child.setLayoutParams(params);
         }
 

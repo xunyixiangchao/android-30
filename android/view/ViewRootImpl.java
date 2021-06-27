@@ -767,6 +767,7 @@ public final class ViewRootImpl implements ViewParent,
         mFirst = true; // true for the first time the view is added
         mPerformContentCapture = true; // also true for the first time the view is added
         mAdded = false;
+        // TODO:创建了mAttachInfo 对象
         mAttachInfo = new View.AttachInfo(mWindowSession, mWindow, display, this, mHandler, this,
                 context);
         mCompatibleVisibilityInfo = new SystemUiVisibilityInfo();
@@ -2483,6 +2484,7 @@ public final class ViewRootImpl implements ViewParent,
             if (mViewLayoutDirectionInitial == View.LAYOUT_DIRECTION_INHERIT) {
                 host.setLayoutDirection(config.getLayoutDirection());
             }
+// TODO:view设置mAttachInfo对象
             host.dispatchAttachedToWindow(mAttachInfo, 0);
             mAttachInfo.mTreeObserver.dispatchOnWindowAttachedChange(true);
             dispatchApplyInsets(host);
@@ -2515,6 +2517,7 @@ public final class ViewRootImpl implements ViewParent,
         }
 
         // Execute enqueued actions on every traversal in case a detached view enqueued an action
+// TODO:执行
         getRunQueue().executeActions(mAttachInfo.mHandler);
 
         boolean cutoutChanged = false;

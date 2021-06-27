@@ -18256,6 +18256,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         if (mParent instanceof ViewGroup) {
             ((ViewGroup) mParent).onSetLayoutParams(this, params);
         }
+        // TODO: View绘制流程
         requestLayout();
     }
 
@@ -18830,12 +18831,25 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     public boolean post(Runnable action) {
         final AttachInfo attachInfo = mAttachInfo;
+        // TODO:如果attachInfo不为空则执行attachInfo.mHandler.post(action)
+        //这与主线程mHandler.post方法是一样的
+        //该对象是在dispatchAttachedToWindow中传入
+        //dispatchAttachedToWindow方法是在onResume()方法后，调用绘制流程ViewRootImpl#performTraversals()时调用。
+        //所以在onCreate()方法中 attachInfo 为null
         if (attachInfo != null) {
             return attachInfo.mHandler.post(action);
         }
 
         // Postpone the runnable until we know on which thread it needs to run.
         // Assume that the runnable will be successfully placed after attach.
+
+        //所以在onCreate()方法中调用的话，会将这次action缓存起来，调用executeActions时消费
+        //在ViewRootImpl#performTraversals()中，调用 getRunQueue().executeActions(mAttachInfo.mHandler)执行
+        //执行是将action以Message传入到MainHandler中，
+        //而performTraversals()方法，是 TraversalRunnable 中的执行事务，也是在主线程中执行。
+        //所以这些action要等到 TraversalRunnable 执行完后才能够执行，performTraversals() 方法中执行了onMeasure(),
+        // onLayout(),onDraw()的过程，所以
+        // 在执行action时，已经测量完，此时的View的宽高是有值的
         getRunQueue().post(action);
         return true;
     }

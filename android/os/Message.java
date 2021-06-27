@@ -137,6 +137,7 @@ public final class Message implements Parcelable {
     /*package*/ Runnable callback;
 
     // sometimes we store linked lists of these things
+    // TODO:MessageQueue链表存储时的一下个节点
     @UnsupportedAppUsage
     /*package*/ Message next;
 
