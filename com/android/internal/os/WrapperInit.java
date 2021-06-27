@@ -137,6 +137,7 @@ public class WrapperInit {
         command.append(targetSdkVersion);
         Zygote.appendQuotedShellArgs(command, args);
         preserveCapabilities();
+        //execShell执行到WrapperInit#main方法
         Zygote.execShell(command.toString());
     }
 

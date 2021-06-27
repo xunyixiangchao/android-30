@@ -931,6 +931,7 @@ public class ZygoteInit {
 
             // The select loop returns early in the child process after a fork and loops forever in the zygote.
             // loops forever in the zygote.
+            // todo: 桌面startActivity流程
             caller = zygoteServer.runSelectLoop(abiList);
         } catch (Throwable ex) {
             Log.e(TAG, "System zygote died with exception", ex);
@@ -988,6 +989,7 @@ public class ZygoteInit {
      *                              are enabled)
      * @param argv             arg strings
      */
+    // todo: 桌面startActivity流程
     public static final Runnable zygoteInit(int targetSdkVersion, long[] disabledCompatChanges,
             String[] argv, ClassLoader classLoader) {
         if (RuntimeInit.DEBUG) {
@@ -999,6 +1001,7 @@ public class ZygoteInit {
 
         RuntimeInit.commonInit();
         ZygoteInit.nativeZygoteInit();
+        // todo: 桌面startActivity流程
         return RuntimeInit.applicationInit(targetSdkVersion, disabledCompatChanges, argv,
                 classLoader);
     }
