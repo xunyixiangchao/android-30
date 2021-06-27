@@ -331,6 +331,7 @@ public class ThreadLocal<T> {
          * The table, resized as necessary.
          * table.length MUST always be a power of two.
          */
+        //和HashMap差不多，数组+链表
         private Entry[] table;
 
         /**
@@ -370,10 +371,13 @@ public class ThreadLocal<T> {
          * one when we have at least one entry to put in it.
          */
         ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+            //默认大小16，必需是2的幂次倍
             table = new Entry[INITIAL_CAPACITY];
+            //散列
             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
             table[i] = new Entry(firstKey, firstValue);
             size = 1;
+            //设置负载因子为数组长度的2/3
             setThreshold(INITIAL_CAPACITY);
         }
 
