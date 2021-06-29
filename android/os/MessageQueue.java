@@ -71,6 +71,7 @@ public final class MessageQueue {
 
     private native static long nativeInit();
     private native static void nativeDestroy(long ptr);
+    //timeoutMillis如果为-1，表示无限等待，直到有事件发生为止。如果ptr为0，则无需等待立即返回。
     @UnsupportedAppUsage
     private native void nativePollOnce(long ptr, int timeoutMillis); /*non-static for callbacks*/
     private native static void nativeWake(long ptr);
@@ -348,7 +349,7 @@ public final class MessageQueue {
             //在此期间如果有消息添加到队列，并且处理时间小于队列头消息的时间
             // 会调用nativeWake()
             //3.2进入阻塞--看enqueueMessage()
-            nativePollOnce(ptr, nextPollTimeoutMillis);
+            nativePollOnce(ptr, nextPollTimeoutMillis);//最终调用到native中 epoll_wait()进行阻塞
             //加锁，取消息时不能放消息-生产者消费者模式-对应enqueueMessage()
             synchronized (this) {
                 // Try to retrieve the next message.  Return if found.
@@ -389,7 +390,7 @@ public final class MessageQueue {
                     }
                     // TODO:3.1消息队列没有消息
                 } else {
-                    // No more messages.
+                    // 没有消息则时间为-1，无限等待
                     nextPollTimeoutMillis = -1;
                 }
                 //4.1 mQuitting=true，走dispose()

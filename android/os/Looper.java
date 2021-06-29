@@ -75,6 +75,7 @@ public final class Looper {
     private static Looper sMainLooper;  // guarded by Looper.class
     private static Observer sObserver;
 
+    //MessageQueue是final的，所以也是唯一的
     @UnsupportedAppUsage
     final MessageQueue mQueue;
     final Thread mThread;
@@ -322,7 +323,9 @@ public final class Looper {
     // TODO: 私有方法,在prepare()方法中调用
     //主线程不会走到这,因为主线程的Looper已经在SystemServer中创建
     private Looper(boolean quitAllowed) {
-        // TODO: 创建Looper对应的MessageQueue
+        // TODO: 创建Looper对应的MessageQueue，MessageQueue是final的，所以也是唯一的。
+        //所以Looper是唯一的，对应的MessageQueue也是唯一的，
+        //一个Looper对应一个MessageQueue
         mQueue = new MessageQueue(quitAllowed);
         // TODO: 获取当前所在线程
         mThread = Thread.currentThread();
