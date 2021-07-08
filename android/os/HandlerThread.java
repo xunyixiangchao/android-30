@@ -54,7 +54,7 @@ public class HandlerThread extends Thread {
      * Call back method that can be explicitly overridden if needed to execute some
      * setup before Looper loops.
      */
-    // TODO: 继承时,覆盖这个方法,来实现具体工作
+    // TODO: 继承时,覆盖这个方法,来设置loop之前的一些工作
     protected void onLooperPrepared() {
     }
 
@@ -67,7 +67,7 @@ public class HandlerThread extends Thread {
         synchronized (this) {
             //上锁拿到looper后通知,防止调用getLooper()时获取不到
             mLooper = Looper.myLooper();
-            notifyAll();
+            notifyAll();//唤醒其他等待的锁，但不会释放锁
         }
         //设置优先级
         Process.setThreadPriority(mPriority);
@@ -94,7 +94,7 @@ public class HandlerThread extends Thread {
         synchronized (this) {
             while (isAlive() && mLooper == null) {
                 try {
-                    wait();
+                    wait();//looper没有创建时，等待，释放锁。被唤醒后不会立即执行，等上面的锁执行完释放锁，再拿到锁才会执行
                 } catch (InterruptedException e) {
                 }
             }

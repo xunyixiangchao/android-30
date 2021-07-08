@@ -391,6 +391,7 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
      * @see WindowManagerThreadPriorityBooster
      */
     final Object mGlobalLockWithoutBoost = mGlobalLock;
+    //todo 管理Activity栈
     ActivityStackSupervisor mStackSupervisor;
     RootWindowContainer mRootWindowContainer;
     WindowManagerService mWindowManager;
@@ -781,6 +782,8 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
         mFactoryTest = FactoryTest.getMode();
         mSystemThread = ActivityThread.currentActivityThread();
         mUiContext = mSystemThread.getSystemUiContext();
+        //28之前没有的。 管理activity的生命周期--LaunchActivityItem，ResumeActivityItem等
+        //状态管理模式的应用
         mLifecycleManager = new ClientLifecycleManager();
         mInternal = new LocalService();
         GL_ES_VERSION = SystemProperties.getInt("ro.opengles.version", GL_ES_VERSION_UNDEFINED);
@@ -900,12 +903,15 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
         mAppWarnings = createAppWarnings(mUiContext, mH, mUiHandler, systemDir);
         mCompatModePackages = new CompatModePackages(this, systemDir, mH);
         mPendingIntentController = intentController;
+        //todo 管理Activity栈
         mStackSupervisor = createStackSupervisor();
 
         mTaskChangeNotificationController =
                 new TaskChangeNotificationController(mGlobalLock, mStackSupervisor, mH);
         mLockTaskController = new LockTaskController(mContext, mStackSupervisor, mH);
+        // TODO:activity 启动相关的流程在这里面
         mActivityStartController = new ActivityStartController(this);
+        //最近打开的任务列表
         setRecentTasks(new RecentTasks(this, mStackSupervisor));
         mVrController = new VrController(mGlobalLock);
         mKeyguardController = mStackSupervisor.getKeyguardController();

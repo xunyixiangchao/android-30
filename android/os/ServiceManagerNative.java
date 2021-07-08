@@ -49,6 +49,7 @@ public final class ServiceManagerNative {
 // mRemote is no longer used
 class ServiceManagerProxy implements IServiceManager {
     public ServiceManagerProxy(IBinder remote) {
+        //binderProxy
         mRemote = remote;
         mServiceManager = IServiceManager.Stub.asInterface(remote);
     }

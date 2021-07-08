@@ -551,6 +551,8 @@ public final class SystemServer {
 
             // Initialize the system context.
 // TODO:创建系统ActivityThread(调用attach())，mSystemContext,systemUiContext
+            //1。系统相关的资源res--app不光使用app本身资源，也会使用系统资源
+            //
             createSystemContext();
 
             // Call per-process mainline module initialization.
@@ -594,7 +596,9 @@ public final class SystemServer {
         try {
             t.traceBegin("StartServices");
 // TODO:Android启动流程-创建各种服务
-            // TODO:引导服务包含 watchdog，Installer，Uri，AMS，PMS，PKMS。。。
+            // TODO:引导服务包含 watchdog，Installer，Uri，     AMS      ，PMS，PKMS。。。
+            //引导服务：启动的其他服务或多或少的都需要使用引导服务来启动。
+            //有大量的服务使用AMS
             startBootstrapServices(t);
             // TODO:核心服务包含webViewUpdateService,BatteryService(电池)，GpuService。。。
             startCoreServices(t);
@@ -697,7 +701,7 @@ public final class SystemServer {
 
         }
     }
-
+    //创建系统Context
     private void createSystemContext() {
         ActivityThread activityThread = ActivityThread.systemMain();
         mSystemContext = activityThread.getSystemContext();
@@ -769,6 +773,7 @@ public final class SystemServer {
         // TODO: Might need to move after migration to WM.
         ActivityTaskManagerService atm = mSystemServiceManager.startService(
                 ActivityTaskManagerService.Lifecycle.class).getService();
+//todo: 创建AMS
         mActivityManagerService = ActivityManagerService.Lifecycle.startService(
                 mSystemServiceManager, atm);
         mActivityManagerService.setSystemServiceManager(mSystemServiceManager);
@@ -909,7 +914,7 @@ public final class SystemServer {
         AttributeCache.init(mSystemContext);
         t.traceEnd();
 
-        // Set up the Application instance for the system process and get started.
+// TODO:这里将ams添加到ServiceManager中
         t.traceBegin("SetSystemProcess");
         mActivityManagerService.setSystemProcess();
         t.traceEnd();
@@ -971,6 +976,7 @@ public final class SystemServer {
 
         // Tracks application usage stats.
         t.traceBegin("StartUsageService");
+        //用户系统服务
         mSystemServiceManager.startService(UsageStatsService.class);
         mActivityManagerService.setUsageStatsManager(
                 LocalServices.getService(UsageStatsManagerInternal.class));

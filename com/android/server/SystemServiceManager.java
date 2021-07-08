@@ -146,6 +146,7 @@ public class SystemServiceManager {
             }
             final T service;
             try {
+                // TODO:通过反射创建服务
                 Constructor<T> constructor = serviceClass.getConstructor(Context.class);
                 service = constructor.newInstance(mContext);
             } catch (InstantiationException ex) {
@@ -171,10 +172,12 @@ public class SystemServiceManager {
 
     public void startService(@NonNull final SystemService service) {
         // Register it.
+        //添加到列表
         mServices.add(service);
         // Start it.
         long time = SystemClock.elapsedRealtime();
         try {
+            //调用服务的onStart()方法--AMS$Lifecycle#onStart()方法
             service.onStart();
         } catch (RuntimeException ex) {
             throw new RuntimeException("Failed to start service " + service.getClass().getName()

@@ -176,5 +176,5 @@ public abstract class IntentService extends Service {
      *               for details.
      */
     @WorkerThread
-    protected abstract void onHandleIntent(@Nullable Intent intent);
+    protected abstract void  onHandleIntent(@Nullable Intent intent);
 }

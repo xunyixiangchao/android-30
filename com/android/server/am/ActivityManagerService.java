@@ -2098,6 +2098,7 @@ public class ActivityManagerService extends IActivityManager.Stub
 
     public void setSystemProcess() {
         try {
+            // TODO:这里将ams添加到ServiceManager中
             ServiceManager.addService(Context.ACTIVITY_SERVICE, this, /* allowIsolated= */ true,
                     DUMP_FLAG_PRIORITY_CRITICAL | DUMP_FLAG_PRIORITY_NORMAL | DUMP_FLAG_PROTO);
             ServiceManager.addService(ProcessStats.SERVICE_NAME, mProcessStats);
@@ -2351,6 +2352,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             return ssm.startService(ActivityManagerService.Lifecycle.class).getService();
         }
 
+        // TODO:从SSM的startService方法中调用
         @Override
         public void onStart() {
             mService.start();
@@ -2571,6 +2573,7 @@ public class ActivityManagerService extends IActivityManager.Stub
     // Note: This method is invoked on the main thread but may need to attach various
     // handlers to other threads.  So take care to be explicit about the looper.
     public ActivityManagerService(Context systemContext, ActivityTaskManagerService atm) {
+        // TODO:锁屏相关
         LockGuard.installLock(this, LockGuard.INDEX_ACTIVITY);
         mInjector = new Injector(systemContext);
         mContext = systemContext;
@@ -2618,17 +2621,20 @@ public class ActivityManagerService extends IActivityManager.Stub
 
         mEnableOffloadQueue = SystemProperties.getBoolean(
                 "persist.device_config.activity_manager_native_boot.offload_queue_enabled", false);
-
+        // TODO:广播相关
+        //1。前台广播
         mFgBroadcastQueue = new BroadcastQueue(this, mHandler,
                 "foreground", foreConstants, false);
+        //2。后台广播
         mBgBroadcastQueue = new BroadcastQueue(this, mHandler,
                 "background", backConstants, true);
+        //3。卸载广播
         mOffloadBroadcastQueue = new BroadcastQueue(this, mHandler,
                 "offload", offloadConstants, true);
         mBroadcastQueues[0] = mFgBroadcastQueue;
         mBroadcastQueues[1] = mBgBroadcastQueue;
         mBroadcastQueues[2] = mOffloadBroadcastQueue;
-
+// TODO:创建ActivityServices--activity流程相关
         mServices = new ActiveServices(this);
         mProviderMap = new ProviderMap(this);
         mPackageWatchdog = PackageWatchdog.getInstance(mUiContext);
@@ -2637,6 +2643,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         final File systemDir = SystemServiceManager.ensureSystemDir();
 
         // TODO: Move creation of battery stats service outside of activity manager service.
+        // TODO:电量统计服务
         mBatteryStatsService = new BatteryStatsService(systemContext, systemDir,
                 BackgroundThread.get().getHandler());
         mBatteryStatsService.getActiveStatistics().readLocked();
@@ -2645,7 +2652,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 : mBatteryStatsService.getActiveStatistics().getIsOnBattery();
         mBatteryStatsService.getActiveStatistics().setCallback(this);
         mOomAdjProfiler.batteryPowerChanged(mOnBattery);
-
+// TODO:进程统计服务
         mProcessStats = new ProcessStatsService(this, new File(systemDir, "procstats"));
 
         mAppOpsService = mInjector.getAppOpsService(new File(systemDir, "appops.xml"), mHandler);
@@ -2668,7 +2675,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         mActivityTaskManager.initialize(mIntentFirewall, mPendingIntentController,
                 DisplayThread.get().getLooper());
         mAtmInternal = LocalServices.getService(ActivityTaskManagerInternal.class);
-
+        // TODO:收集cpu相关的信息
         mProcessCpuThread = new Thread("CpuTracker") {
             @Override
             public void run() {
@@ -2704,13 +2711,14 @@ public class ActivityManagerService extends IActivityManager.Stub
         };
 
         mHiddenApiBlacklist = new HiddenApiSettings(mHandler, mContext);
-
+        // TODO:watchdog添加监听器
         Watchdog.getInstance().addMonitor(this);
         Watchdog.getInstance().addThread(mHandler);
 
         // bind background threads to little cores
         // this is expected to fail inside of framework tests because apps can't touch cpusets directly
         // make sure we've already adjusted system_server's internal view of itself first
+        // TODO:更新了oomadj
         updateOomAdjLocked(OomAdjuster.OOM_ADJ_REASON_NONE);
         try {
             Process.setThreadGroupAndCpuset(BackgroundThread.get().getThreadId(),
