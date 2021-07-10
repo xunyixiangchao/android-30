@@ -2101,24 +2101,35 @@ public class ActivityManagerService extends IActivityManager.Stub
             // TODO:这里将ams添加到ServiceManager中
             ServiceManager.addService(Context.ACTIVITY_SERVICE, this, /* allowIsolated= */ true,
                     DUMP_FLAG_PRIORITY_CRITICAL | DUMP_FLAG_PRIORITY_NORMAL | DUMP_FLAG_PROTO);
+            //todo:进程统计-ProcessStat
             ServiceManager.addService(ProcessStats.SERVICE_NAME, mProcessStats);
+            // TODO:内存Binder  adb shell dumsys meminfo -p  服务的来源
             ServiceManager.addService("meminfo", new MemBinder(this), /* allowIsolated= */ false,
                     DUMP_FLAG_PRIORITY_HIGH);
+            // TODO:图像信息
             ServiceManager.addService("gfxinfo", new GraphicsBinder(this));
+            // TODO:数据库
             ServiceManager.addService("dbinfo", new DbBinder(this));
             if (MONITOR_CPU_USAGE) {
+                // TODO:cpu
                 ServiceManager.addService("cpuinfo", new CpuBinder(this),
                         /* allowIsolated= */ false, DUMP_FLAG_PRIORITY_CRITICAL);
             }
+            // TODO:权限控制
             ServiceManager.addService("permission", new PermissionController(this));
+            // TODO:进程服务
             ServiceManager.addService("processinfo", new ProcessInfoService(this));
+            // TODO:缓存
             ServiceManager.addService("cacheinfo", new CacheBinder(this));
-
+            //todo:系统Application信息
             ApplicationInfo info = mContext.getPackageManager().getApplicationInfo(
                     "android", STOCK_PM_FLAGS | MATCH_SYSTEM_ONLY);
+            // TODO:最终调用LoadedApk的 installSystemApplicationInfo，加载名为"android"的package
+            //
             mSystemThread.installSystemApplicationInfo(info, getClass().getClassLoader());
 
             synchronized (this) {
+                //todo 创建ProcessRecord对象
                 ProcessRecord app = mProcessList.newProcessRecordLocked(info, info.processName,
                         false,
                         0,
@@ -2130,6 +2141,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 app.makeActive(mSystemThread.getApplicationThread(), mProcessStats);
                 addPidLocked(app);
                 mProcessList.updateLruProcessLocked(app, false, null);
+                //更新oomadj---手机杀进程有关
                 updateOomAdjLocked(OomAdjuster.OOM_ADJ_REASON_NONE);
             }
         } catch (PackageManager.NameNotFoundException e) {
@@ -2149,7 +2161,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                         }
                     }
                 });
-
+        // TODO:相机
         final int[] cameraOp = {AppOpsManager.OP_CAMERA};
         mAppOpsService.startWatchingActive(cameraOp, new IAppOpsActiveCallback.Stub() {
             @Override
@@ -7926,15 +7938,17 @@ public class ActivityManagerService extends IActivityManager.Stub
             }
         }
         if (providers != null) {
-            mSystemThread.installSystemProviders(providers);
+            mSystemThread.installSystemProviders(providers); //安装所有的系统Provider
         }
 
         synchronized (this) {
             mSystemProvidersInstalled = true;
         }
         mConstants.start(mContext.getContentResolver());
+        // TODO:创建核心Setting Observer 用于监控Settings
         mCoreSettingsObserver = new CoreSettingsObserver(this);
         mActivityTaskManager.installSystemProviders();
+        // TODO:开发者选项
         mDevelopmentSettingsObserver = new DevelopmentSettingsObserver();
         SettingsToPropertiesMapper.start(mContext.getContentResolver());
         mOomAdjuster.initSettings();
@@ -9541,6 +9555,9 @@ public class ActivityManagerService extends IActivityManager.Stub
     /**
      * Ready. Set. Go!
      */
+    // TODO:启动系统UI
+    //一系列服务的systemReady
+    //mAtmInternal.startHomeOnAllDisplays-启动LaunchActivity
     public void systemReady(final Runnable goingCallback, @NonNull TimingsTraceAndSlog t) {
         t.traceBegin("PhaseActivityManagerReady");
         mSystemServiceManager.preSystemReady();
@@ -9549,6 +9566,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 // If we're done calling all the receivers, run the next "boot phase" passed in
                 // by the SystemServer
                 if (goingCallback != null) {
+                    // TODO:调用goingCallback的run方法
                     goingCallback.run();
                 }
                 t.traceEnd(); // PhaseActivityManagerReady
@@ -9641,7 +9659,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             Slog.wtf(TAG, "PowerManagerInternal not found.");
         }
         t.traceEnd();
-
+        //又走了一遍
         if (goingCallback != null) goingCallback.run();
 
         t.traceBegin("getCurrentUser"); // should be fast, but these methods acquire locks
@@ -9670,6 +9688,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         final boolean bootingSystemUser = currentUserId == UserHandle.USER_SYSTEM;
 
         if (bootingSystemUser) {
+            // TODO:调用所有服务的startUser方法
             mSystemServiceManager.startUser(t, currentUserId);
         }
 
@@ -9700,9 +9719,10 @@ public class ActivityManagerService extends IActivityManager.Stub
                 }
                 t.traceEnd();
             }
-
+// TODO:启动HomeActivity--mAtmInternal继承类ActivityTaskManagerService$LocalService#startHomeOnAllDisplays
             if (bootingSystemUser) {
                 t.traceBegin("startHomeOnAllDisplays");
+                // TODO:启动HomeActivity流程
                 mAtmInternal.startHomeOnAllDisplays(currentUserId, "systemReady");
                 t.traceEnd();
             }
@@ -9750,6 +9770,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             }
 
             t.traceBegin("resumeTopActivities");
+            // TODO:恢复栈顶的Activity
             mAtmInternal.resumeTopActivities(false /* scheduleIdle */);
             t.traceEnd();
 

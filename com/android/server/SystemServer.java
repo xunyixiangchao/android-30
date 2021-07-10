@@ -191,6 +191,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
+import java.util.function.ToDoubleBiFunction;
 
 public final class SystemServer {
 
@@ -1131,6 +1132,7 @@ public final class SystemServer {
             t.traceEnd();
 
             t.traceBegin("InstallSystemProviders");
+            // TODO:安装系统的Provider
             mActivityManagerService.installSystemProviders();
             // Now that SettingsProvider is ready, reactivate SQLiteCompatibilityWalFlags
             SQLiteCompatibilityWalFlags.reset();
@@ -1172,8 +1174,10 @@ public final class SystemServer {
             // WMS needs sensor service ready
             ConcurrentUtils.waitForFutureNoInterrupt(mSensorServiceStart, START_SENSOR_SERVICE);
             mSensorServiceStart = null;
+            // TODO:创建WMS
             wm = WindowManagerService.main(context, inputManager, !mFirstBoot, mOnlyCore,
                     new PhoneWindowManager(), mActivityManagerService.mActivityTaskManager);
+            // TODO:将wms添加到sm
             ServiceManager.addService(Context.WINDOW_SERVICE, wm, /* allowIsolated= */ false,
                     DUMP_FLAG_PRIORITY_CRITICAL | DUMP_FLAG_PROTO);
             ServiceManager.addService(Context.INPUT_SERVICE, inputManager,
@@ -1181,6 +1185,7 @@ public final class SystemServer {
             t.traceEnd();
 
             t.traceBegin("SetWindowManagerService");
+            // TODO:AMS设置WMS
             mActivityManagerService.setWindowManager(wm);
             t.traceEnd();
 
@@ -2247,9 +2252,15 @@ public final class SystemServer {
         // where third party code can really run (but before it has actually
         // started launching the initial applications), for us to complete our
         // initialization.
+        // TODO: 上面的所有服务都已经创建启动完了
+        // TODO:启动系统UI
+        //一系列服务的systemReady
+        //startHomeActivityLocked-启动LaunchActivity
+        //（）-> runnalbe方法
         mActivityManagerService.systemReady(() -> {
             Slog.i(TAG, "Making services ready");
             t.traceBegin("StartActivityManagerReadyPhase");
+            // TODO:调各个服务的onBootPhase方法
             mSystemServiceManager.startBootPhase(t, SystemService.PHASE_ACTIVITY_MANAGER_READY);
             t.traceEnd();
             t.traceBegin("StartObservingNativeCrashes");
@@ -2284,6 +2295,7 @@ public final class SystemServer {
 
             t.traceBegin("StartSystemUI");
             try {
+                //启动服务“com.android.systemui/.SystemUiService"
                 startSystemUi(context, windowManagerF);
             } catch (Throwable e) {
                 reportWtf("starting System UI", e);
@@ -2364,7 +2376,10 @@ public final class SystemServer {
             if (webviewPrep != null) {
                 ConcurrentUtils.waitForFutureNoInterrupt(webviewPrep, WEBVIEW_PREPARATION);
             }
-            mSystemServiceManager.startBootPhase(t, SystemService.PHASE_THIRD_PARTY_APPS_CAN_START);
+            //todo：phase 600 这之前都是调用systemReady
+            mSystemServiceManager.startBootPhase(t,
+                    SystemService.PHASE_THIRD_PARTY_APPS_CAN_START);//todo：phase 600
+            //todo：phase 600 这之后都是调用 systemRunning
             t.traceEnd();
 
             t.traceBegin("StartNetworkStack");

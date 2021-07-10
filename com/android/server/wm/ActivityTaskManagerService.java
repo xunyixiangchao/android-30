@@ -6805,10 +6805,11 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
                         allowInstrumenting, fromHomeKey);
             }
         }
-
+        // TODO:启动HomeActivity流程
         @Override
         public boolean startHomeOnAllDisplays(int userId, String reason) {
             synchronized (mGlobalLock) {
+                // TODO:启动HomeActivity流程
                 return mRootWindowContainer.startHomeOnAllDisplays(userId, reason);
             }
         }

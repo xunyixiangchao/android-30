@@ -1446,11 +1446,12 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
     ActivityRecord getDefaultDisplayHomeActivityForUser(int userId) {
         return getDefaultTaskDisplayArea().getHomeActivityForUser(userId);
     }
-
+    // TODO:启动HomeActivity流程
     boolean startHomeOnAllDisplays(int userId, String reason) {
         boolean homeStarted = false;
         for (int i = getChildCount() - 1; i >= 0; i--) {
             final int displayId = getChildAt(i).mDisplayId;
+            // TODO:启动HomeActivity流程
             homeStarted |= startHomeOnDisplay(userId, reason, displayId);
         }
         return homeStarted;
@@ -1468,12 +1469,12 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
             }
         }
     }
-
+    // TODO:启动HomeActivity流程
     boolean startHomeOnDisplay(int userId, String reason, int displayId) {
         return startHomeOnDisplay(userId, reason, displayId, false /* allowInstrumenting */,
                 false /* fromHomeKey */);
     }
-
+    // TODO:启动HomeActivity流程
     boolean startHomeOnDisplay(int userId, String reason, int displayId, boolean allowInstrumenting,
             boolean fromHomeKey) {
         // Fallback to top focused display or default display if the displayId is invalid.
@@ -1486,6 +1487,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         boolean result = false;
         for (int tcNdx = display.getTaskDisplayAreaCount() - 1; tcNdx >= 0; --tcNdx) {
             final TaskDisplayArea taskDisplayArea = display.getTaskDisplayAreaAt(tcNdx);
+            // TODO:启动HomeActivity流程
             result |= startHomeOnTaskDisplayArea(userId, reason, taskDisplayArea,
                     allowInstrumenting, fromHomeKey);
         }
@@ -1503,6 +1505,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
      *    If there are multiple activities matched, use first one.
      *  - Use the secondary home defined in the config.
      */
+    // TODO:启动HomeActivity流程
     boolean startHomeOnTaskDisplayArea(int userId, String reason, TaskDisplayArea taskDisplayArea,
             boolean allowInstrumenting, boolean fromHomeKey) {
         // Fallback to top focused display area if the provided one is invalid.
@@ -1516,6 +1519,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         ActivityInfo aInfo = null;
         if (taskDisplayArea == getDefaultTaskDisplayArea()) {
             homeIntent = mService.getHomeIntent();
+            //解析HomeActivity信息
             aInfo = resolveHomeActivity(userId, homeIntent);
         } else if (shouldPlaceSecondaryHomeOnDisplayArea(taskDisplayArea)) {
             Pair<ActivityInfo, Intent> info = resolveSecondaryHomeActivity(userId, taskDisplayArea);
@@ -1542,6 +1546,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         // actually launched.
         final String myReason = reason + ":" + userId + ":" + UserHandle.getUserId(
                 aInfo.applicationInfo.uid) + ":" + taskDisplayArea.getDisplayId();
+        // TODO:启动HomeActivity流程
         mService.getActivityStartController().startHomeActivity(homeIntent, aInfo, myReason,
                 taskDisplayArea);
         return true;

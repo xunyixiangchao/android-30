@@ -171,7 +171,7 @@ public class ActivityStartController {
 
         mLastStarter.postStartActivityProcessing(r, result, targetStack);
     }
-
+    // TODO:启动HomeActivity流程
     void startHomeActivity(Intent intent, ActivityInfo aInfo, String reason,
             TaskDisplayArea taskDisplayArea) {
         final ActivityOptions options = ActivityOptions.makeBasic();
@@ -203,6 +203,7 @@ public class ActivityStartController {
                 .setCallingUid(0)
                 .setActivityInfo(aInfo)
                 .setActivityOptions(options.toBundle())
+                // TODO:启动HomeActivity流程
                 .execute();
         mLastHomeActivityStartRecord = tmpOutRecord[0];
         if (homeStack.mInResumeTopActivity) {
