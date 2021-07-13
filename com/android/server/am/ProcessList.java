@@ -2275,6 +2275,7 @@ public final class ProcessList {
             }
 
             final Process.ProcessStartResult startResult;
+            //如果是webview进程
             if (hostingRecord.usesWebviewZygote()) {
                 startResult = startWebView(entryPoint,
                         app.processName, uid, uid, gids, runtimeFlags, mountExternal,
@@ -2294,7 +2295,7 @@ public final class ProcessList {
                         false, false,
                         new String[]{PROC_START_SEQ_IDENT + app.startSeq});
             } else {
-// todo: 桌面startActivity流程
+// todo: 桌面startActivity流程--这里使用的默认的REGULAR_ZYGOTE
                 startResult = Process.start(entryPoint,
                         app.processName, uid, uid, gids, runtimeFlags, mountExternal,
                         app.info.targetSdkVersion, seInfo, requiredAbi, instructionSet,

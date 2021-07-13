@@ -1660,7 +1660,7 @@ class ActivityStack extends Task {
                 userLeaving = false;
             }
         }
-
+// TODO:将发起者置为pause状态
         boolean pausing = taskDisplayArea.pauseBackStacks(userLeaving, next);
         if (mResumedActivity != null) {
             if (DEBUG_STATES) Slog.d(TAG_STATES,
@@ -1675,6 +1675,7 @@ class ActivityStack extends Task {
             // very soon and it would be a waste to let it get killed if it
             // happens to be sitting towards the end.
             if (next.attachedToProcess()) {
+                // 更新进程信息-旧activity
                 next.app.updateProcessInfo(false /* updateServiceConnectionActivities */,
                         true /* activityChange */, false /* updateOomAdj */,
                         false /* addPendingTopUid */);
@@ -1751,6 +1752,7 @@ class ActivityStack extends Task {
         // We are starting up the next activity, so tell the window manager
         // that the previous one will be hidden soon.  This way it can know
         // to ignore it when computing the desired screen orientation.
+        // 这里准备开启页面
         boolean anim = true;
         final DisplayContent dc = taskDisplayArea.mDisplayContent;
         if (prev != null) {
@@ -1832,7 +1834,8 @@ class ActivityStack extends Task {
                     + " (in existing)");
 
             next.setState(RESUMED, "resumeTopActivityInnerLocked");
-
+// 更新进程信息--更新updateOomAdj优先级--WindowProcessController#updateProcessInfo-->
+            //到WindowProcessListener实现类ProcessRecor#updateProcessInfo
             next.app.updateProcessInfo(false /* updateServiceConnectionActivities */,
                     true /* activityChange */, true /* updateOomAdj */,
                     true /* addPendingTopUid */);
@@ -1881,6 +1884,7 @@ class ActivityStack extends Task {
                 final ClientTransaction transaction =
                         ClientTransaction.obtain(next.app.getThread(), next.appToken);
                 // Deliver all pending results.
+                //判断是否需要触发onActivityResult函数
                 ArrayList<ResultInfo> a = next.results;
                 if (a != null) {
                     final int N = a.size();
@@ -1890,7 +1894,7 @@ class ActivityStack extends Task {
                         transaction.addCallback(ActivityResultItem.obtain(a));
                     }
                 }
-
+//是否触发onNewIntent()
                 if (next.newIntents != null) {
                     transaction.addCallback(
                             NewIntentItem.obtain(next.newIntents, true /* resume */));

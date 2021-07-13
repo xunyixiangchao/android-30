@@ -463,10 +463,12 @@ public class ZygoteProcess {
 // zygoteServer.runSelectLoop
         return attemptZygoteSendArgsAndGetResult(zygoteState, msgStr);
     }
-    //试图发送参数孵化进程并获得结果
+    //试图发送参数孵化进程并获得结果--阻塞函数
     private Process.ProcessStartResult attemptZygoteSendArgsAndGetResult(
             ZygoteState zygoteState, String msgStr) throws ZygoteStartFailedEx {
         try {
+            //zygoteState里有LocalSocket,调用connet连接Socket进行通信
+            //connect连接ZygoteInit中的ZygoteServer--runSelectLoop方法不断的取出连接
             final BufferedWriter zygoteWriter = zygoteState.mZygoteOutputWriter;
             final DataInputStream zygoteInputStream = zygoteState.mZygoteInputStream;
 
@@ -627,6 +629,7 @@ public class ZygoteProcess {
      * @return An object that describes the result of the attempt to start the process.
      * @throws ZygoteStartFailedEx if process start failed for any reason
      */
+    // todo: 桌面startActivity流程
     private Process.ProcessStartResult startViaZygote(@NonNull final String processClass,
                                                       @Nullable final String niceName,
                                                       final int uid, final int gid,

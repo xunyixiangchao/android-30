@@ -2354,10 +2354,11 @@ public abstract class ContentProvider implements ContentInterface, ComponentCall
      * @param context The context this provider is running in
      * @param info Registered information about this content provider
      */
+    //TODO：contentProvider启动流程
     public void attachInfo(Context context, ProviderInfo info) {
         attachInfo(context, info, false);
     }
-
+    //TODO：contentProvider启动流程
     private void attachInfo(Context context, ProviderInfo info, boolean testing) {
         mNoPerms = testing;
         mCallingPackage = new ThreadLocal<>();
@@ -2385,6 +2386,7 @@ public abstract class ContentProvider implements ContentInterface, ComponentCall
                 setTransportLoggingEnabled(Log.isLoggable(getClass().getSimpleName(),
                         Log.VERBOSE));
             }
+            //TODO：contentProvider启动流程
             ContentProvider.this.onCreate();
         }
     }

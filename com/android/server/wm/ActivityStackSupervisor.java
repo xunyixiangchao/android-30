@@ -981,7 +981,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
         //进程存在
         if (wpc != null && wpc.hasThread()) {
             try {
-                // todo: 桌面startActivity流程
+                // todo: 桌面startActivity流程--热启动
                 realStartActivityLocked(r, wpc, andResume, checkConfig);
                 return;
             } catch (RemoteException e) {
@@ -998,7 +998,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
 
         final boolean isTop = andResume && r.isTopRunningActivity();
         //进程不存在
-        // todo: 桌面startActivity流程
+        // todo: 桌面startActivity流程--冷启动
         mService.startProcessAsync(r, knownToBeDead, isTop, isTop ? "top-activity" : "activity");
     }
 

@@ -1313,6 +1313,7 @@ public class Activity extends ContextThemeWrapper
     }
 
     private void dispatchActivityCreated(@Nullable Bundle savedInstanceState) {
+        ////分发生命周期到Application的dispatchActivityCreated
         getApplication().dispatchActivityCreated(this, savedInstanceState);
         Object[] callbacks = collectActivityLifecycleCallbacks();
         if (callbacks != null) {
@@ -1586,6 +1587,7 @@ public class Activity extends ContextThemeWrapper
                     ? mLastNonConfigurationInstances.fragments : null);
         }
         mFragments.dispatchCreate();
+        //分发生命周期到Application
         dispatchActivityCreated(savedInstanceState);
         if (mVoiceInteractor != null) {
             mVoiceInteractor.attachActivity(this);

@@ -3181,7 +3181,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             return proc != null;
         }
     }
-
+    // todo: 桌面startActivity流程
     @GuardedBy("this")
     final ProcessRecord startProcessLocked(String processName,
             ApplicationInfo info, boolean knownToBeDead, int intentFlags,
@@ -5054,6 +5054,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         long bindApplicationTimeMillis;
         if (pid != MY_PID && pid >= 0) {
             synchronized (mPidsSelfLocked) {
+                //根据pid获取ProcessRecord
                 app = mPidsSelfLocked.get(pid);
             }
             if (app != null && (app.startUid != callingUid || app.startSeq != startSeq)) {
@@ -5337,6 +5338,8 @@ public class ActivityManagerService extends IActivityManager.Stub
                 // being bound to an application.
                 thread.runIsolatedEntryPoint(app.isolatedEntryPoint, app.isolatedEntryPointArgs);
             } else if (instr2 != null) {
+                // todo: 桌面startActivity流程,进入是创建Application----->下面有创建Activity的过程
+                //thread是applicationProxy这里又会走到activitythread$ApplicationThread中去
                 thread.bindApplication(processName, appInfo, providerList,
                         instr2.mClass,
                         profilerInfo, instr2.mArguments,
@@ -5350,7 +5353,6 @@ public class ActivityManagerService extends IActivityManager.Stub
                         buildSerial, autofillOptions, contentCaptureOptions,
                         app.mDisabledCompatChanges);
             } else {
-// todo: 桌面startActivity流程,进入是创建Application----->下面有创建Activity的过程
                 thread.bindApplication(processName, appInfo, providerList, null, profilerInfo,
                         null, null, null, testMode,
                         mBinderTransactionTrackingEnabled, enableTrackAllocation,
@@ -5476,12 +5478,13 @@ public class ActivityManagerService extends IActivityManager.Stub
             throw new SecurityException("Invalid application interface");
         }
         synchronized (this) {
-            int callingPid = Binder.getCallingPid();
-            final int callingUid = Binder.getCallingUid();
-            final long origId = Binder.clearCallingIdentity();
+            //binder天然带有调用者的身份信息uid
+            int callingPid = Binder.getCallingPid();//获取调用端的pid
+            final int callingUid = Binder.getCallingUid();//获取调用端的uid
+            final long origId = Binder.clearCallingIdentity();//把pid,uid设置为ams的
             // todo: 桌面startActivity流程
             attachApplicationLocked(thread, callingPid, callingUid, startSeq);
-            Binder.restoreCallingIdentity(origId);
+            Binder.restoreCallingIdentity(origId);//恢复为app的
         }
     }
 
@@ -19674,6 +19677,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                     // preempted by other processes before attaching the process of top app.
                     // todo: 桌面startActivity流程
                     startProcessLocked(processName, info, knownToBeDead, 0 /* intentFlags */,
+                            //这里hostingZygote使用默认的REGULAR_ZYGOTE
                             new HostingRecord(hostingType, hostingName, isTop),
                             ZYGOTE_POLICY_FLAG_LATENCY_SENSITIVE, false /* allowWhileBooting */,
                             false /* isolated */, true /* keepIfLarge */);

@@ -474,6 +474,7 @@ class ActivityStarter {
                 }
             }
 
+            // TODO:保存原始intent
             // Save a copy in case ephemeral needs it
             ephemeralIntent = new Intent(intent);
             // Don't modify the client's object!
@@ -489,7 +490,7 @@ class ActivityStarter {
                 // so it looks like a "normal" instant app launch.
                 intent.setComponent(null /* component */);
             }
-
+            //todo:收集Intent
             resolveInfo = supervisor.resolveIntent(intent, resolvedType, userId,
                     0 /* matchFlags */,
                     computeResolveFilterUid(callingUid, realCallingUid, filterCallingUid));
@@ -501,7 +502,7 @@ class ActivityStarter {
                     // as user will be sent via confirm credentials to unlock the profile.
                     final UserManager userManager = UserManager.get(supervisor.mService.mContext);
                     boolean profileLockedAndParentUnlockingOrUnlocked = false;
-                    final long token = Binder.clearCallingIdentity();
+                    final long token = Binder.clearCallingIdentity();  //权限控制
                     try {
                         final UserInfo parent = userManager.getProfileParent(userId);
                         profileLockedAndParentUnlockingOrUnlocked = (parent != null)
@@ -519,6 +520,7 @@ class ActivityStarter {
                     }
                 }
             }
+            // TODO:解析Activity信息
 
             // Collect information about the target of the Intent.
             activityInfo = supervisor.resolveActivity(intent, resolveInfo, startFlags,
@@ -649,6 +651,7 @@ class ActivityStarter {
             // and we need to check dynamic Uri permissions, then we're forced
             // to assume those permissions are denied to avoid deadlocking.
             if (mRequest.activityInfo == null) {
+                // TODO:解析Activity信息
                 mRequest.resolveActivity(mSupervisor);
             }
 
@@ -671,7 +674,7 @@ class ActivityStarter {
                 if (res != START_SUCCESS) {
                     return res;
                 }
-                // todo: 桌面startActivity流程
+ // todo: 桌面startActivity流程
                 res = executeRequest(mRequest);
 
                 Binder.restoreCallingIdentity(origId);
@@ -871,7 +874,7 @@ class ActivityStarter {
         // Pull the optional Ephemeral Installer-only bundle out of the options early.
         final Bundle verificationBundle =
                 options != null ? options.popAppVerificationBundle() : null;
-
+// TODO:获取调用者进程记录对象
         WindowProcessController callerApp = null;
         if (caller != null) {
             callerApp = mService.getProcessController(caller);
@@ -884,7 +887,7 @@ class ActivityStarter {
                 err = ActivityManager.START_PERMISSION_DENIED;
             }
         }
-
+        //又获取了userId,
         final int userId = aInfo != null && aInfo.applicationInfo != null
                 ? UserHandle.getUserId(aInfo.applicationInfo.uid) : 0;
         if (err == ActivityManager.START_SUCCESS) {
@@ -905,12 +908,12 @@ class ActivityStarter {
                 }
             }
         }
-
+        //flag过滤
         final int launchFlags = intent.getFlags();
         if ((launchFlags & Intent.FLAG_ACTIVITY_FORWARD_RESULT) != 0 && sourceRecord != null) {
             // Transfer the result target from the source activity to the new one being started,
             // including any failures.
-            if (requestCode >= 0) {
+            if (requestCode >= 0) { //actviity执行结果的返回由源Activity转换到新的Activity，不需要返回结果则不会转换
                 SafeActivityOptions.abort(options);
                 return ActivityManager.START_FORWARD_AND_REQUEST_CONFLICT;
             }
@@ -939,17 +942,18 @@ class ActivityStarter {
                 callingFeatureId = sourceRecord.launchedFromFeatureId;
             }
         }
-
+        //一些校验
         if (err == ActivityManager.START_SUCCESS && intent.getComponent() == null) {
             // We couldn't find a class that can handle the given Intent.
             // That's the end of that!
-            err = ActivityManager.START_INTENT_NOT_RESOLVED;
+            // TODO:是不是在AndroidManifest中注册-START_INTENT_NOT_RESOLVED
+            err = ActivityManager.START_INTENT_NOT_RESOLVED;   //没有相关的component
         }
 
         if (err == ActivityManager.START_SUCCESS && aInfo == null) {
             // We couldn't find the specific class specified in the Intent.
             // Also the end of the line.
-            err = ActivityManager.START_CLASS_NOT_FOUND;
+            err = ActivityManager.START_CLASS_NOT_FOUND; //无法找到对应的ActivityInfo
         }
 
         if (err == ActivityManager.START_SUCCESS && sourceRecord != null
@@ -1002,7 +1006,7 @@ class ActivityStarter {
             SafeActivityOptions.abort(options);
             return err;
         }
-
+// TODO:校验当前应用是否有开启权限，我们的普通开启肯定是有权限的
         boolean abort = !mSupervisor.checkStartAnyActivityPermission(intent, aInfo, resultWho,
                 requestCode, callingPid, callingUid, callingPackage, callingFeatureId,
                 request.ignoreTargetSecurity, inTask != null, callerApp, resultRecord, resultStack);
@@ -1156,7 +1160,7 @@ class ActivityStarter {
 
             aInfo = mSupervisor.resolveActivity(intent, rInfo, startFlags, null /*profilerInfo*/);
         }
-
+// TODO:创建我们的目标ActivityRecord对象
         final ActivityRecord r = new ActivityRecord(mService, callerApp, callingPid, callingUid,
                 callingPackage, callingFeatureId, intent, resolvedType, aInfo,
                 mService.getGlobalConfiguration(), resultRecord, resultWho, requestCode,
@@ -1600,13 +1604,14 @@ class ActivityStarter {
                            IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,
                            int startFlags, boolean doResume, ActivityOptions options, Task inTask,
                            boolean restrictedBgActivity, NeededUriGrants intentGrants) {
+        // TODO:根据启动intent识别启动模式，如果是startActivityForResult并且启动模式是NEW_TASK的话， 就会让startActivity
         setInitialState(r, options, inTask, doResume, startFlags, sourceRecord, voiceSession,
                 voiceInteractor, restrictedBgActivity);
-
+        // TODO:判断启动模式，并且在mLaunchFlags上追加对应的标记
         computeLaunchingTaskFlags();
-
+        //获取Activity的启动栈
         computeSourceStack();
-
+        //根据上面的计算，应用这识别到的flags
         mIntent.setFlags(mLaunchFlags);
 
         final Task reusedTask = getReusableTask();
@@ -1627,6 +1632,7 @@ class ActivityStarter {
         computeLaunchParams(r, sourceRecord, targetTask);
 
         // Check if starting activity on given task or on a new task is allowed.
+        // TODO:是不是在AndroidManifest中注册-START_CLASS_NOT_FOUND
         int startResult = isAllowedToStart(r, newTask, targetTask);
         if (startResult != START_SUCCESS) {
             return startResult;
@@ -1648,6 +1654,7 @@ class ActivityStarter {
         // we need to check if it should only be launched once.
         final ActivityStack topStack = mRootWindowContainer.getTopDisplayFocusedStack();
         if (topStack != null) {
+            // TODO:顶部Task不为空，触发onNewIntent()
             startResult = deliverToCurrentTopIfNeeded(topStack, intentGrants);
             if (startResult != START_SUCCESS) {
                 return startResult;
@@ -1990,7 +1997,7 @@ class ActivityStarter {
             // that is the case, so this is it!
             return START_RETURN_INTENT_TO_CALLER;
         }
-
+// TODO:触发onNewIntent()
         deliverNewIntent(top, intentGrants);
 
         // Don't use mStartActivity.task to show the toast. We're not starting a new activity but
@@ -2285,7 +2292,7 @@ class ActivityStarter {
             if (checkedCaller == null
                     || !checkedCaller.mActivityComponent.equals(r.mActivityComponent)) {
                 // Caller is not the same as launcher, so always needed.
-                mStartFlags &= ~START_FLAG_ONLY_IF_NEEDED;
+                mStartFlags &= ~START_FLAG_ONLY_IF_NEEDED; // TODO:调用者与将要启动的Activity不相同时，进入这里
             }
         }
 
@@ -2341,6 +2348,7 @@ class ActivityStarter {
             // If task is empty, then adopt the interesting intent launch flags in to the
             // activity being started.
             if (root == null) {
+                //是不是NEW_TASK
                 final int flagsOfInterest = FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_MULTIPLE_TASK
                         | FLAG_ACTIVITY_NEW_DOCUMENT | FLAG_ACTIVITY_RETAIN_IN_RECENTS;
                 mLaunchFlags = (mLaunchFlags & ~flagsOfInterest)
@@ -2592,6 +2600,7 @@ class ActivityStarter {
         }
 
         activity.logStartActivity(EventLogTags.WM_NEW_INTENT, activity.getTask());
+        // TODO:onNewIntent流程
         activity.deliverNewIntentLocked(mCallingUid, mStartActivity.intent, intentGrants,
                 mStartActivity.launchedFromPackage);
         mIntentDelivered = true;

@@ -2405,6 +2405,7 @@ public final class ActivityThread extends ClientTransactionHandler {
 
     @UnsupportedAppUsage
     ActivityThread() {
+        //创建资源管理器
         mResourcesManager = ResourcesManager.getInstance();
     }
 
@@ -6383,6 +6384,7 @@ public final class ActivityThread extends ClientTransactionHandler {
     @UnsupportedAppUsage
     private void handleBindApplication(AppBindData data) {
         // Register the UI Thread as a sensitive thread to the runtime.
+        //把UI线程注册为运行时的虚拟机
         VMRuntime.registerSensitiveThread();
         // In the case the stack depth property exists, pass it down to the runtime.
         String property = SystemProperties.get("debug.allocTracker.stackDepth");
@@ -6695,7 +6697,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         try {
             // If the app is being launched for full backup or restore, bring it up in
             // a restricted environment with the base application class.
-//创建Application
+//创建Application--data.info为LoadedApk
             app = data.info.makeApplication(data.restrictedBackupMode, null);
 
             // Propagate autofill compat state
@@ -6708,8 +6710,10 @@ public final class ActivityThread extends ClientTransactionHandler {
 
             // don't bring up providers in restricted mode; they may depend on the
             // app's custom Application class
+//如果有contentProvider，初始化contentProvider
             if (!data.restrictedBackupMode) {
                 if (!ArrayUtils.isEmpty(data.providers)) {
+                    //TODO：contentProvider启动流程
                     installContentProviders(app, data.providers);
                 }
             }
@@ -6779,7 +6783,7 @@ public final class ActivityThread extends ClientTransactionHandler {
             throw ex.rethrowFromSystemServer();
         }
     }
-
+    //TODO：contentProvider启动流程
     @UnsupportedAppUsage
     private void installContentProviders(
             Context context, List<ProviderInfo> providers) {
@@ -6794,6 +6798,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 buf.append(cpi.name);
                 Log.i(TAG, buf.toString());
             }
+            //TODO：contentProvider启动流程
             ContentProviderHolder cph = installProvider(context, null, cpi,
                     false /*noisy*/, true /*noReleaseNeeded*/, true /*stable*/);
             if (cph != null) {
@@ -7192,6 +7197,7 @@ public final class ActivityThread extends ClientTransactionHandler {
      * and returns the existing provider.  This can happen due to concurrent
      * attempts to acquire the same provider.
      */
+    //TODO：contentProvider启动流程
     @UnsupportedAppUsage
     private ContentProviderHolder installProvider(Context context,
             ContentProviderHolder holder, ProviderInfo info,
@@ -7253,6 +7259,7 @@ public final class ActivityThread extends ClientTransactionHandler {
                 if (DEBUG_PROVIDER) Slog.v(
                     TAG, "Instantiating local provider " + info.name);
                 // XXX Need to create the correct context for this provider.
+//TODO：contentProvider启动流程
                 localProvider.attachInfo(c, info);
             } catch (java.lang.Exception e) {
                 if (!mInstrumentation.onException(null, e)) {
@@ -7344,10 +7351,12 @@ public final class ActivityThread extends ClientTransactionHandler {
     private void attach(boolean system, long startSeq) {
         sCurrentActivityThread = this;
         mSystemThread = system;
+        // TODO:应用级别走这里
         if (!system) {
             android.ddm.DdmHandleAppName.setAppName("<pre-initialized>",
                                                     UserHandle.myUserId());
             RuntimeInit.setApplicationObject(mAppThread.asBinder());
+            //获取AMS-这里是AMS的代理对象
             final IActivityManager mgr = ActivityManager.getService();
             try {
                 // todo: 桌面startActivity流程
@@ -7379,6 +7388,10 @@ public final class ActivityThread extends ClientTransactionHandler {
                     }
                 }
             });
+            //systemserver走这里
+            //创建mInstrumentation
+            //创建context
+            //创建Application
         } else {
             // Don't set application object here -- if the system crashes,
             // we can't display an alert, we just want to die die die.
@@ -7387,10 +7400,12 @@ public final class ActivityThread extends ClientTransactionHandler {
             try {
                 mInstrumentation = new Instrumentation();
                 mInstrumentation.basicInit(this);
+                //SystemContext--根据LoadedApk对象创建Context
                 ContextImpl context = ContextImpl.createAppContext(
                         this, getSystemContext().mPackageInfo);
+                //创建Application
                 mInitialApplication = context.mPackageInfo.makeApplication(true, null);
-                mInitialApplication.onCreate();
+                mInitialApplication.onCreate();//初始化Application信息
             } catch (Exception e) {
                 throw new RuntimeException(
                         "Unable to instantiate Application():" + e.toString(), e);

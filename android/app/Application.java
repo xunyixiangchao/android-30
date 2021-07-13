@@ -301,9 +301,10 @@ public class Application extends ContextWrapper implements ComponentCallbacks2 {
             mComponentCallbacks.remove(callback);
         }
     }
-
+    //注册一个ActivityLifecycleCallbacks--在Activity的生命周期里会调用到
     public void registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks callback) {
         synchronized (mActivityLifecycleCallbacks) {
+            //添加到集合
             mActivityLifecycleCallbacks.add(callback);
         }
     }
@@ -364,6 +365,7 @@ public class Application extends ContextWrapper implements ComponentCallbacks2 {
         }
     }
 
+    //Activity的onCreate()回调ActivityLifecycleCallbacks的onActivityCreated
     @UnsupportedAppUsage
     /* package */ void dispatchActivityCreated(@NonNull Activity activity,
             @Nullable Bundle savedInstanceState) {

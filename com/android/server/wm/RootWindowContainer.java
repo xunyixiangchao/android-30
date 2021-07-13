@@ -2303,7 +2303,7 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
         boolean result = false;
         if (targetStack != null && (targetStack.isTopStackInDisplayArea()
                 || getTopDisplayFocusedStack() == targetStack)) {
-            // todo: 桌面startActivity流程
+// todo: 桌面startActivity流程--从这里开始resume我们的MainActivity
             result = targetStack.resumeTopActivityUncheckedLocked(target, targetOptions);
         }
 

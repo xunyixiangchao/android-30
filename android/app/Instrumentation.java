@@ -1708,11 +1708,14 @@ public class Instrumentation {
         try {
             intent.migrateExtraStreamToClipData(who);
             intent.prepareToLeaveProcess(who);
-            // todo: 桌面startActivity流程--》ActivityManagerService#startActivity
+            // todo: 桌面startActivity流程--》ActivityTaskManagerService#startActivity
+            // whoThread 是app的代理对象，传给ams，让ams回调
+            //activitytaskmanager.getserice()=ActivityManagerPoxy
             int result = ActivityTaskManager.getService().startActivity(whoThread,
                     who.getBasePackageName(), who.getAttributionTag(), intent,
                     intent.resolveTypeIfNeeded(who.getContentResolver()), token,
                     target != null ? target.mEmbeddedID : null, requestCode, 0, null, options);
+            //根据检查结果result判断-是不是在AndroidManifest中注册
             checkStartActivityResult(result, intent);
         } catch (RemoteException e) {
             throw new RuntimeException("Failure from system", e);
@@ -2045,6 +2048,7 @@ public class Instrumentation {
         }
 
         switch (res) {
+            //报错是不是在AndroidManifest中注册
             case ActivityManager.START_INTENT_NOT_RESOLVED:
             case ActivityManager.START_CLASS_NOT_FOUND:
                 if (intent instanceof Intent && ((Intent) intent).getComponent() != null)

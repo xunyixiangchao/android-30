@@ -1454,8 +1454,10 @@ class ProcessRecord implements WindowProcessListener {
             if (updateServiceConnectionActivities) {
                 mService.mServices.updateServiceConnectionActivitiesLocked(this);
             }
+            //更新进程信息
             mService.mProcessList.updateLruProcessLocked(this, activityChange, null /* client */);
             if (updateOomAdj) {
+                //更新OomAdj的优先级
                 mService.updateOomAdjLocked(this, OomAdjuster.OOM_ADJ_REASON_ACTIVITY);
             }
         }

@@ -1195,7 +1195,7 @@ public final class LoadedApk {
     @UnsupportedAppUsage
     public Application makeApplication(boolean forceDefaultAppClass,
             Instrumentation instrumentation) {
-        if (mApplication != null) {
+        if (mApplication != null) { //保证一个LoadedApk只创建一个application
             return mApplication;
         }
 
@@ -1204,6 +1204,7 @@ public final class LoadedApk {
         Application app = null;
 
         String appClass = mApplicationInfo.className;
+        //SystemServer进入该分支
         if (forceDefaultAppClass || (appClass == null)) {
             appClass = "android.app.Application";
         }
@@ -1246,7 +1247,7 @@ public final class LoadedApk {
             }
         }
         mActivityThread.mAllApplications.add(app);
-        mApplication = app;
+        mApplication = app; // 将刚创建的app赋值给mApplication
         //这里mInstrumentation传的是null，所以下面这个不走
         if (instrumentation != null) {
             try {
