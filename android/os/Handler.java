@@ -221,9 +221,9 @@ public class Handler {
         if (FIND_POTENTIAL_LEAKS) {
             final Class<? extends Handler> klass = getClass();
             if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &&
-                (klass.getModifiers() & Modifier.STATIC) == 0) {
+                    (klass.getModifiers() & Modifier.STATIC) == 0) {
                 Log.w(TAG, "The following Handler class should be static or leaks might occur: " +
-                           klass.getCanonicalName());
+                        klass.getCanonicalName());
             }
         }
 
@@ -231,7 +231,7 @@ public class Handler {
         if (mLooper == null) {
             throw new RuntimeException(
                     "Can't create handler inside thread " + Thread.currentThread()
-                    + " that has not called Looper.prepare()");
+                            + " that has not called Looper.prepare()");
         }
         mQueue = mLooper.mQueue;
         mCallback = callback;
@@ -549,6 +549,8 @@ public class Handler {
      * message queue.  Returns false on failure, usually because the
      * looper processing the message queue is exiting.
      */
+    // TODO:发送一个优先级高的Message--这个Message的when值为0
+    //一般的Message的when值为SystemClock.uptimeMillis()+delayMillis(delayMillis>=0)
     public final boolean postAtFrontOfQueue(@NonNull Runnable r) {
         return sendMessageAtFrontOfQueue(getPostMessage(r));
     }
@@ -743,6 +745,8 @@ public class Handler {
      * message queue.  Returns false on failure, usually because the
      * looper processing the message queue is exiting.
      */
+    // TODO:发送一个优先级高的Message-这个Message的when值为0
+    //一般的Message的when值为SystemClock.uptimeMillis()+delayMillis(delayMillis>=0)
     public final boolean sendMessageAtFrontOfQueue(@NonNull Message msg) {
         MessageQueue queue = mQueue;
         if (queue == null) {
@@ -909,8 +913,8 @@ public class Handler {
     @Override
     public String toString() {
         return "Handler (" + getClass().getName() + ") {"
-               + Integer.toHexString(System.identityHashCode(this))
-               + "}";
+                + Integer.toHexString(System.identityHashCode(this))
+                + "}";
     }
 
     @UnsupportedAppUsage
