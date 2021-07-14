@@ -490,7 +490,7 @@ class ActivityStarter {
                 // so it looks like a "normal" instant app launch.
                 intent.setComponent(null /* component */);
             }
-            //todo:收集Intent
+            //todo:收集Intent--resolveInfo通过supervisor.resolveIntent获取。
             resolveInfo = supervisor.resolveIntent(intent, resolvedType, userId,
                     0 /* matchFlags */,
                     computeResolveFilterUid(callingUid, realCallingUid, filterCallingUid));
@@ -521,8 +521,8 @@ class ActivityStarter {
                 }
             }
             // TODO:解析Activity信息
-
-            // Collect information about the target of the Intent.
+            //activityInfo为空为报-是不是在AndroidManifest中注册错误,这里从AndroidManifest解析Activity信息时生成的对象
+            // 1.activityInfo是从resolveInfo.activityInfo获取的
             activityInfo = supervisor.resolveActivity(intent, resolveInfo, startFlags,
                     profilerInfo);
 
@@ -854,6 +854,7 @@ class ActivityStarter {
         Intent intent = request.intent;
         NeededUriGrants intentGrants = request.intentGrants;
         String resolvedType = request.resolvedType;
+        //aInfo为空为报-是不是在AndroidManifest中注册错误
         ActivityInfo aInfo = request.activityInfo;
         ResolveInfo rInfo = request.resolveInfo;
         final IVoiceInteractionSession voiceSession = request.voiceSession;
@@ -884,6 +885,7 @@ class ActivityStarter {
             } else {
                 Slog.w(TAG, "Unable to find app for caller " + caller + " (pid=" + callingPid
                         + ") when starting: " + intent.toString());
+                // TODO:权限拒绝
                 err = ActivityManager.START_PERMISSION_DENIED;
             }
         }
@@ -946,10 +948,9 @@ class ActivityStarter {
         if (err == ActivityManager.START_SUCCESS && intent.getComponent() == null) {
             // We couldn't find a class that can handle the given Intent.
             // That's the end of that!
-            // TODO:是不是在AndroidManifest中注册-START_INTENT_NOT_RESOLVED
             err = ActivityManager.START_INTENT_NOT_RESOLVED;   //没有相关的component
         }
-
+// 1.TODO:是不是在AndroidManifest中注册-START_CLASS_NOT_FOUND
         if (err == ActivityManager.START_SUCCESS && aInfo == null) {
             // We couldn't find the specific class specified in the Intent.
             // Also the end of the line.
@@ -1632,7 +1633,7 @@ class ActivityStarter {
         computeLaunchParams(r, sourceRecord, targetTask);
 
         // Check if starting activity on given task or on a new task is allowed.
-        // TODO:是不是在AndroidManifest中注册-START_CLASS_NOT_FOUND
+//2.TODO:是不是在AndroidManifest中注册-START_CLASS_NOT_FOUND
         int startResult = isAllowedToStart(r, newTask, targetTask);
         if (startResult != START_SUCCESS) {
             return startResult;
@@ -1818,6 +1819,7 @@ class ActivityStarter {
     }
 
     private int isAllowedToStart(ActivityRecord r, boolean newTask, Task targetTask) {
+        //包名为空--START_CLASS_NOT_FOUND
         if (mStartActivity.packageName == null) {
             if (mStartActivity.resultTo != null) {
                 mStartActivity.resultTo.sendResult(INVALID_UID, mStartActivity.resultWho,

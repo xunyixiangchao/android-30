@@ -671,7 +671,7 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
         }
         return aInfo;
     }
-
+    //返回ResolveInfo信息
     ResolveInfo resolveIntent(Intent intent, String resolvedType, int userId, int flags,
             int filterCallingUid) {
         try {
@@ -698,6 +698,9 @@ public class ActivityStackSupervisor implements RecentTasks.Callbacks {
             // (e.g. AMS.startActivityAsUser).
             final long token = Binder.clearCallingIdentity();
             try {
+                //返回了一个resolveIntent
+                //1.AMS的getPackageManagerInternalLocked 获取 PackageManagerInternal类（抽象类）
+                //2.具体实现 PackageManagerService#resolveIntent
                 return mService.getPackageManagerInternalLocked().resolveIntent(
                         intent, resolvedType, modifiedFlags, privateResolveFlags, userId, true,
                         filterCallingUid);

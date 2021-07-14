@@ -5315,7 +5315,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
         return updateFlagsForComponent(flags, userId);
     }
-
+    // TODO:获取ActivityInfo
     @Override
     public ActivityInfo getActivityInfo(ComponentName component, int flags, int userId) {
         return getActivityInfoInternal(component, flags, Binder.getCallingUid(), userId);
@@ -5327,6 +5327,7 @@ public class PackageManagerService extends IPackageManager.Stub
      * to clearing. Because it can only be provided by trusted code, it's value can be
      * trusted and will be used as-is; unlike userId which will be validated by this method.
      */
+    // TODO:获取ActivityInfo
     private ActivityInfo getActivityInfoInternal(ComponentName component, int flags,
             int filterCallingUid, int userId) {
         if (!mUserManager.exists(userId)) return null;
@@ -5354,6 +5355,7 @@ public class PackageManagerService extends IPackageManager.Stub
                         a, flags, ps.readUserState(userId), userId, ps);
             }
             if (mResolveComponentName.equals(component)) {
+                // TODO:获取ActivityInfo
                 return PackageParser.generateActivityInfo(
                         mResolveActivity, flags, new PackageUserState(), userId);
             }
@@ -6400,9 +6402,11 @@ public class PackageManagerService extends IPackageManager.Stub
         return null;
     }
 
+    // TODO:获取ResolveInfo过程
     @Override
     public ResolveInfo resolveIntent(Intent intent, String resolvedType,
             int flags, int userId) {
+        // TODO:获取ResolveInfo过程
         return resolveIntentInternal(intent, resolvedType, flags, 0 /*privateResolveFlags*/,
                 userId, false, Binder.getCallingUid());
     }
@@ -6427,6 +6431,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     false /*requireFullPermission*/, false /*checkShell*/, "resolve intent");
 
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "queryIntentActivities");
+            // TODO:获取 ResolveInfo 过程--ResolveInfo会有多个
             final List<ResolveInfo> query = queryIntentActivitiesInternal(intent, resolvedType,
                     flags, privateResolveFlags, filterCallingUid, userId, resolveForStart,
                     true /*allowDynamicSplits*/);
@@ -6435,7 +6440,7 @@ public class PackageManagerService extends IPackageManager.Stub
             final boolean queryMayBeFiltered =
                     UserHandle.getAppId(filterCallingUid) >= Process.FIRST_APPLICATION_UID
                             && !resolveForStart;
-
+// TODO:获取ResolveInfo过程
             final ResolveInfo bestChoice =
                     chooseBestActivity(
                             intent, resolvedType, flags, privateResolveFlags, query, userId,
@@ -7125,7 +7130,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 intent, resolvedType, flags, 0 /*privateResolveFlags*/, Binder.getCallingUid(),
                 userId, false /*resolveForStart*/, true /*allowDynamicSplits*/);
     }
-
+    // TODO:获取 ResolveInfo 过程
     private @NonNull List<ResolveInfo> queryIntentActivitiesInternal(Intent intent,
             String resolvedType, int flags, @PrivateResolveFlags int privateResolveFlags,
             int filterCallingUid, int userId, boolean resolveForStart, boolean allowDynamicSplits) {
@@ -7149,6 +7154,7 @@ public class PackageManagerService extends IPackageManager.Stub
                         flags));
         if (comp != null) {
             final List<ResolveInfo> list = new ArrayList<>(1);
+            // TODO:获取ActivityInfo
             final ActivityInfo ai = getActivityInfo(comp, flags, userId);
             if (ai != null) {
                 // When specifying an explicit component, we prevent the activity from being

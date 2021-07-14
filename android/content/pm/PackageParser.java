@@ -7955,7 +7955,7 @@ public class PackageParser {
         updateApplicationInfo(ai, flags, state);
         return ai;
     }
-
+    // TODO:获取ActivityInfo---Manifest的解析
     public static ApplicationInfo generateApplicationInfo(ApplicationInfo ai, int flags,
             PackageUserState state, int userId) {
         if (ai == null) return null;
@@ -7971,6 +7971,7 @@ public class PackageParser {
         } else {
             ai.flags &= ~ApplicationInfo.FLAG_STOPPED;
         }
+        // TODO:获取ActivityInfo
         updateApplicationInfo(ai, flags, state);
         return ai;
     }
@@ -8131,7 +8132,7 @@ public class PackageParser {
         ai.applicationInfo = generateApplicationInfo(a.owner, flags, state, userId);
         return ai;
     }
-
+    // TODO:获取ActivityInfo
     public static final ActivityInfo generateActivityInfo(ActivityInfo ai, int flags,
             PackageUserState state, int userId) {
         if (ai == null) return null;
