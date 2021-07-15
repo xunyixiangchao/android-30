@@ -846,6 +846,7 @@ public final class SystemServer {
         t.traceEnd();
 
         // Only run "core" apps if we're encrypting the device.
+        //判断手机是否设置了密码
         String cryptState = VoldProperties.decrypt().orElse("");
         if (ENCRYPTING_STATE.equals(cryptState)) {
             Slog.w(TAG, "Detected encryption in progress - only parsing core apps");
@@ -866,6 +867,7 @@ public final class SystemServer {
         t.traceBegin("StartPackageManagerService");
         try {
             Watchdog.getInstance().pauseWatchingCurrentThread("packagemanagermain");
+            // TODO:PKMS运行main方法
             mPackageManagerService = PackageManagerService.main(mSystemContext, installer,
                     mFactoryTestMode != FactoryTest.FACTORY_TEST_OFF, mOnlyCore);
         } finally {
@@ -1342,6 +1344,7 @@ public final class SystemServer {
             t.traceBegin("UpdatePackagesIfNeeded");
             try {
                 Watchdog.getInstance().pauseWatchingCurrentThread("dexopt");
+                // TODO:PKMS,如果没有加密，完成dex的优化
                 mPackageManagerService.updatePackagesIfNeeded();
             } catch (Throwable e) {
                 reportWtf("update packages", e);
@@ -1353,6 +1356,7 @@ public final class SystemServer {
 
         t.traceBegin("PerformFstrimIfNeeded");
         try {
+            // TODO:PKMS执行performFstrimIfNeeded完成维护
             mPackageManagerService.performFstrimIfNeeded();
         } catch (Throwable e) {
             reportWtf("performing fstrim", e);
@@ -2197,6 +2201,7 @@ public final class SystemServer {
         t.traceEnd();
 
         t.traceBegin("MakePackageManagerServiceReady");
+        // TODO:PKMS准备就绪
         mPackageManagerService.systemReady();
         t.traceEnd();
 

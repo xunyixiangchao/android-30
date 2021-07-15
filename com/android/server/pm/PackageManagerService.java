@@ -9656,6 +9656,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
 
         final long startTime = System.nanoTime();
+        // TODO:PKMS,如果没有加密，完成dex的优化
         final int[] stats = performDexOptUpgrade(pkgs, mIsPreNUpgrade /* showDialog */,
                     causeFirstBoot ? REASON_FIRST_BOOT : REASON_BOOT,
                     false /* bootComplete */);
