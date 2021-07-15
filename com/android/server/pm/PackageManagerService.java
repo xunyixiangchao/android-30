@@ -2558,6 +2558,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
     }
 
+    // TODO:PKMS的main方法过程
     public static PackageManagerService main(Context context, Installer installer,
             boolean factoryTest, boolean onlyCore) {
         // Self-check for initial settings.
@@ -2594,7 +2595,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 new Injector.SystemServiceProducer<>(AppOpsManager.class),
                 (i, pm) -> AppsFilter.create(pm.mPmInternal, i),
                 (i, pm) -> (PlatformCompat) ServiceManager.getService("platform_compat"));
-
+        //TODO:PKMS的main方法过程-实例化PKMS
         PackageManagerService m = new PackageManagerService(injector, onlyCore, factoryTest);
         t.traceEnd(); // "create package manager"
 
@@ -2633,7 +2634,9 @@ public class PackageManagerService extends IPackageManager.Stub
                 });
 
         m.installWhitelistedSystemPackages();
+        // TODO:PKMS的main方法过程-将PKMS添加ServiceManager
         ServiceManager.addService("package", m);
+        // TODO:多了一个PKMN服务添加到SM中
         final PackageManagerNative pmn = m.new PackageManagerNative();
         ServiceManager.addService("package_native", pmn);
         return m;
@@ -2811,7 +2814,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mResolveComponentName = testParams.resolveComponentName;
         mPackages.putAll(testParams.packages);
     }
-
+    //TODO:PKMS的main方法过程-PKMS构造方法
     public PackageManagerService(Injector injector, boolean onlyCore, boolean factoryTest) {
         PackageManager.disableApplicationInfoCache();
         PackageManager.disablePackageInfoCache();
@@ -2836,11 +2839,13 @@ public class PackageManagerService extends IPackageManager.Stub
         if (mSdkVersion <= 0) {
             Slog.w(TAG, "**** ro.build.version.sdk not set!");
         }
-
+//TODO:PKMS的main方法过程-阶段1：BOOT_PROGRESS_PMS_START
         mContext = injector.getContext();
         mFactoryTest = factoryTest;
         mOnlyCore = onlyCore;
+        //1-1：创建DisplayMetrics来保存分辨率等信息
         mMetrics = new DisplayMetrics();
+        //2-1：安装器
         mInstaller = injector.getInstaller();
 
         // Create sub-components that provide services / data. Order here is important.
@@ -2851,8 +2856,11 @@ public class PackageManagerService extends IPackageManager.Stub
         LocalServices.addService(PackageManagerInternal.class, mPmInternal);
         mUserManager = injector.getUserManagerService();
         mComponentResolver = injector.getComponentResolver();
+        //3-1：创建权限管理
         mPermissionManager = injector.getPermissionManagerServiceInternal();
+        //4-1：获取Settings来保存安装包信息
         mSettings = injector.getSettings();
+        //权3-2：获取限管理服务
         mPermissionManagerService = (IPermissionManager) ServiceManager.getService("permissionmgr");
         mIncrementalManager =
                 (IncrementalManager) mContext.getSystemService(Context.INCREMENTAL_SERVICE);
@@ -2916,7 +2924,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mMoveCallbacks = new MoveCallbacks(FgThread.get().getLooper());
 
         mViewCompiler = new ViewCompiler(mInstallLock, mInstaller);
-
+        //1-2：获取分辨率等信息
         getDefaultDisplayMetrics(mInjector.getDisplayManager(), mMetrics);
 
         t.traceBegin("get system config");

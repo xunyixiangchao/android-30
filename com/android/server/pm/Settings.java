@@ -446,7 +446,10 @@ public final class Settings {
                 FileUtils.S_IRWXU|FileUtils.S_IRWXG
                 |FileUtils.S_IROTH|FileUtils.S_IXOTH,
                 -1, -1);
+        //读取系统下的packages.xml文件--/data/system/packages.xml
+        //1.权限-系统权限，package-所有的系统应用
         mSettingsFilename = new File(mSystemDir, "packages.xml");
+        //读取系统下的packages-backup.xml备份文件
         mBackupSettingsFilename = new File(mSystemDir, "packages-backup.xml");
         mPackageListFilename = new File(mSystemDir, "packages.list");
         FileUtils.setPermissions(mPackageListFilename, 0640, SYSTEM_UID, PACKAGE_INFO_GID);
