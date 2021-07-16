@@ -2815,7 +2815,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mResolveComponentName = testParams.resolveComponentName;
         mPackages.putAll(testParams.packages);
     }
-    //TODO:PKMS初始化过程，后半部分--PKMS的构造方法
+    //TODO:PKMS初始化过程，后半部分--PKMS的构造方法  
     //TODO:PKMS的main方法过程-PKMS构造方法
     public PackageManagerService(Injector injector, boolean onlyCore, boolean factoryTest) {
         PackageManager.disableApplicationInfoCache();
