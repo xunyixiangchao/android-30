@@ -718,6 +718,8 @@ public final class SystemServer {
      * in one place here.  Unless your service is also entwined in these dependencies, it should be
      * initialized in one of the other functions.
      */
+    //TODO:PKMS初始化过程，前半部分--SystemServer中的流程
+
     private void startBootstrapServices(@NonNull TimingsTraceAndSlog t) {
         t.traceBegin("startBootstrapServices");
 
@@ -755,6 +757,7 @@ public final class SystemServer {
         // create critical directories such as /data/user with the appropriate
         // permissions.  We need this to complete before we initialize other services.
         t.traceBegin("StartInstaller");
+        //TODO:PKMS初始化过程，前半部分--第一步，启动Installer服务
         Installer installer = mSystemServiceManager.startService(Installer.class);
         t.traceEnd();
 
@@ -847,6 +850,7 @@ public final class SystemServer {
 
         // Only run "core" apps if we're encrypting the device.
         //判断手机是否设置了密码
+        //TODO:PKMS初始化过程，前半部分--第二步，获取设备是否加密（例如:手机设置了密码）
         String cryptState = VoldProperties.decrypt().orElse("");
         if (ENCRYPTING_STATE.equals(cryptState)) {
             Slog.w(TAG, "Detected encryption in progress - only parsing core apps");
@@ -867,6 +871,7 @@ public final class SystemServer {
         t.traceBegin("StartPackageManagerService");
         try {
             Watchdog.getInstance().pauseWatchingCurrentThread("packagemanagermain");
+//TODO:PKMS初始化过程，前半部分--第三步调用PKMS的main方法，实例化PKMS
             // TODO:PKMS运行main方法
             mPackageManagerService = PackageManagerService.main(mSystemContext, installer,
                     mFactoryTestMode != FactoryTest.FACTORY_TEST_OFF, mOnlyCore);
@@ -891,6 +896,8 @@ public final class SystemServer {
         // Manages A/B OTA dexopting. This is a bootstrap service as we need it to rename
         // A/B artifacts after boot, before anything else might touch/need them.
         // Note: this isn't needed during decryption (we don't have /data anyways).
+
+        //TODO:PKMS初始化过程，前半部分--第四步：如果设备没有加密，操作它管理A/B OTA dexopting
         if (!mOnlyCore) {
             boolean disableOtaDexopt = SystemProperties.getBoolean("config.disable_otadexopt",
                     false);
@@ -1344,7 +1351,7 @@ public final class SystemServer {
             t.traceBegin("UpdatePackagesIfNeeded");
             try {
                 Watchdog.getInstance().pauseWatchingCurrentThread("dexopt");
-                // TODO:PKMS,如果没有加密，完成dex的优化
+                //TODO:PKMS初始化过程，前半部分--第五步：如果没有加密，执行pkms中performDexOptUpgrade完成dex的优化
                 mPackageManagerService.updatePackagesIfNeeded();
             } catch (Throwable e) {
                 reportWtf("update packages", e);
@@ -1356,7 +1363,7 @@ public final class SystemServer {
 
         t.traceBegin("PerformFstrimIfNeeded");
         try {
-            // TODO:PKMS执行performFstrimIfNeeded完成维护
+            //TODO:PKMS初始化过程，前半部分--第六步：执行performFstrimIfNeeded完成维护
             mPackageManagerService.performFstrimIfNeeded();
         } catch (Throwable e) {
             reportWtf("performing fstrim", e);
@@ -2201,7 +2208,7 @@ public final class SystemServer {
         t.traceEnd();
 
         t.traceBegin("MakePackageManagerServiceReady");
-        // TODO:PKMS准备就绪
+        //TODO:PKMS初始化过程，前半部分--第七步：PKMS准备就绪
         mPackageManagerService.systemReady();
         t.traceEnd();
 

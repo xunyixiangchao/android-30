@@ -2596,6 +2596,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 (i, pm) -> AppsFilter.create(pm.mPmInternal, i),
                 (i, pm) -> (PlatformCompat) ServiceManager.getService("platform_compat"));
         //TODO:PKMS的main方法过程-实例化PKMS
+        //TODO:PKMS初始化过程，后半部分--PKMS的构造方法
         PackageManagerService m = new PackageManagerService(injector, onlyCore, factoryTest);
         t.traceEnd(); // "create package manager"
 
@@ -2814,6 +2815,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mResolveComponentName = testParams.resolveComponentName;
         mPackages.putAll(testParams.packages);
     }
+    //TODO:PKMS初始化过程，后半部分--PKMS的构造方法
     //TODO:PKMS的main方法过程-PKMS构造方法
     public PackageManagerService(Injector injector, boolean onlyCore, boolean factoryTest) {
         PackageManager.disableApplicationInfoCache();
@@ -2830,6 +2832,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
         mInjector = injector;
         mInjector.bootstrap(this);
+        // TODO:两个重要的锁mLock,mInstallLock
         mLock = injector.getLock();
         mInstallLock = injector.getInstallLock();
         LockGuard.installLock(mLock, LockGuard.INDEX_PACKAGES);
@@ -3026,7 +3029,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
             EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_SYSTEM_SCAN_START,
                     startTime);
-
+//TODO:PKMS的main方法过程-阶段2：BOOT_PROGRESS_PMS_SYSTEM_SCAN_START
             final String bootClassPath = System.getenv("BOOTCLASSPATH");
             final String systemServerClassPath = System.getenv("SYSTEMSERVERCLASSPATH");
 
@@ -3091,6 +3094,8 @@ public class PackageManagerService extends IPackageManager.Stub
             // any apps.)
             // For security and version matching reason, only consider overlay packages if they
             // reside in the right directory.
+            //1.扫描各种目录下的apk （system,vendor,product,odm,oem）  等目录的priv-app,app,overlay等包。
+            //清除安装时临时文件以及其他不必要的信息
             for (int i = mDirsToScanAsSystem.size() - 1; i >= 0; i--) {
                 final ScanPartition partition = mDirsToScanAsSystem.get(i);
                 if (partition.getOverlayFolder() == null) {
@@ -3228,6 +3233,8 @@ public class PackageManagerService extends IPackageManager.Stub
                 //CHECKSTYLE:ON IndentationCheck
             }
             if (!mOnlyCore) {
+//TODO:PKMS的main方法过程-阶段3：BOOT_PROGRESS_PMS_DATA_SCAN_START
+                //1.处理data目录的应用信息，及时更新，去除不必要的信息
                 EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_DATA_SCAN_START,
                         SystemClock.uptimeMillis());
                 scanDirTracedLI(sAppInstallDir, 0, scanFlags | SCAN_REQUIRE_KNOWN, 0,
@@ -3242,7 +3249,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 throw new IllegalStateException("Not all tasks finished before calling close: "
                         + unfinishedTasks);
             }
-
+            //1.处理data目录的应用信息，及时更新，去除不必要的信息
             if (!mOnlyCore) {
                 // Remove disable package settings for updated system apps that were
                 // removed via an OTA. If the update is no longer present, remove the
@@ -3414,6 +3421,9 @@ public class PackageManagerService extends IPackageManager.Stub
             mPackageUsage.read(mSettings.mPackages);
             mCompilerStats.read();
 
+//TODO:PKMS的main方法过程-阶段4：BOOT_PROGRESS_PMS_SCAN_END
+            //1.OTA后首次启动要清除不必要的缓存数据，权限等默认项。更新后要清理相关数据，
+            //更新package.xml
             EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_SCAN_END,
                     SystemClock.uptimeMillis());
             Slog.i(TAG, "Time to scan packages: "
@@ -3539,6 +3549,9 @@ public class PackageManagerService extends IPackageManager.Stub
             t.traceBegin("write settings");
             mSettings.writeLPr();
             t.traceEnd();
+
+//TODO:PKMS的main方法过程-阶段5：BOOT_PROGRESS_PMS_READY
+            //GC回收内存
             EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_READY,
                     SystemClock.uptimeMillis());
 
@@ -3569,6 +3582,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
             // PermissionController hosts default permission granting and role management, so it's a
             // critical part of the core system.
+
+            //PermissionController 主持 缺陷许可证的授予和角色管理，所以这是核心系统的一个关键部分。
             mRequiredPermissionControllerPackage = getRequiredPermissionControllerLPr();
 
             mSettings.setPermissionControllerVersion(
@@ -3645,12 +3660,15 @@ public class PackageManagerService extends IPackageManager.Stub
         // are all flushed.  Not really needed, but keeps things nice and
         // tidy.
         t.traceBegin("GC");
+        // TODO:打开应用之后，及时回收处理
         Runtime.getRuntime().gc();
         t.traceEnd();
 
         // The initial scanning above does many calls into installd while
         // holding the mPackages lock, but we're mostly interested in yelling
         // once we have a booted system.
+
+        // 上面的初始扫描在持有mPackage锁的同时对installd进行了多次调用
         mInstaller.setWarnIfHeld(mLock);
 
         PackageParser.readConfigUseRoundIcon(mContext.getResources());
