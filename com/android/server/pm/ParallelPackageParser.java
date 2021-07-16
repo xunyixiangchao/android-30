@@ -105,6 +105,7 @@ class ParallelPackageParser {
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "parallel parsePackage [" + scanFile + "]");
             try {
                 pr.scanFile = scanFile;
+                //传入的file是apk文件，作用是解析apk
                 pr.parsedPackage = parsePackage(scanFile, parseFlags);
             } catch (Throwable e) {
                 pr.throwable = e;

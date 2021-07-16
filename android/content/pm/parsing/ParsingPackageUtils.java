@@ -225,12 +225,14 @@ public class ParsingPackageUtils {
      *
      * @see PackageParser#parsePackageLite(File, int)
      */
+    //解析apk
     public ParseResult<ParsingPackage> parsePackage(ParseInput input, File packageFile,
             int flags)
             throws PackageParserException {
         if (packageFile.isDirectory()) {
             return parseClusterPackage(input, packageFile, flags);
         } else {
+            //解析apk
             return parseMonolithicPackage(input, packageFile, flags);
         }
     }
@@ -313,6 +315,7 @@ public class ParsingPackageUtils {
      * Note that this <em>does not</em> perform signature verification; that
      * must be done separately in {@link #getSigningDetails(ParsingPackageRead, boolean)}.
      */
+    //解析apk
     private ParseResult<ParsingPackage> parseMonolithicPackage(ParseInput input, File apkFile,
             int flags) throws PackageParserException {
         ParseResult<PackageParser.PackageLite> liteResult =
@@ -329,6 +332,7 @@ public class ParsingPackageUtils {
 
         final SplitAssetLoader assetLoader = new DefaultSplitAssetLoader(lite, flags);
         try {
+            //解析apk--主要对AndroidManifest.xml进行解析，解析的所有信息存放在 ParsingPackage 对象中
             ParseResult<ParsingPackage> result = parseBaseApk(input,
                     apkFile,
                     apkFile.getCanonicalPath(),
@@ -346,7 +350,7 @@ public class ParsingPackageUtils {
             IoUtils.closeQuietly(assetLoader);
         }
     }
-
+    //解析apk--主要对AndroidManifest.xml进行解析，解析的所有信息存放在 ParsingPackage 对象中
     private ParseResult<ParsingPackage> parseBaseApk(ParseInput input, File apkFile,
             String codePath, AssetManager assets, int flags) {
         final String apkPath = apkFile.getAbsolutePath();
@@ -368,7 +372,7 @@ public class ParsingPackageUtils {
         try (XmlResourceParser parser = assets.openXmlResourceParser(cookie,
                 PackageParser.ANDROID_MANIFEST_FILENAME)) {
             final Resources res = new Resources(assets, mDisplayMetrics, null);
-
+//解析apk--主要对AndroidManifest.xml进行解析，解析的所有信息存放在 ParsingPackage 对象中
             ParseResult<ParsingPackage> result = parseBaseApk(input, apkPath, codePath, res,
                     parser, flags);
             if (result.isError()) {
@@ -461,6 +465,7 @@ public class ParsingPackageUtils {
      * @param flags   Flags how to parse
      * @return Parsed package or null on error.
      */
+    //解析apk--主要对AndroidManifest.xml进行解析，解析的所有信息存放在 ParsingPackage 对象中
     private ParseResult<ParsingPackage> parseBaseApk(ParseInput input, String apkPath,
             String codePath, Resources res, XmlResourceParser parser, int flags)
             throws XmlPullParserException, IOException, PackageParserException {
@@ -490,6 +495,7 @@ public class ParsingPackageUtils {
                     parser.getAttributeBooleanValue(null, "coreApp", false);
             final ParsingPackage pkg = mCallback.startParsingPackage(
                     pkgName, apkPath, codePath, manifestArray, isCoreApp);
+            //解析apk
             final ParseResult<ParsingPackage> result =
                     parseBaseApkTags(input, pkg, manifestArray, res, parser, flags);
             if (result.isError()) {
@@ -709,7 +715,7 @@ public class ParsingPackageUtils {
                 return ParsingUtils.unknownTag("<application>", pkg, parser, input);
         }
     }
-
+    //解析apk--主要对AndroidManifest.xml进行解析，解析的所有信息存放在 ParsingPackage 对象中
     private ParseResult<ParsingPackage> parseBaseApkTags(ParseInput input, ParsingPackage pkg,
             TypedArray sa, Resources res, XmlResourceParser parser, int flags)
             throws XmlPullParserException, IOException {
@@ -740,6 +746,7 @@ public class ParsingPackageUtils {
 
             // TODO(b/135203078): Convert to instance methods to share variables
             // <application> has special logic, so it's handled outside the general method
+            //解析的application标签
             if (PackageParser.TAG_APPLICATION.equals(tagName)) {
                 if (foundApp) {
                     if (PackageParser.RIGID_PARSER) {
@@ -750,6 +757,7 @@ public class ParsingPackageUtils {
                     }
                 } else {
                     foundApp = true;
+                    //解析的application标签
                     result = parseBaseApplication(input, pkg, res, parser, flags);
                 }
             } else {
@@ -1608,6 +1616,7 @@ public class ParsingPackageUtils {
      * a local variable and using it. Otherwise there's an ordering problem which can be broken
      * if any code moves around.
      */
+    //解析的application标签-针对application标签全面解析，例如application中的activity,service...
     private ParseResult<ParsingPackage> parseBaseApplication(ParseInput input,
             ParsingPackage pkg, Resources res, XmlResourceParser parser, int flags)
             throws XmlPullParserException, IOException {
@@ -1622,7 +1631,7 @@ public class ParsingPackageUtils {
             if (sa == null) {
                 return input.error("<application> does not contain any attributes");
             }
-
+            //applicaiton-name
             String name = sa.getNonConfigurationString(R.styleable.AndroidManifestApplication_name,
                     0);
             if (name != null) {
@@ -1818,6 +1827,7 @@ public class ParsingPackageUtils {
             final ParseResult result;
             String tagName = parser.getName();
             boolean isActivity = false;
+//解析四大组件等
             switch (tagName) {
                 case "activity":
                     isActivity = true;

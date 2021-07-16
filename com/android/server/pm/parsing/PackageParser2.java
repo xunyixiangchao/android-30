@@ -140,6 +140,7 @@ public class PackageParser2 implements AutoCloseable {
     @AnyThread
     public ParsedPackage parsePackage(File packageFile, int flags, boolean useCaches)
             throws PackageParserException {
+        //如果使用缓存并且存在缓存直接返回缓存的ParsedPackage
         if (useCaches && mCacher != null) {
             ParsedPackage parsed = mCacher.getCachedResult(packageFile, flags);
             if (parsed != null) {
@@ -149,6 +150,7 @@ public class PackageParser2 implements AutoCloseable {
 
         long parseTime = LOG_PARSE_TIMINGS ? SystemClock.uptimeMillis() : 0;
         ParseInput input = mSharedResult.get().reset();
+        //主要是这里进行解析apk
         ParseResult<ParsingPackage> result = parsingUtils.parsePackage(input, packageFile, flags);
         if (result.isError()) {
             throw new PackageParserException(result.getErrorCode(), result.getErrorMessage(),
