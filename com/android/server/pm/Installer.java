@@ -175,11 +175,14 @@ public class Installer extends SystemService {
             return true;
         }
     }
-
+    //TODO:APk的安装--安装过程
     public long createAppData(String uuid, String packageName, int userId, int flags, int appId,
             String seInfo, int targetSdkVersion) throws InstallerException {
         if (!checkBeforeRemote()) return -1;
         try {
+            //TODO:APk的安装--安装过程--最后到了installd服务进程
+            //installd源码位于frameworks/base/cmds/installd
+            //installd.c和installd.h文件
             return mInstalld.createAppData(uuid, packageName, userId, flags, appId, seInfo,
                     targetSdkVersion);
         } catch (Exception e) {

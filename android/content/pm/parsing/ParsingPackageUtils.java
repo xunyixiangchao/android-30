@@ -1617,6 +1617,7 @@ public class ParsingPackageUtils {
      * if any code moves around.
      */
     //解析的application标签-针对application标签全面解析，例如application中的activity,service...
+    //ParsingPackage接口实现ParsingPackageImpl，PackageImpl
     private ParseResult<ParsingPackage> parseBaseApplication(ParseInput input,
             ParsingPackage pkg, Resources res, XmlResourceParser parser, int flags)
             throws XmlPullParserException, IOException {
@@ -1668,7 +1669,7 @@ public class ParsingPackageUtils {
 
                 pkg.setManageSpaceActivityName(manageSpaceActivityName);
             }
-
+            //是否允许数据备份
             if (pkg.isAllowBackup()) {
                 // backupAgent, killAfterRestore, fullBackupContent, backupInForeground,
                 // and restoreAnyVersion are only relevant if backup is possible for the

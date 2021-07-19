@@ -913,6 +913,7 @@ public class PackageManagerServiceUtils {
      * @return returns status code according to those in
      *         {@link PackageManager}
      */
+    //apk安装--copy apk--io操作将apk拷贝到/data/app下
     public static int copyPackage(String packagePath, File targetDir) {
         if (packagePath == null) {
             return PackageManager.INSTALL_FAILED_INVALID_URI;

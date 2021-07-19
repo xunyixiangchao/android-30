@@ -440,9 +440,11 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_STREAM_VALIDATE_AND_COMMIT:
+                    //TODO:APk的安装
                     handleStreamValidateAndCommit();
                     break;
                 case MSG_INSTALL:
+                    //TODO:APk的安装
                     handleInstall();
                     break;
                 case MSG_ON_PACKAGE_INSTALLED:
@@ -1113,6 +1115,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
         }
     }
 
+    //TODO:APk的安装--session#commit
     @Override
     public void commit(@NonNull IntentSender statusReceiver, boolean forTransfer) {
         if (hasParentSessionId()) {
@@ -1143,11 +1146,12 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
                 return;
             }
         }
-
+//TODO:APk的安装
         dispatchStreamValidateAndCommit();
     }
 
     private void dispatchStreamValidateAndCommit() {
+        //TODO:APk的安装
         mHandler.obtainMessage(MSG_STREAM_VALIDATE_AND_COMMIT).sendToTarget();
     }
 
@@ -1202,7 +1206,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
         if (!allSessionsReady) {
             return;
         }
-
+//TODO:APk的安装
         mHandler.obtainMessage(MSG_INSTALL).sendToTarget();
     }
 
@@ -1694,7 +1698,6 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
             dispatchSessionFinished(PackageManager.INSTALL_SUCCEEDED, "Session staged", null);
             return;
         }
-
         if (isApexInstallation()) {
             destroyInternal();
             dispatchSessionFinished(PackageManager.INSTALL_FAILED_INTERNAL_ERROR,
@@ -1710,6 +1713,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
 
         try {
             synchronized (mLock) {
+                //TODO:APk的安装
                 installNonStagedLocked(childSessions);
             }
         } catch (PackageManagerException e) {
@@ -1752,8 +1756,10 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
                         failure.error, failure.getLocalizedMessage(), null);
                 return;
             }
+            //TODO:APk的安装--最终走到了PKMS的#installStage方法
             mPm.installStage(installingChildSessions);
         } else {
+            //TODO:APk的安装--最终走到了PKMS的#installStage方法
             mPm.installStage(installingSession);
         }
     }

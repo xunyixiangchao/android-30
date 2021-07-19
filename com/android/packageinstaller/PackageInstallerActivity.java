@@ -61,6 +61,7 @@ import java.io.File;
  * Based on the user response the package is then installed by launching InstallAppConfirm
  * sub activity. All state transitions are handled in this activity
  */
+//TODO:APk的安装--是个弹窗Activity
 public class PackageInstallerActivity extends AlertActivity {
     private static final String TAG = "PackageInstaller";
 
@@ -346,6 +347,7 @@ public class PackageInstallerActivity extends AlertActivity {
 
         // load dummy layout with OK button disabled until we override this layout in
         // startInstallConfirm
+        //TODO:APk的安装--安装
         bindUi();
         checkIfAllowedAndInitiateInstall();
     }
@@ -387,6 +389,7 @@ public class PackageInstallerActivity extends AlertActivity {
                             mInstaller.setPermissionsResult(mSessionId, true);
                             finish();
                         } else {
+                            //TODO:APk的安装--安装
                             startInstall();
                         }
                     }
@@ -580,6 +583,8 @@ public class PackageInstallerActivity extends AlertActivity {
         }
         newIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
         if(localLOGV) Log.i(TAG, "downloaded app uri="+mPackageURI);
+
+        //TODO:APk的安装--启动正在安装页面 InstallInstalling
         startActivity(newIntent);
         finish();
     }

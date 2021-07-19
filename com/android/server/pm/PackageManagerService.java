@@ -1665,6 +1665,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
         void doHandleMessage(Message msg) {
             switch (msg.what) {
+                //TODO:APk的安装--copy动作--copy到/data/app下
                 case INIT_COPY: {
                     HandlerParams params = (HandlerParams) msg.obj;
                     if (params != null) {
@@ -1672,6 +1673,7 @@ public class PackageManagerService extends IPackageManager.Stub
                         Trace.asyncTraceEnd(TRACE_TAG_PACKAGE_MANAGER, "queueInstall",
                                 System.identityHashCode(params));
                         Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "startCopy");
+                        //TODO:APk的安装--拷贝过程
                         params.startCopy();
                         Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
                     }
@@ -12878,7 +12880,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
         mHandler.sendMessage(msg);
     }
-
+    //TODO:APk的安装--installStage
     void installStage(List<ActiveInstallSession> children)
             throws PackageManagerException {
         final Message msg = mHandler.obtainMessage(INIT_COPY);
@@ -12892,6 +12894,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 System.identityHashCode(msg.obj));
         Trace.asyncTraceBegin(TRACE_TAG_PACKAGE_MANAGER, "queueInstall",
                 System.identityHashCode(msg.obj));
+        //TODO:APk的安装
         mHandler.sendMessage(msg);
     }
 
@@ -14374,12 +14377,13 @@ public class PackageManagerService extends IPackageManager.Stub
             }
         }
     }
-
+    //TODO:APk的安装--安装过程
     private void processPendingInstall(final InstallArgs args, final int currentStatus) {
         if (args.mMultiPackageInstallParams != null) {
             args.mMultiPackageInstallParams.tryProcessInstallRequest(args, currentStatus);
         } else {
             PackageInstalledInfo res = createPackageInstalledInfo(currentStatus);
+            //TODO:APk的安装--安装过程
             processInstallRequestsAsync(
                     res.returnCode == PackageManager.INSTALL_SUCCEEDED,
                     Collections.singletonList(new InstallRequest(args, res)));
@@ -14387,14 +14391,17 @@ public class PackageManagerService extends IPackageManager.Stub
     }
 
     // Queue up an async operation since the package installation may take a little while.
+    //TODO:APk的安装--安装过程
     private void processInstallRequestsAsync(boolean success,
             List<InstallRequest> installRequests) {
         mHandler.post(() -> {
             if (success) {
                 for (InstallRequest request : installRequests) {
+                    //将之前安装失败的清理掉-安装一半，临时文件等
                     request.args.doPreInstall(request.installResult.returnCode);
                 }
                 synchronized (mInstallLock) {
+                    //TODO:APk的安装--安装过程
                     installPackagesTracedLI(installRequests);
                 }
                 for (InstallRequest request : installRequests) {
@@ -14655,10 +14662,11 @@ public class PackageManagerService extends IPackageManager.Stub
             this.traceCookie = traceCookie;
             return this;
         }
-
+        //TODO:APk的安装
         final void startCopy() {
             if (DEBUG_INSTALL) Slog.i(TAG, "startCopy " + mUser + ": " + this);
             handleStartCopy();
+            //TODO:APk的安装-- InstallParams 或 MultiPackageInstallParams 实现类（都在PKMS中，内部类）
             handleReturnCode();
         }
 
@@ -15478,13 +15486,14 @@ public class PackageManagerService extends IPackageManager.Stub
             mEnableRollbackCompleted = true;
             handleReturnCode();
         }
-
+        //TODO:APk的安装--handleReturnCode
         @Override
         void handleReturnCode() {
             if (mVerificationCompleted
                     && mIntegrityVerificationCompleted && mEnableRollbackCompleted) {
                 if ((installFlags & PackageManager.INSTALL_DRY_RUN) != 0) {
                     String packageName = "";
+                    //apk安装--扫描的过程
                     ParseResult<PackageLite> result = ApkLiteParseUtils.parsePackageLite(
                             new ParseTypeImpl(
                                     (changeId, packageName1, targetSdkVersion) -> {
@@ -15509,8 +15518,10 @@ public class PackageManagerService extends IPackageManager.Stub
                     return;
                 }
                 if (mRet == PackageManager.INSTALL_SUCCEEDED) {
+                    //apk安装--copy apk--FileInstallArgs#copyApk--拷贝过程
                     mRet = mArgs.copyApk();
                 }
+                //TODO:APk的安装--安装过程
                 processPendingInstall(mArgs, mRet);
             }
         }
@@ -15698,16 +15709,17 @@ public class PackageManagerService extends IPackageManager.Stub
             this.codeFile = (codePath != null) ? new File(codePath) : null;
             this.resourceFile = (resourcePath != null) ? new File(resourcePath) : null;
         }
-
+        //apk安装--copy apk
         int copyApk() {
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "copyApk");
             try {
+                //apk安装--copy apk
                 return doCopyApk();
             } finally {
                 Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
             }
         }
-
+        //apk安装--copy apk
         private int doCopyApk() {
             if (origin.staged) {
                 if (DEBUG_INSTALL) Slog.d(TAG, origin.file + " already staged; skipping copy");
@@ -15726,7 +15738,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 Slog.w(TAG, "Failed to create copy file: " + e);
                 return PackageManager.INSTALL_FAILED_INSUFFICIENT_STORAGE;
             }
-
+//apk安装--copy apk
             int ret = PackageManagerServiceUtils.copyPackage(
                     origin.file.getAbsolutePath(), codeFile);
             if (ret != PackageManager.INSTALL_SUCCEEDED) {
@@ -16229,6 +16241,7 @@ public class PackageManagerService extends IPackageManager.Stub
     private void installPackagesTracedLI(List<InstallRequest> requests) {
         try {
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "installPackages");
+            //TODO:APk的安装--安装过程--会执行apk的扫描
             installPackagesLI(requests);
         } finally {
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
@@ -16858,6 +16871,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 installResults.put(packageName, request.installResult);
                 installArgs.put(packageName, request.args);
                 try {
+                    //TODO:APk的安装--安装过程--扫描apk
                     final ScanResult result = scanPackageTracedLI(
                             prepareResult.packageToScan, prepareResult.parseFlags,
                             prepareResult.scanFlags, System.currentTimeMillis(),
@@ -16916,6 +16930,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
                 }
             }
+            //TODO:APk的安装--安装过程
             executePostCommitSteps(commitRequest);
         } finally {
             if (success) {
@@ -16967,6 +16982,7 @@ public class PackageManagerService extends IPackageManager.Stub
      * is released. These are typically more expensive or require calls to installd, which often
      * locks on {@link #mLock}.
      */
+    //TODO:APk的安装--安装过程
     private void executePostCommitSteps(CommitRequest commitRequest) {
         final ArraySet<IncrementalStorage> incrementalStorages = new ArraySet<>();
         for (ReconciledPackage reconciledPkg : commitRequest.reconciledPackages.values()) {
@@ -16984,6 +17000,7 @@ public class PackageManagerService extends IPackageManager.Stub
                 }
                 incrementalStorages.add(storage);
             }
+            //TODO:APk的安装--安装过程--createAppData()
             prepareAppDataAfterInstallLIF(pkg);
             if (reconciledPkg.prepareResult.clearCodeCache) {
                 clearAppDataLIF(pkg, UserHandle.USER_ALL, FLAG_STORAGE_DE | FLAG_STORAGE_CE
@@ -22834,6 +22851,7 @@ public class PackageManagerService extends IPackageManager.Stub
      * <p>
      * <em>Note: To avoid a deadlock, do not call this method with {@code mLock} lock held</em>
      */
+    //TODO:APk的安装--安装过程--createAppData()
     private void prepareAppDataAfterInstallLIF(AndroidPackage pkg) {
         final PackageSetting ps;
         synchronized (mLock) {
@@ -22855,6 +22873,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
             if (ps.getInstalled(user.id)) {
                 // TODO: when user data is locked, mark that we're still dirty
+
+                //TODO:APk的安装--安装过程--createAppData()
                 prepareAppDataLIF(pkg, user.id, flags);
 
                 if (umInternal.isUserUnlockingOrUnlocked(user.id)) {
@@ -22875,11 +22895,13 @@ public class PackageManagerService extends IPackageManager.Stub
      * will try recovering system apps by wiping data; third-party app data is
      * left intact.
      */
+    //TODO:APk的安装--安装过程--createAppData()
     private void prepareAppDataLIF(AndroidPackage pkg, int userId, int flags) {
         if (pkg == null) {
             Slog.wtf(TAG, "Package was null!", new Throwable());
             return;
         }
+        //TODO:APk的安装--安装过程--createAppData()
         prepareAppDataLeafLIF(pkg, userId, flags);
     }
 
@@ -22893,7 +22915,7 @@ public class PackageManagerService extends IPackageManager.Stub
             prepareAppDataLIF(pkg, userId, flags);
         }
     }
-
+    //TODO:APk的安装--安装过程--createAppData()
     private void prepareAppDataLeafLIF(AndroidPackage pkg, int userId, int flags) {
         if (DEBUG_APP_DATA) {
             Slog.v(TAG, "prepareAppData for " + pkg.getPackageName() + " u" + userId + " 0x"
@@ -22924,6 +22946,7 @@ public class PackageManagerService extends IPackageManager.Stub
                         + ", but trying to recover: " + e);
                 destroyAppDataLeafLIF(pkg, userId, flags);
                 try {
+                    //TODO:APk的安装--安装过程--Installer.createAppData()
                     ceDataInode = mInstaller.createAppData(volumeUuid, packageName, userId, flags,
                             appId, seInfo, pkg.getTargetSdkVersion());
                     logCriticalInfo(Log.DEBUG, "Recovery succeeded!");

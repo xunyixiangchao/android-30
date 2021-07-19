@@ -49,6 +49,7 @@ import java.io.OutputStream;
  * <p>This has two phases: First send the data to the package manager, then wait until the package
  * manager processed the result.</p>
  */
+//TODO:APk的安装--正在安装页面
 public class InstallInstalling extends AlertActivity {
     private static final String LOG_TAG = InstallInstalling.class.getSimpleName();
 
@@ -218,7 +219,7 @@ public class InstallInstalling extends AlertActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+//TODO:APk的安装--正在安装页面-onResume()中启动InstallingAsyncTask来进行安装
         // This is the first onResume in a single life of the activity
         if (mInstallingTask == null) {
             PackageInstaller installer = getPackageManager().getPackageInstaller();
@@ -329,6 +330,7 @@ public class InstallInstalling extends AlertActivity {
      * Send the package to the package installer and then register a event result observer that
      * will call {@link #launchFinishBasedOnResult(int, int, String)}
      */
+    //TODO:APk的安装-InstallingAsyncTask
     private final class InstallingAsyncTask extends AsyncTask<Void, Void,
             PackageInstaller.Session> {
         volatile boolean isDone;
@@ -337,6 +339,8 @@ public class InstallInstalling extends AlertActivity {
         protected PackageInstaller.Session doInBackground(Void... params) {
             PackageInstaller.Session session;
             try {
+                //TODO:APk的安装--获取安装进程（安装过程有问题不会影响原应用）
+                // --PKMS#getPackageInstaller()--PackageInstallerService#openSession--PackageInstallerSession
                 session = getPackageManager().getPackageInstaller().openSession(mSessionId);
             } catch (IOException e) {
                 return null;
@@ -345,6 +349,7 @@ public class InstallInstalling extends AlertActivity {
             session.setStagingProgress(0);
 
             try {
+                //TODO:APk的安装-获取apk文件
                 File file = new File(mPackageURI.getPath());
 
                 try (InputStream in = new FileInputStream(file)) {
@@ -402,7 +407,7 @@ public class InstallInstalling extends AlertActivity {
                         mInstallId,
                         broadcastIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-
+                //TODO:APk的安装-session.commit--PackageInstallerSession#commit
                 session.commit(pendingIntent.getIntentSender());
                 mCancelButton.setEnabled(false);
                 setFinishOnTouchOutside(false);

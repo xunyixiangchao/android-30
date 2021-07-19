@@ -231,12 +231,15 @@ public class ParsingPackageImpl implements ParsingPackage, Parcelable {
     @DataClass.ParcelWith(ForInternedStringList.class)
     protected List<String> protectedBroadcasts = emptyList();
 
+    //所有的Activity
     @NonNull
     protected List<ParsedActivity> activities = emptyList();
 
+    //所有的receiver
     @NonNull
     protected List<ParsedActivity> receivers = emptyList();
 
+    //所有的 services
     @NonNull
     protected List<ParsedService> services = emptyList();
 
@@ -246,6 +249,7 @@ public class ParsingPackageImpl implements ParsingPackage, Parcelable {
     @NonNull
     private List<ParsedAttribution> attributions = emptyList();
 
+    //所有的 permissions
     @NonNull
     protected List<ParsedPermission> permissions = emptyList();
 
