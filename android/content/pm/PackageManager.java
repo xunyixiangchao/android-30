@@ -4748,10 +4748,17 @@ public abstract class PackageManager {
      */
     @NonNull
     @UnsupportedAppUsage
+    // TODO:动态权限申请流程-返回intent
     public Intent buildRequestPermissionsIntent(@NonNull String[] permissions) {
         if (ArrayUtils.isEmpty(permissions)) {
            throw new IllegalArgumentException("permission cannot be null or empty");
         }
+        //寻找系统隐藏应用-packages/apps/PackageInstaller
+        //action:android.content.pm.action.REQUEST_PERMISSIONS
+        //在AndroidManifest.xml中查找action对应的Activity
+        // ->GrantPermissionsActivity 对应的方法 onPermissionGrantResult()
+        // -> AppPermissionGroup#grantRuntimePermissions
+        // ->到 PKMS#grantRuntimePermission
         Intent intent = new Intent(ACTION_REQUEST_PERMISSIONS);
         intent.putExtra(EXTRA_REQUEST_PERMISSIONS_NAMES, permissions);
         intent.setPackage(getPermissionControllerPackageName());

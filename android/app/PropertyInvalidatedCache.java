@@ -359,6 +359,7 @@ public abstract class PropertyInvalidatedCache<Query, Result> {
     /**
      * Get a value from the cache or recompute it.
      */
+
     public Result query(Query query) {
         // Let access to mDisabled race: it's atomic anyway.
         long currentNonce = (!isDisabledLocal()) ? getCurrentNonce() : NONCE_DISABLED;

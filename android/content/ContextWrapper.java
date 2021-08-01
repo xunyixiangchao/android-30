@@ -809,7 +809,9 @@ public class ContextWrapper extends Context {
     }
 
     @Override
+    // TODO:动态权限检查流程
     public int checkPermission(String permission, int pid, int uid) {
+        // TODO:动态权限检查流程-contextImpl#checkPermission
         return mBase.checkPermission(permission, pid, uid);
     }
 

@@ -4210,6 +4210,7 @@ public class ActivityManager {
 
     /** @hide */
     @UnsupportedAppUsage
+    // TODO:动态权限检查流程
     public static int checkComponentPermission(String permission, int uid,
             int owningUid, boolean exported) {
         // Root, system server get to do everything.
@@ -4240,6 +4241,7 @@ public class ActivityManager {
             return PackageManager.PERMISSION_GRANTED;
         }
         try {
+            // TODO:动态权限检查流程-PKMS#checkUidPermission
             return AppGlobals.getPackageManager()
                     .checkUidPermission(permission, uid);
         } catch (RemoteException e) {

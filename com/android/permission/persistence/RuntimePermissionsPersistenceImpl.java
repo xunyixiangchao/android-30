@@ -174,6 +174,7 @@ public class RuntimePermissionsPersistenceImpl implements RuntimePermissionsPers
     @Override
     public void writeForUser(@NonNull RuntimePermissionsState runtimePermissions,
             @NonNull UserHandle user) {
+        // TODO:动态权限申请流程-目录com.android.permission/apexdata 文件-runtime-permissions.xml
         File file = getFile(user);
         AtomicFile atomicFile = new AtomicFile(file);
         FileOutputStream outputStream = null;

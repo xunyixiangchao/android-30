@@ -451,12 +451,13 @@ public class SystemConfig {
         TimingsTraceLog log = new TimingsTraceLog(TAG, Trace.TRACE_TAG_SYSTEM_SERVER);
         log.traceBegin("readAllPermissions");
         try {
+            //读取所有的权限
             readAllPermissions();
         } finally {
             log.traceEnd();
         }
     }
-
+    //读取所有的权限
     private void readAllPermissions() {
         // Read configuration from system
         readPermissions(Environment.buildPath(
@@ -541,6 +542,7 @@ public class SystemConfig {
         }
     }
 
+    //读取权限
     @VisibleForTesting
     public void readPermissions(File libraryDir, int permissionFlag) {
         // Read permissions from given directory.
@@ -576,7 +578,7 @@ public class SystemConfig {
                 Slog.w(TAG, "Permissions library file " + f + " cannot be read");
                 continue;
             }
-
+//读取权限--从xml里读取
             readPermissionsFromXml(f, permissionFlag);
         }
 
@@ -590,7 +592,7 @@ public class SystemConfig {
         Slog.w(TAG, "<" + name + "> not allowed in partition of "
                 + permFile + " at " + parser.getPositionDescription());
     }
-
+    //读取权限--从xml里读取--/system/etc/permissions
     private void readPermissionsFromXml(File permFile, int permissionFlag) {
         FileReader permReader = null;
         try {
@@ -650,6 +652,7 @@ public class SystemConfig {
                             String gidStr = parser.getAttributeValue(null, "gid");
                             if (gidStr != null) {
                                 int gid = android.os.Process.getGidForName(gidStr);
+                                //组权限的话存储到mGlobalGids里
                                 mGlobalGids = appendInt(mGlobalGids, gid);
                             } else {
                                 Slog.w(TAG, "<" + name + "> without gid in " + permFile + " at "

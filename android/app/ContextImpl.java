@@ -1953,10 +1953,12 @@ class ContextImpl extends Context {
     }
 
     @Override
+    // TODO:动态权限检查流程
     public int checkPermission(String permission, int pid, int uid) {
         if (permission == null) {
             throw new IllegalArgumentException("permission is null");
         }
+        // TODO:动态权限检查流程
         return PermissionManager.checkPermission(permission, pid, uid);
     }
 

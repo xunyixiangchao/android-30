@@ -6191,7 +6191,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             return ActivityManagerService.this;
         }
     }
-
+    // TODO:动态权限检查流程
     public static int checkComponentPermission(String permission, int pid, int uid,
             int owningUid, boolean exported) {
         if (pid == MY_PID) {
@@ -6212,6 +6212,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 }
             }
         }
+        // TODO:动态权限检查流程
         return ActivityManager.checkComponentPermission(permission, uid,
                 owningUid, exported);
     }
@@ -6225,11 +6226,13 @@ public class ActivityManagerService extends IActivityManager.Stub
      *
      * This can be called with or without the global lock held.
      */
+    // TODO:动态权限检查流程
     @Override
     public int checkPermission(String permission, int pid, int uid) {
         if (permission == null) {
             return PackageManager.PERMISSION_DENIED;
         }
+        // TODO:动态权限检查流程
         return checkComponentPermission(permission, pid, uid, -1, true);
     }
 

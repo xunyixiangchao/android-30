@@ -1791,6 +1791,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     synchronized (mLock) {
                         removeMessages(WRITE_SETTINGS);
                         removeMessages(WRITE_PACKAGE_RESTRICTIONS);
+                        // TODO:动态权限申请流程
                         mSettings.writeLPr();
                         mDirtyUsers.clear();
                     }
@@ -2521,13 +2522,14 @@ public class PackageManagerService extends IPackageManager.Stub
         }
         return extras;
     }
-
+    // TODO:动态权限申请流程
     void scheduleWriteSettingsLocked() {
         // We normally invalidate when we write settings, but in cases where we delay and
         // coalesce settings writes, this strategy would have us invalidate the cache too late.
         // Invalidating on schedule addresses this problem.
         PackageManager.invalidatePackageInfoCache();
         if (!mHandler.hasMessages(WRITE_SETTINGS)) {
+            // TODO:动态权限申请流程
             mHandler.sendEmptyMessageDelayed(WRITE_SETTINGS, WRITE_SETTINGS_DELAY);
         }
     }
@@ -2885,6 +2887,16 @@ public class PackageManagerService extends IPackageManager.Stub
         // CHECKSTYLE:ON IndentationCheck
         t.traceEnd();
 
+        //引导服务和系统UID有关，如果想静默安装就要设置好UID，但这个UID必须要求系统签名，
+        // 而这个系统签名是属于各大厂商的机密。
+        //做系统应用开发时，是adb push 的安装方法：
+        // adb remount
+        // adb shell
+        // chrom 777 system/app
+        // exit
+        // adb push xxx/xxx.apk  system/app
+        // adb reboot
+        // 注意：xxx/xxx.apk是apk本地路径 system/app是系统目录
         t.traceBegin("addSharedUsers");
         mSettings.addSharedUserLPw("android.uid.system", Process.SYSTEM_UID,
                 ApplicationInfo.FLAG_SYSTEM, ApplicationInfo.PRIVATE_FLAG_PRIVILEGED);
@@ -2933,6 +2945,7 @@ public class PackageManagerService extends IPackageManager.Stub
         getDefaultDisplayMetrics(mInjector.getDisplayManager(), mMetrics);
 
         t.traceBegin("get system config");
+        //获取单例SystemConfig，构造函数会去读取权限
         SystemConfig systemConfig = SystemConfig.getInstance();
         mAvailableFeatures = systemConfig.getAvailableFeatures();
         ApplicationPackageManager.invalidateHasSystemFeatureCache();
@@ -5906,11 +5919,13 @@ public class PackageManagerService extends IPackageManager.Stub
     }
 
     // NOTE: Can't remove without a major refactor. Keep around for now.
+    // TODO:动态权限检查流程
     @Override
     public int checkUidPermission(String permName, int uid) {
         try {
             // Because this is accessed via the package manager service AIDL,
             // go through the permission manager service AIDL
+            // TODO:动态权限检查流程
             return mPermissionManagerService.checkUidPermission(permName, uid);
         } catch (RemoteException ignore) { }
         return PackageManager.PERMISSION_DENIED;
@@ -5962,11 +5977,13 @@ public class PackageManagerService extends IPackageManager.Stub
     }
 
     // NOTE: Can't remove due to unsupported app usage
+    // TODO:动态权限申请流程
     @Override
     public void grantRuntimePermission(String packageName, String permName, final int userId) {
         try {
             // Because this is accessed via the package manager service AIDL,
             // go through the permission manager service AIDL
+            // TODO:动态权限申请流程
             mPermissionManagerService.grantRuntimePermission(packageName, permName, userId);
         } catch (RemoteException ignore) { }
     }
@@ -21438,6 +21455,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
     }
 
+    //TODO:PKMS权限扫描-对/system/etc/permissions/中各种xml进行扫描
     @Override
     public void systemReady() {
         enforceSystemOrRoot("Only the system can claim the system is ready");
@@ -25048,11 +25066,12 @@ public class PackageManagerService extends IPackageManager.Stub
                 Slog.wtf(TAG, e);
             }
         }
-
+        // TODO:动态权限申请流程
         @Override
         public void writeSettings(boolean async) {
             synchronized (mLock) {
                 if (async) {
+                    // TODO:动态权限申请流程
                     scheduleWriteSettingsLocked();
                 } else {
                     mSettings.writeLPr();

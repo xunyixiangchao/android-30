@@ -5215,7 +5215,9 @@ public class Activity extends ContextThemeWrapper
      * @see #checkSelfPermission(String)
      * @see #shouldShowRequestPermissionRationale(String)
      */
+    // TODO:动态权限申请流程
     public final void requestPermissions(@NonNull String[] permissions, int requestCode) {
+        //code必需>=0
         if (requestCode < 0) {
             throw new IllegalArgumentException("requestCode should be >= 0");
         }
@@ -5225,7 +5227,12 @@ public class Activity extends ContextThemeWrapper
             onRequestPermissionsResult(requestCode, new String[0], new int[0]);
             return;
         }
+        // TODO:动态权限申请流程-组装intent
+        //PackageManager#buildRequestPermissionsIntent
+        //请求完权限后，将结果返回
         Intent intent = getPackageManager().buildRequestPermissionsIntent(permissions);
+        // TODO:动态权限申请流程--返回结果
+        //->dispatchActivityResult()分发结果 REQUEST_PERMISSIONS_WHO_PREFIX
         startActivityForResult(REQUEST_PERMISSIONS_WHO_PREFIX, intent, requestCode, null);
         mHasCurrentPermissionsRequest = true;
     }
@@ -8321,9 +8328,13 @@ public class Activity extends ContextThemeWrapper
         mFragments.noteStateNotSaved();
         if (who == null) {
             onActivityResult(requestCode, resultCode, data);
+
         } else if (who.startsWith(REQUEST_PERMISSIONS_WHO_PREFIX)) {
+            // TODO:动态权限申请流程-截取，如果为空则为activity,不为空则为fragment
+            // 因为fragment是// TODO:动态权限申请流程+fragment的Tag
             who = who.substring(REQUEST_PERMISSIONS_WHO_PREFIX.length());
             if (TextUtils.isEmpty(who)) {
+                // TODO:动态权限申请流程
                 dispatchRequestPermissionsResult(requestCode, data);
             } else {
                 Fragment frag = mFragments.findFragmentByWho(who);
@@ -8468,7 +8479,7 @@ public class Activity extends ContextThemeWrapper
          */
         public void onTranslucentConversionComplete(boolean drawComplete);
     }
-
+    // TODO:动态权限申请流程
     private void dispatchRequestPermissionsResult(int requestCode, Intent data) {
         mHasCurrentPermissionsRequest = false;
         // If the package installer crashed we may have not data - best effort.
@@ -8476,6 +8487,7 @@ public class Activity extends ContextThemeWrapper
                 PackageManager.EXTRA_REQUEST_PERMISSIONS_NAMES) : new String[0];
         final int[] grantResults = (data != null) ? data.getIntArrayExtra(
                 PackageManager.EXTRA_REQUEST_PERMISSIONS_RESULTS) : new int[0];
+        // TODO:动态权限申请流程-回调onRequestPermissionsResult
         onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 

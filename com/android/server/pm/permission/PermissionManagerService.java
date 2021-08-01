@@ -320,9 +320,11 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         }
         @Override
         public void onPermissionGranted(int uid, int userId) {
+            //发广播通知权限改变
             mOnPermissionChangeListeners.onPermissionsChanged(uid);
 
             // Not critical; if this is lost, the application has to request again.
+            // TODO:动态权限申请流程->PKMS$PackageManagerInternalImpl#writeSettings
             mPackageManagerInt.writeSettings(true);
         }
         @Override
@@ -905,7 +907,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         }
         return checkPermissionInternal(pkg, true, permName, userId);
     }
-
+    // TODO:动态权限检查流程
     private int checkPermissionInternal(@NonNull AndroidPackage pkg, boolean isPackageExplicit,
             @NonNull String permissionName, @UserIdInt int userId) {
         final int callingUid = getCallingUid();
@@ -953,6 +955,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         return true;
     }
 
+    // TODO:动态权限检查流程
     @Override
     public int checkUidPermission(String permName, int uid) {
         // Not using Objects.requireNonNull() here for compatibility reasons.
@@ -969,14 +972,17 @@ public class PermissionManagerService extends IPermissionManager.Stub {
             checkPermissionDelegate = mCheckPermissionDelegate;
         }
         if (checkPermissionDelegate == null)  {
+            // TODO:动态权限检查流程
             return checkUidPermissionImpl(permName, uid);
         }
         return checkPermissionDelegate.checkUidPermission(permName, uid,
                 this::checkUidPermissionImpl);
     }
 
+    // TODO:动态权限检查流程
     private int checkUidPermissionImpl(String permName, int uid) {
         final AndroidPackage pkg = mPackageManagerInt.getPackage(uid);
+        // TODO:动态权限检查流程
         return checkUidPermissionInternal(pkg, uid, permName);
     }
 
@@ -991,19 +997,22 @@ public class PermissionManagerService extends IPermissionManager.Stub {
             @NonNull String permissionName) {
         if (pkg != null) {
             final int userId = UserHandle.getUserId(uid);
+            // TODO:动态权限检查流程
             return checkPermissionInternal(pkg, false, permissionName, userId);
         }
 
+        // TODO:动态权限检查流程-检查单一权限是否已授权
         if (checkSingleUidPermissionInternal(uid, permissionName)) {
             return PackageManager.PERMISSION_GRANTED;
         }
 
         final String fullerPermissionName = FULLER_PERMISSION_MAP.get(permissionName);
+        // TODO:动态权限检查流程-检查完整（组）权限是否已授权
         if (fullerPermissionName != null
                 && checkSingleUidPermissionInternal(uid, fullerPermissionName)) {
             return PackageManager.PERMISSION_GRANTED;
         }
-
+        // TODO:动态权限检查流程-拒绝
         return PackageManager.PERMISSION_DENIED;
     }
 
@@ -1394,18 +1403,20 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         }
     }
 
+    // TODO:动态权限申请流程
     @Override
     public void grantRuntimePermission(String packageName, String permName, final int userId) {
         final int callingUid = Binder.getCallingUid();
         final boolean overridePolicy =
                 checkUidPermission(ADJUST_RUNTIME_PERMISSIONS_POLICY, callingUid)
                         == PackageManager.PERMISSION_GRANTED;
-
+        // TODO:动态权限申请流程
         grantRuntimePermissionInternal(permName, packageName, overridePolicy,
                 callingUid, userId, mDefaultPermissionCallback);
     }
 
     // TODO swap permission name and package name
+    // TODO:动态权限申请流程
     private void grantRuntimePermissionInternal(String permName, String packageName,
             boolean overridePolicy, int callingUid, final int userId, PermissionCallback callback) {
         if (ApplicationPackageManager.DEBUG_TRACE_GRANTS
@@ -1529,7 +1540,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         if (bp.isRuntime()) {
             logPermission(MetricsEvent.ACTION_PERMISSION_GRANTED, permName, packageName);
         }
-
+// TODO:动态权限申请流程--同意时，回调 mDefaultPermissionCallback
         if (callback != null) {
             callback.onPermissionGranted(uid, userId);
         }
@@ -5028,8 +5039,10 @@ public class PermissionManagerService extends IPermissionManager.Stub {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                // TODO:动态权限申请流程
                 case MSG_ON_PERMISSIONS_CHANGED: {
                     final int uid = msg.arg1;
+                    // TODO:动态权限申请流程
                     handleOnPermissionsChanged(uid);
                 } break;
             }
@@ -5049,7 +5062,7 @@ public class PermissionManagerService extends IPermissionManager.Stub {
                 obtainMessage(MSG_ON_PERMISSIONS_CHANGED, uid, 0).sendToTarget();
             }
         }
-
+        // TODO:动态权限申请流程
         private void handleOnPermissionsChanged(int uid) {
             final int count = mPermissionListeners.beginBroadcast();
             try {

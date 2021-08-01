@@ -527,6 +527,7 @@ public final class PermissionManager {
     }
 
     /* @hide */
+// TODO:动态权限检查流程
     private static int checkPermissionUncached(@Nullable String permission, int pid, int uid) {
         final IActivityManager am = ActivityManager.getService();
         if (am == null) {
@@ -543,6 +544,7 @@ public final class PermissionManager {
             return PackageManager.PERMISSION_DENIED;
         }
         try {
+            // TODO:动态权限检查流程-调用ams#checkPermission
             return am.checkPermission(permission, pid, uid);
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
@@ -611,12 +613,15 @@ public final class PermissionManager {
                     16, CACHE_KEY_PACKAGE_INFO) {
                 @Override
                 protected Integer recompute(PermissionQuery query) {
+                    // TODO:动态权限检查流程
                     return checkPermissionUncached(query.permission, query.pid, query.uid);
                 }
             };
 
     /** @hide */
+    // TODO:动态权限检查流程
     public static int checkPermission(@Nullable String permission, int pid, int uid) {
+        // TODO:动态权限检查流程  这里走query会走到recompute方法
         return sPermissionCache.query(new PermissionQuery(permission, pid, uid));
     }
 

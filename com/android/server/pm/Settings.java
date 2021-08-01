@@ -1340,9 +1340,10 @@ public final class Settings {
             writePackageRestrictionsLPr(user.id);
         }
     }
-
+    // TODO:动态权限申请流程
     void writeAllRuntimePermissionsLPr() {
         for (int userId : UserManagerService.getInstance().getUserIds()) {
+            // TODO:动态权限申请流程
             mRuntimePermissionsPersistence.writePermissionsForUserAsyncLPr(userId);
         }
     }
@@ -2426,7 +2427,7 @@ public final class Settings {
 
         }
     }
-
+    // TODO:动态权限申请流程
     void writeLPr() {
         //Debug.startMethodTracing("/data/system/packageprof", 8 * 1024 * 1024);
 
@@ -2571,6 +2572,7 @@ public final class Settings {
             writeKernelMappingLPr();
             writePackageListLPr();
             writeAllUsersPackageRestrictionsLPr();
+// TODO:动态权限申请流程
             writeAllRuntimePermissionsLPr();
             com.android.internal.logging.EventLogTags.writeCommitSysConfigFile(
                     "package", SystemClock.uptimeMillis() - startTime);
@@ -5431,7 +5433,7 @@ public final class Settings {
             mHandler.removeMessages(userId);
             writePermissionsSync(userId);
         }
-
+        // TODO:动态权限申请流程
         @GuardedBy("Settings.this.mLock")
         public void writePermissionsForUserAsyncLPr(int userId) {
             final long currentTimeMillis = SystemClock.uptimeMillis();
@@ -5456,6 +5458,7 @@ public final class Settings {
                         maxDelayMillis);
 
                 Message message = mHandler.obtainMessage(userId);
+                // TODO:动态权限申请流程-MyHandler
                 mHandler.sendMessageDelayed(message, writeDelayMillis);
             } else {
                 mLastNotWrittenMutationTimesMillis.put(userId, currentTimeMillis);
@@ -5464,7 +5467,7 @@ public final class Settings {
                 mWriteScheduled.put(userId, true);
             }
         }
-
+        // TODO:动态权限申请流程
         private void writePermissionsSync(int userId) {
             RuntimePermissionsState runtimePermissions;
             synchronized (mPersistenceLock) {
@@ -5503,7 +5506,7 @@ public final class Settings {
                 runtimePermissions = new RuntimePermissionsState(version, fingerprint,
                         packagePermissions, sharedUserPermissions);
             }
-
+            // TODO:动态权限申请流程-创建runtime-permissions.xml
             mPersistence.writeForUser(runtimePermissions, UserHandle.of(userId));
         }
 
@@ -5777,6 +5780,7 @@ public final class Settings {
             public void handleMessage(Message message) {
                 final int userId = message.what;
                 Runnable callback = (Runnable) message.obj;
+                // TODO:动态权限申请流程
                 writePermissionsSync(userId);
                 if (callback != null) {
                     callback.run();
