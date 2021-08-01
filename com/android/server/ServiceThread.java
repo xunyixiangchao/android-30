@@ -35,6 +35,9 @@ public class ServiceThread extends HandlerThread {
 
     @Override
     public void run() {
+        //如果传递了后台级线程优先级，则使用 'false' 调用会导致将来对setThreadPriority(int)调用引发异常。
+        // 这仅在 JNI 层使用定义为 1 的 GUARD_THREAD_PRIORITY 构建时才有效。
+        //进程优化级比GUARD_THREAD_PRIORITY还低时会抛出异常
         Process.setCanSelfBackground(false);
 
         if (!mAllowIo) {

@@ -37,7 +37,7 @@ public final class DisplayThread extends ServiceThread {
         // AnimationThread. Thus, set the priority to one lower.
         super("android.display", Process.THREAD_PRIORITY_DISPLAY + 1, false /*allowIo*/);
     }
-
+    //这是一个单例类，一个进程只能有一个
     private static void ensureThreadLocked() {
         if (sInstance == null) {
             sInstance = new DisplayThread();

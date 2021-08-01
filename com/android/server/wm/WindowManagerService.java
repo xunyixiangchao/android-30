@@ -559,9 +559,12 @@ public class WindowManagerService extends IWindowManager.Stub
     /**
      * All currently active sessions with clients.
      */
+    // 保存了当前所有想向WMs寻求窗口管理服务的客户端。
+    // 注意Session是具有进程唯一性
     final ArraySet<Session> mSessions = new ArraySet<>();
 
     /** Mapping from an IWindow IBinder to the server's Window object. */
+    // 保存所有窗口的状态信息
     final HashMap<IBinder, WindowState> mWindowMap = new HashMap<>();
 
     /** Mapping from an InputWindowHandle token to the server's Window object. */
@@ -1099,10 +1102,11 @@ public class WindowManagerService extends IWindowManager.Stub
     static WindowManagerService getInstance() {
         return sInstance;
     }
-
+    // TODO:WMS创建过程
     public static WindowManagerService main(final Context context, final InputManagerService im,
             final boolean showBootMsgs, final boolean onlyCore, WindowManagerPolicy policy,
             ActivityTaskManagerService atm) {
+        // TODO:WMS创建过程
         return main(context, im, showBootMsgs, onlyCore, policy, atm,
                 SurfaceControl.Transaction::new, Surface::new, SurfaceControl.Builder::new);
     }
@@ -1117,7 +1121,12 @@ public class WindowManagerService extends IWindowManager.Stub
             ActivityTaskManagerService atm, Supplier<SurfaceControl.Transaction> transactionFactory,
             Supplier<Surface> surfaceFactory,
             Function<SurfaceSession, SurfaceControl.Builder> surfaceControlFactory) {
+        //使用runWithScissors，在run()执行完之前阻塞在这里，所里返回时，是创建完了的sInstance
+        //WindowManagerService的main是在systemserver线程中执行，sInstance是在DisplayThread线程中执行，
+        //所以跨线程通信用到了Handler，handler大部分是异步的，runWithScissors()方法是同步执行的。
         DisplayThread.getHandler().runWithScissors(() ->
+                // TODO:WMS创建过程-创建WMS
+                //在DisplayThread线程构建的
                 sInstance = new WindowManagerService(context, im, showBootMsgs, onlyCore, policy,
                         atm, transactionFactory, surfaceFactory, surfaceControlFactory), 0);
         return sInstance;
@@ -1128,6 +1137,7 @@ public class WindowManagerService extends IWindowManager.Stub
             @Override
             public void run() {
                 WindowManagerPolicyThread.set(Thread.currentThread(), Looper.myLooper());
+                //调用mPolicy.init()
                 mPolicy.init(mContext, WindowManagerService.this, WindowManagerService.this);
             }
         }, 0);
@@ -1180,6 +1190,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
         mDisplayWindowSettings = new DisplayWindowSettings(this);
         mPolicy = policy;
+        //windowAnimator-动画管理的类
         mAnimator = new WindowAnimator(this);
         mRoot = new RootWindowContainer(this);
 
@@ -1229,8 +1240,9 @@ public class WindowManagerService extends IWindowManager.Stub
         mScreenFrozenLock.setReferenceCounted(false);
 
         mDisplayNotificationController = new DisplayWindowListenerController(this);
-
+        // 获取AMS
         mActivityManager = ActivityManager.getService();
+        // 获取ATMS
         mActivityTaskManager = ActivityTaskManager.getService();
         mAmInternal = LocalServices.getService(ActivityManagerInternal.class);
         mAtmInternal = LocalServices.getService(ActivityTaskManagerInternal.class);
@@ -1330,6 +1342,7 @@ public class WindowManagerService extends IWindowManager.Stub
      * Called after all entities (such as the {@link ActivityManagerService}) have been set up and
      * associated with the {@link WindowManagerService}.
      */
+    // TODO:WMS创建过程-将WMS设置给AMS后，调用
     public void onInitReady() {
         initPolicy();
 
@@ -4647,9 +4660,10 @@ public class WindowManagerService extends IWindowManager.Stub
         } catch (RemoteException e) {
         }
     }
-
+    // TODO:WMS创建过程
     public void systemReady() {
         mSystemReady = true;
+        //调用mPolicy.systemReady()
         mPolicy.systemReady();
         mRoot.forAllDisplayPolicies(DisplayPolicy::systemReady);
         mTaskSnapshotController.systemReady();

@@ -1184,6 +1184,7 @@ public final class SystemServer {
             ConcurrentUtils.waitForFutureNoInterrupt(mSensorServiceStart, START_SENSOR_SERVICE);
             mSensorServiceStart = null;
             // TODO:创建WMS
+            // TODO:WMS创建过程
             wm = WindowManagerService.main(context, inputManager, !mFirstBoot, mOnlyCore,
                     new PhoneWindowManager(), mActivityManagerService.mActivityTaskManager);
             // TODO:将wms添加到sm
@@ -1199,6 +1200,7 @@ public final class SystemServer {
             t.traceEnd();
 
             t.traceBegin("WindowManagerServiceOnInitReady");
+            // TODO:WMS创建过程- 1.调用onInitReady()
             wm.onInitReady();
             t.traceEnd();
 
@@ -1309,6 +1311,7 @@ public final class SystemServer {
 
         t.traceBegin("MakeDisplayReady");
         try {
+            // TODO:WMS创建过程 2.-displayReady()
             wm.displayReady();
         } catch (Throwable e) {
             reportWtf("making display ready", e);
@@ -2161,6 +2164,7 @@ public final class SystemServer {
 
         t.traceBegin("MakeWindowManagerServiceReady");
         try {
+            // TODO:WMS创建过程 3.-systemReady(),wms流程完成
             wm.systemReady();
         } catch (Throwable e) {
             reportWtf("making Window Manager Service ready", e);

@@ -593,6 +593,8 @@ public class Handler {
      * If we ever do make it part of the API, we might want to rename it to something
      * less funny like runUnsafe().
      */
+    // TODO:在WMS的main方法创建WMS对象时用到了这个
+    // 消息执行后再继续往下执行
     public final boolean runWithScissors(@NonNull Runnable r, long timeout) {
         if (r == null) {
             throw new IllegalArgumentException("runnable must not be null");
@@ -600,12 +602,12 @@ public class Handler {
         if (timeout < 0) {
             throw new IllegalArgumentException("timeout must be non-negative");
         }
-
+        //如果执行线程为当前线程-直接调用run()方法执行，返回true
         if (Looper.myLooper() == mLooper) {
             r.run();
             return true;
         }
-
+        // 非当前线程，先封装成BlockingRunnable
         BlockingRunnable br = new BlockingRunnable(r);
         return br.postAndWait(this, timeout);
     }
@@ -973,9 +975,11 @@ public class Handler {
 
         @Override
         public void run() {
+            //在这时执行，runnable
             try {
                 mTask.run();
             } finally {
+                //执行完将标识设为true，并唤醒线程notifyAll()
                 synchronized (this) {
                     mDone = true;
                     notifyAll();
@@ -984,10 +988,11 @@ public class Handler {
         }
 
         public boolean postAndWait(Handler handler, long timeout) {
+            //消息没发送出去时，返回false
             if (!handler.post(this)) {
                 return false;
             }
-
+            //发送出去后，等待消息执行，如果没执行呢就阻塞在这里wait()
             synchronized (this) {
                 if (timeout > 0) {
                     final long expirationTime = SystemClock.uptimeMillis() + timeout;
@@ -1004,6 +1009,7 @@ public class Handler {
                 } else {
                     while (!mDone) {
                         try {
+                            //wait()阻塞这里
                             wait();
                         } catch (InterruptedException ex) {
                         }
