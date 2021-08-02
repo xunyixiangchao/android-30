@@ -594,7 +594,7 @@ public class Handler {
      * less funny like runUnsafe().
      */
     // TODO:在WMS的main方法创建WMS对象时用到了这个
-    // 消息执行后再继续往下执行
+    // 消息执行后再继续往下执行-runWithScissors同步消息
     public final boolean runWithScissors(@NonNull Runnable r, long timeout) {
         if (r == null) {
             throw new IllegalArgumentException("runnable must not be null");
