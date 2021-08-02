@@ -1133,11 +1133,12 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     private void initPolicy() {
+        //UI线程
         UiThread.getHandler().runWithScissors(new Runnable() {
             @Override
             public void run() {
                 WindowManagerPolicyThread.set(Thread.currentThread(), Looper.myLooper());
-                //调用mPolicy.init()
+                //调用mPolicy.init()--对应的是 PhoneWindowManager 窗口管理策略
                 mPolicy.init(mContext, WindowManagerService.this, WindowManagerService.this);
             }
         }, 0);

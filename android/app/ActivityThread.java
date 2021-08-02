@@ -3334,6 +3334,7 @@ public final class ActivityThread extends ClientTransactionHandler {
     /**  Core implementation of activity launch. */
     private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent) {
         ActivityInfo aInfo = r.activityInfo;
+        //如果包信息为空则获取包信息
         if (r.packageInfo == null) {
             r.packageInfo = getPackageInfo(aInfo.applicationInfo, r.compatInfo,
                     Context.CONTEXT_INCLUDE_CODE);
@@ -3355,7 +3356,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         Activity activity = null;
         try {
             java.lang.ClassLoader cl = appContext.getClassLoader();
-// todo: 桌面startActivity流程
+// todo: 桌面startActivity流程-创建activity对象
             activity = mInstrumentation.newActivity(
                     cl, component.getClassName(), r.intent);
             StrictMode.incrementExpectedActivityCount(activity.getClass());
@@ -3406,6 +3407,7 @@ public final class ActivityThread extends ClientTransactionHandler {
 
                 appContext.setOuterContext(activity);
                 // todo: 桌面startActivity流程-->里面会创建PhoneWindow
+                //调用activity的attach方法，传入token-是个binder --->AMS的 ActivityRecord 的 appToken
                 activity.attach(appContext, this, getInstrumentation(), r.token,
                         r.ident, app, r.intent, r.activityInfo, title, r.parent,
                         r.embeddedID, r.lastNonConfigurationInstances, config,

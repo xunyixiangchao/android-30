@@ -7953,6 +7953,7 @@ public class Activity extends ContextThemeWrapper
             }
         }
         //windows 设置 WindowManager(WindowManagerImpl)
+        // WindowManagerImpl又交给了WindowManagerGlobal
         mWindow.setWindowManager(
                 (WindowManager)context.getSystemService(Context.WINDOW_SERVICE),
                 mToken, mComponent.flattenToString(),

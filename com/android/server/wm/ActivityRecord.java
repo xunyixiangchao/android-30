@@ -1410,7 +1410,8 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
     }
 
     static class Token extends IApplicationToken.Stub {
-        private WeakReference<ActivityRecord> weakActivity;
+        //对应的是Activity
+        private WeakReference<ActivityRecord> weakActivity; //对应的是Activity
         private final String name;
         private final String tokenString;
 
