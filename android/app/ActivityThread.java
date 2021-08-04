@@ -4524,6 +4524,7 @@ public final class ActivityThread extends ClientTransactionHandler {
         }
         if (r.window == null && !a.mFinished && willBeVisible) {
             r.window = r.activity.getWindow();
+            //拿DecorView
             View decor = r.window.getDecorView();
             decor.setVisibility(View.INVISIBLE);
             ViewManager wm = a.getWindowManager();

@@ -899,12 +899,15 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
             return;
         }
         mDeathRecipient = deathRecipient;
-
+        //如果是子窗口，使用它依附的窗口类型来计算
         if (mAttrs.type >= FIRST_SUB_WINDOW && mAttrs.type <= LAST_SUB_WINDOW) {
             // The multiplier here is to reserve space for multiple
             // windows in the same type layer.
+            //计算mBaseLayer
+            //TYPE_LAYER_MULTIPLIER在wms中值为10000+TYPE_LAYER_OFFSET起始值1000
             mBaseLayer = mPolicy.getWindowLayerLw(parentWindow)
                     * TYPE_LAYER_MULTIPLIER + TYPE_LAYER_OFFSET;
+            //计算 mSubLayer
             mSubLayer = mPolicy.getSubWindowLayerFromTypeLw(a.type);
             mIsChildWindow = true;
 
@@ -913,12 +916,13 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
             mIsImWindow = parentWindow.mAttrs.type == TYPE_INPUT_METHOD
                     || parentWindow.mAttrs.type == TYPE_INPUT_METHOD_DIALOG;
             mIsWallpaper = parentWindow.mAttrs.type == TYPE_WALLPAPER;
+        //非子窗口，直接使用窗口类型来计算
         } else {
             // The multiplier here is to reserve space for multiple
             // windows in the same type layer.
             mBaseLayer = mPolicy.getWindowLayerLw(this)
                     * TYPE_LAYER_MULTIPLIER + TYPE_LAYER_OFFSET;
-            mSubLayer = 0;
+            mSubLayer = 0; //无效，仅在子窗口中有用
             mIsChildWindow = false;
             mLayoutAttached = false;
             mIsImWindow = mAttrs.type == TYPE_INPUT_METHOD
@@ -960,6 +964,7 @@ class WindowState extends WindowContainer<WindowState> implements WindowManagerP
 
     void attach() {
         if (DEBUG) Slog.v(TAG, "Attaching " + this + " token=" + mToken);
+        // TODO: 添加窗口-又调用了session#windowAddedLocked
         mSession.windowAddedLocked(mAttrs.packageName);
     }
 

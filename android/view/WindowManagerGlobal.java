@@ -327,7 +327,7 @@ public final class WindowManagerGlobal {
 
         return null;
     }
-
+    //从Activity#makeVisible来
     public void addView(View view, ViewGroup.LayoutParams params,
             Display display, Window parentWindow, int userId) {
         if (view == null) {
@@ -395,6 +395,7 @@ public final class WindowManagerGlobal {
                     }
                 }
             }
+            //一个DecorView对应一个ViewRootImpl
             //创建ViewRootImpl实例,
             // viewrootImpl中创建了mAttachInfo实例
             root = new ViewRootImpl(view.getContext(), display);

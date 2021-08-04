@@ -795,10 +795,11 @@ class RootWindowContainer extends WindowContainer<DisplayContent>
 
         return leakedSurface || killedApps;
     }
-
+    //RootWindowContainer里进行计算
     void performSurfacePlacement() {
         Trace.traceBegin(TRACE_TAG_WINDOW_MANAGER, "performSurfacePlacement");
         try {
+            //RootWindowContainer里进行计算
             performSurfacePlacementNoTrace();
         } finally {
             Trace.traceEnd(TRACE_TAG_WINDOW_MANAGER);

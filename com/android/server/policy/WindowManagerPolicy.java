@@ -872,6 +872,7 @@ public interface WindowManagerPolicy extends WindowManagerPolicyConstants {
      *         above and negative is below.
      */
     default int getSubWindowLayerFromTypeLw(int type) {
+        //根据类型返回层次
         switch (type) {
             case TYPE_APPLICATION_PANEL:
             case TYPE_APPLICATION_ATTACHED_DIALOG:

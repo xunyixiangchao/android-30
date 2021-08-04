@@ -1383,7 +1383,7 @@ public class WindowManagerService extends IWindowManager.Stub
         }
         return false;
     }
-
+    // TODO: 添加窗口
     public int addWindow(Session session, IWindow client, int seq,
             LayoutParams attrs, int viewVisibility, int displayId, Rect outFrame,
             Rect outContentInsets, Rect outStableInsets,
@@ -1406,6 +1406,7 @@ public class WindowManagerService extends IWindowManager.Stub
         final long origId = Binder.clearCallingIdentity();
         final int type = attrs.type;
 
+        //添加Window的一些报错
         synchronized (mGlobalLock) {
             if (!mDisplayReady) {
                 throw new IllegalStateException("Display has not been initialialized");
@@ -1559,7 +1560,7 @@ public class WindowManagerService extends IWindowManager.Stub
                 token = new WindowToken(this, client.asBinder(), type, false, displayContent,
                         session.mCanAddInternalSystemWindow);
             }
-
+            // 新的WindowState对象在其构造函数中根据窗口类型初始化了其主序mBaseLayer和mSubLayer
             final WindowState win = new WindowState(this, session, client, token, parentWindow,
                     appOp[0], seq, attrs, viewVisibility, session.mUid, userId,
                     session.mCanAddInternalSystemWindow);
@@ -1638,7 +1639,7 @@ public class WindowManagerService extends IWindowManager.Stub
             if (excludeWindowTypeFromTapOutTask(type)) {
                 displayContent.mTapExcludedWindows.add(win);
             }
-
+            //WindowState#attach 流程
             win.attach();
             mWindowMap.put(client.asBinder(), win);
             win.initAppOpsState();
@@ -2117,7 +2118,7 @@ public class WindowManagerService extends IWindowManager.Stub
         return mContext.checkPermission(permission.STATUS_BAR, pid, uid)
                         == PackageManager.PERMISSION_GRANTED;
     }
-
+    //重新计算window
     public int relayoutWindow(Session session, IWindow client, int seq, LayoutParams attrs,
             int requestedWidth, int requestedHeight, int viewVisibility, int flags,
             long frameNumber, Rect outFrame, Rect outContentInsets,
@@ -2290,6 +2291,9 @@ public class WindowManagerService extends IWindowManager.Stub
 
             // We may be deferring layout passes at the moment, but since the client is interested
             // in the new out values right now we need to force a layout.
+
+            //核心方法，windows窗口计算
+            //调用WindowSurfacePlacer.performSurfacePlacement()来计算activity窗口的大小。
             mWindowPlacerLocked.performSurfacePlacement(true /* force */);
 
             if (shouldRelayout) {

@@ -6310,8 +6310,12 @@ public class Activity extends ContextThemeWrapper
     }
 
     void makeVisible() {
+        //还没有添加window
         if (!mWindowAdded) {
+            //获取WindowManager
             ViewManager wm = getWindowManager();
+            //将mDecor添加到wm  wm对接的是DecorView
+            //调到windowmanagerGlobal
             wm.addView(mDecor, getWindow().getAttributes());
             mWindowAdded = true;
         }

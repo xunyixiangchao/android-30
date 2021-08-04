@@ -945,7 +945,9 @@ public final class ViewRootImpl implements ViewParent,
     public void setView(View view, WindowManager.LayoutParams attrs, View panelParentView,
                         int userId) {
         synchronized (this) {
+            //viewrootImpl与View做关联只能做一次，如果赋值过，就不会再执行
             if (mView == null) {
+                //将顶层视图DecorView赋值给全局的mView
                 mView = view;
 
                 mAttachInfo.mDisplayState = mDisplay.getState();
@@ -1054,6 +1056,10 @@ public final class ViewRootImpl implements ViewParent,
                     collectViewAttributes();
                     adjustLayoutParamsForCompatibility(mWindowAttributes);
                     //对应的类为android/service/wms/Session.java
+                    //同一进程中所有的ViewRootImpl对象只对应唯一相同的Session
+                    //mWindow  是binder回调
+                    //调用到wms
+                    //这里没有传view，真正传过去的是mTmpFrame   窗口的矩形区域
                     res = mWindowSession.addToDisplayAsUser(mWindow, mSeq, mWindowAttributes,
                             getHostVisibility(), mDisplay.getDisplayId(), userId, mTmpFrame,
                             mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,
@@ -2707,6 +2713,7 @@ public final class ViewRootImpl implements ViewParent,
                     }
                     mChoreographer.mFrameInfo.addFlags(FrameInfo.FLAG_WINDOW_LAYOUT_CHANGED);
                 }
+                //重新计算window
                 relayoutResult = relayoutWindow(params, viewVisibility, insetsPending);
 
                 if (DEBUG_LAYOUT) Log.v(mTag, "relayout: frame=" + frame.toShortString()
@@ -7549,7 +7556,7 @@ public final class ViewRootImpl implements ViewParent,
         }
         return mAccessibilityInteractionController;
     }
-
+    //重新计算window
     private int relayoutWindow(WindowManager.LayoutParams params, int viewVisibility,
                                boolean insetsPending) throws RemoteException {
 
@@ -7578,7 +7585,7 @@ public final class ViewRootImpl implements ViewParent,
         if (mSurface.isValid()) {
             frameNumber = mSurface.getNextFrameNumber();
         }
-
+        //重新计算window-调用session的relayout方法-再到wms的 relayoutWindow
         int relayoutResult = mWindowSession.relayout(mWindow, mSeq, params,
                 (int) (mView.getMeasuredWidth() * appScale + 0.5f),
                 (int) (mView.getMeasuredHeight() * appScale + 0.5f), viewVisibility,

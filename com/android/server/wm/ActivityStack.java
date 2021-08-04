@@ -2125,6 +2125,7 @@ class ActivityStack extends Task {
                         prev = null;
                     }
                 }
+                //TODO: 窗口添加过程-开启窗口
                 r.showStartingWindow(prev, newTask, isTaskSwitch(r, focusedTopActivity));
             }
         } else {

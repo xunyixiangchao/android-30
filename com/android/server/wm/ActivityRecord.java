@@ -1714,7 +1714,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
     boolean attachedToProcess() {
         return hasProcess() && app.hasThread();
     }
-
+    //TODO: 窗口添加过程
     boolean addStartingWindow(String pkg, int theme, CompatibilityInfo compatInfo,
             CharSequence nonLocalizedLabel, int labelRes, int icon, int logo, int windowFlags,
             IBinder transferFrom, boolean newTask, boolean taskSwitch, boolean processRunning,
@@ -1734,7 +1734,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
             // App already has a visible window...why would you want a starting window?
             return false;
         }
-
+        //  使用快照
         final ActivityManager.TaskSnapshot snapshot =
                 mWmService.mTaskSnapshotController.getSnapshot(task.mTaskId, task.mUserId,
                         false /* restoreFromDisk */, false /* isLowResolution */);
@@ -1759,6 +1759,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         // effect (a full-screen opaque starting window that fades away to the real contents
         // when it is ready) does not work for this.
         ProtoLog.v(WM_DEBUG_STARTING_WINDOW, "Checking theme of starting window: 0x%x", theme);
+        //使用闪屏页面
         if (theme != 0) {
             AttributeCache.Entry ent = AttributeCache.instance().get(pkg, theme,
                     com.android.internal.R.styleable.Window,
@@ -1810,9 +1811,11 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         }
 
         ProtoLog.v(WM_DEBUG_STARTING_WINDOW, "Creating SplashScreenStartingData");
+        //封装成SplashScreenStartingData对象
         mStartingData = new SplashScreenStartingData(mWmService, pkg,
                 theme, compatInfo, nonLocalizedLabel, labelRes, icon, logo, windowFlags,
                 getMergedOverrideConfiguration());
+        //启动
         scheduleAddStartingWindow();
         return true;
     }
@@ -1864,6 +1867,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
 
             WindowManagerPolicy.StartingSurface surface = null;
             try {
+                //创建一个surface屏幕画布
                 surface = startingData.createStartingSurface(ActivityRecord.this);
             } catch (Exception e) {
                 Slog.w(TAG, "Exception when adding starting window", e);
@@ -5712,7 +5716,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         voiceSession = null;
         pendingVoiceInteractionStart = false;
     }
-
+    //TODO: 窗口添加过程-开启窗口
     void showStartingWindow(ActivityRecord prev, boolean newTask, boolean taskSwitch) {
         if (mTaskOverlay) {
             // We don't show starting window for overlay activities.
@@ -5726,6 +5730,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
 
         final CompatibilityInfo compatInfo =
                 mAtmService.compatibilityInfoForPackageLocked(info.applicationInfo);
+        //TODO: 窗口添加过程-添加窗口
         final boolean shown = addStartingWindow(packageName, theme,
                 compatInfo, nonLocalizedLabel, labelRes, icon, logo, windowFlags,
                 prev != null ? prev.appToken : null, newTask, taskSwitch, isProcessRunning(),

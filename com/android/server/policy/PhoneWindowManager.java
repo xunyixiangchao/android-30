@@ -2282,6 +2282,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     /** {@inheritDoc} */
+    // TODO: 添加窗口
     @Override
     public StartingSurface addSplashScreen(IBinder appToken, String packageName, int theme,
             CompatibilityInfo compatInfo, CharSequence nonLocalizedLabel, int labelRes, int icon,
@@ -2337,12 +2338,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
                 typedArray.recycle();
             }
-
+            //创建了一个PhoneWindow
             final PhoneWindow win = new PhoneWindow(context);
             win.setIsStartingWindow(true);
 
             CharSequence label = context.getResources().getText(labelRes, null);
             // Only change the accessibility title if the label is localized
+            //设置Title
             if (label != null) {
                 win.setTitle(label, true);
             } else {
@@ -2396,14 +2398,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             params.setTitle("Splash Screen " + packageName);
+            //添加内容  核心1
             addSplashscreenContent(win, context);
-
+            //获取wm
             wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
+            //获取DecorView
             view = win.getDecorView();
 
             if (DEBUG_SPLASH_SCREEN) Slog.d(TAG, "Adding splash screen window for "
                 + packageName + " / " + appToken + ": " + (view.getParent() != null ? view : null));
-
+            //最终也要addView
             wm.addView(view, params);
 
             // Only return the view if it was successfully added to the
@@ -2427,22 +2431,26 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         return null;
     }
-
+    //添加内容
     private void addSplashscreenContent(PhoneWindow win, Context ctx) {
         final TypedArray a = ctx.obtainStyledAttributes(R.styleable.Window);
+        //获取资源
         final int resId = a.getResourceId(R.styleable.Window_windowSplashscreenContent, 0);
         a.recycle();
         if (resId == 0) {
             return;
         }
+        //转化为Drawable
         final Drawable drawable = ctx.getDrawable(resId);
         if (drawable == null) {
             return;
         }
 
         // We wrap this into a view so the system insets get applied to the drawable.
+        //创建一个View
         final View v = new View(ctx);
         v.setBackground(drawable);
+        //将View设置给PhoneWindow
         win.setContentView(v);
     }
 

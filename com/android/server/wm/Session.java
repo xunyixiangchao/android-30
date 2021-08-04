@@ -167,12 +167,15 @@ class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
     }
 
 
+    //ViewRootImpl中mWindowSession.addToDisplayAsUser方法过来
     @Override
     public int addToDisplayAsUser(IWindow window, int seq, WindowManager.LayoutParams attrs,
             int viewVisibility, int displayId, int userId, Rect outFrame,
             Rect outContentInsets, Rect outStableInsets,
             DisplayCutout.ParcelableWrapper outDisplayCutout, InputChannel outInputChannel,
             InsetsState outInsetsState, InsetsSourceControl[] outActiveControls) {
+        //调用wms的addWindow
+        //window 是IWindow.Stub  wms回调
         return mService.addWindow(this, window, seq, attrs, viewVisibility, displayId, outFrame,
                 outContentInsets, outStableInsets, outDisplayCutout, outInputChannel,
                 outInsetsState, outActiveControls, userId);
@@ -198,6 +201,7 @@ class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
         mService.setWillReplaceWindows(appToken, childrenOnly);
     }
 
+    //重新计算window
     @Override
     public int relayout(IWindow window, int seq, WindowManager.LayoutParams attrs,
             int requestedWidth, int requestedHeight, int viewFlags, int flags, long frameNumber,
@@ -210,6 +214,7 @@ class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
         if (false) Slog.d(TAG_WM, ">>>>>> ENTERED relayout from "
                 + Binder.getCallingPid());
         Trace.traceBegin(TRACE_TAG_WINDOW_MANAGER, mRelayoutTag);
+        //重新计算window-relayoutWindow
         int res = mService.relayoutWindow(this, window, seq, attrs,
                 requestedWidth, requestedHeight, viewFlags, flags, frameNumber,
                 outFrame, outContentInsets, outVisibleInsets,
@@ -508,14 +513,16 @@ class Session extends IWindowSession.Stub implements IBinder.DeathRecipient {
             }
         }
     }
-
+    // TODO: 添加窗口
     void windowAddedLocked(String packageName) {
         mPackageName = packageName;
         mRelayoutTag = "relayoutWindow: " + mPackageName;
+        //mSurfaceSession为空，创建mSurfaceSession对象并把自己加入到wms的mSessions中
         if (mSurfaceSession == null) {
             if (DEBUG) {
                 Slog.v(TAG_WM, "First window added to " + this + ", creating SurfaceSession");
             }
+            //mSurfaceSession中调用native方法，到了SurfaceFlinger流程
             mSurfaceSession = new SurfaceSession();
             ProtoLog.i(WM_SHOW_TRANSACTIONS, "  NEW SURFACE SESSION %s", mSurfaceSession);
             mService.mSessions.add(this);

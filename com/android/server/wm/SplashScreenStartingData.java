@@ -53,6 +53,7 @@ class SplashScreenStartingData extends StartingData {
 
     @Override
     StartingSurface createStartingSurface(ActivityRecord activity) {
+        //createStartingSurface#addSplashScreen->PhoneWindowManager#addSplashScreen
         return mService.mPolicy.addSplashScreen(activity.token, mPkg, mTheme, mCompatInfo,
                 mNonLocalizedLabel, mLabelRes, mIcon, mLogo, mWindowFlags,
                 mMergedOverrideConfiguration, activity.getDisplayContent().getDisplayId());

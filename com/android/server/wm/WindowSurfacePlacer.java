@@ -124,10 +124,12 @@ class WindowSurfacePlacer {
         int loopCount = 6;
         do {
             mTraversalScheduled = false;
+            //RootWindowContainer里进行计算
             performSurfacePlacementLoop();
             mService.mAnimationHandler.removeCallbacks(mPerformSurfacePlacement);
             loopCount--;
         } while (mTraversalScheduled && loopCount > 0);
+
         mService.mRoot.mWallpaperActionPending = false;
     }
 
@@ -175,6 +177,7 @@ class WindowSurfacePlacer {
         }
 
         try {
+            //RootWindowContainer里进行计算
             mService.mRoot.performSurfacePlacement();
 
             mInLayout = false;
