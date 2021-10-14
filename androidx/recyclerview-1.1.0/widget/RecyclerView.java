@@ -3566,6 +3566,8 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
              */
             mLayout.onMeasure(mRecycler, mState, widthSpec, heightSpec);
 
+            //宽高是确定值时，直接返回
+            //会在onLayout中测量和布局
             final boolean measureSpecModeIsExactly =
                     widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY;
             if (measureSpecModeIsExactly || mAdapter == null) {
@@ -3573,12 +3575,15 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             }
 
             if (mState.mLayoutStep == State.STEP_START) {
+                // 关键 dispatchLayoutStep1，dispatchLayoutStep2，dispatchLayoutStep3只会执行一次
+                //dispatchLayoutStep3只在onLayout中执行。1和3是对动画进行处理，1是动画前布局，3是动画后布局
                 dispatchLayoutStep1();
             }
             // set dimensions in 2nd step. Pre-layout should happen with old dimensions for
             // consistency
             mLayout.setMeasureSpecs(widthSpec, heightSpec);
             mState.mIsMeasuring = true;
+            // 关键
             dispatchLayoutStep2();
 
             // now we can get the width and height from the children.
@@ -4481,8 +4486,19 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
 
     @Override
     public void draw(Canvas c) {
+        //调用 View的draw
+        //onDraw(canvas);
+        //分发-画孩子
+        //dispatchDraw(canvas);
+
+
+        //1。执行onDraw->recyclerView#onDraw() ->画分割线
+        //mItemDecorations.get(i).onDraw(c, this, mState);
+
+        //2。dispatchDraw绘制ItemView
         super.draw(c);
 
+        //3。分割线的onDrawOver
         final int count = mItemDecorations.size();
         for (int i = 0; i < count; i++) {
             mItemDecorations.get(i).onDrawOver(c, this, mState);
@@ -4540,6 +4556,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         }
     }
 
+    //画分割线
     @Override
     public void onDraw(Canvas c) {
         super.onDraw(c);
@@ -6218,7 +6235,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                                                     + exceptionLabel());
             }
             boolean fromScrapOrHiddenOrCache = false;
-            ViewHolder holder = null;
+
             // 0) If there is a changed scrap, try to find from there
 
             //一 TODO: RecyclerView复用 - 滑动过程--》屏幕内缓存 mChangedScrap,mAttachedScrap
@@ -6240,6 +6257,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             // * 按照Type来查找ViewHolder
             // * 每个Type默认最多缓存5个
 
+            ViewHolder holder = null;
             if (mState.isPreLayout()) {
                 // TODO: RecyclerView复用 - 滑动过程--》从mChangedScrap获取holder
                 holder = getChangedScrapViewForPosition(position);
@@ -6293,6 +6311,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                         fromScrapOrHiddenOrCache = true;
                     }
                 }
+                // TODO: RecyclerView复用--自定义缓存复用
                 if (holder == null && mViewCacheExtension != null) {
                     // We are NOT sending the offsetPosition because LayoutManager does not
                     // know it.
@@ -6799,7 +6818,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
                     return holder;
                 }
             }
-
+            //--fling时不走这块
             if (!dryRun) {
                 //用于按位置查找消失的视图
                 View view = mChildHelper.findHiddenNonRemovedView(position);
@@ -9315,20 +9334,14 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          *
          * @param recycler Recycler to scrap views into
          */
-<<<<<<< HEAD
-        //todo: RecyclerView的回收
-=======
+
         // TODO: RecyclerView回收
->>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
         public void detachAndScrapAttachedViews(@NonNull Recycler recycler) {
             final int childCount = getChildCount();
             for (int i = childCount - 1; i >= 0; i--) {
                 final View v = getChildAt(i);
-<<<<<<< HEAD
-                //todo: RecyclerView的回收
-=======
+
                 // TODO: RecyclerView回收
->>>>>>> 2635e5d13a3e7d71937c1ad1cbf991025be282d8
                 scrapOrRecycleView(recycler, i, v);
             }
         }
@@ -9505,7 +9518,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          */
         public void measureChildWithMargins(@NonNull View child, int widthUsed, int heightUsed) {
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-
+            //分割线区域
             final Rect insets = mRecyclerView.getItemDecorInsetsForChild(child);
             widthUsed += insets.left + insets.right;
             heightUsed += insets.top + insets.bottom;
@@ -9712,6 +9725,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
          * @see View#layout(int, int, int, int)
          * @see #layoutDecorated(View, int, int, int, int)
          */
+        //布局
         public void layoutDecoratedWithMargins(@NonNull View child, int left, int top, int right,
                                                int bottom) {
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();

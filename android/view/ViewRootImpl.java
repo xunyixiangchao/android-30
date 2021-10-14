@@ -1166,6 +1166,7 @@ public final class ViewRootImpl implements ViewParent,
                         mInputQueue = new InputQueue();
                         mInputQueueCallback.onInputQueueCreated(mInputQueue);
                     }
+                    //负责接收事件--
                     mInputEventReceiver = new WindowInputEventReceiver(inputChannel,
                             Looper.myLooper());
                 }
@@ -1184,6 +1185,7 @@ public final class ViewRootImpl implements ViewParent,
 
                 // Set up the input pipeline.
                 CharSequence counterSuffix = attrs.getTitle();
+                //InputStage种类
                 mSyntheticInputStage = new SyntheticInputStage();
                 InputStage viewPostImeStage = new ViewPostImeInputStage(mSyntheticInputStage);
                 InputStage nativePostImeStage = new NativePostImeInputStage(viewPostImeStage,
@@ -8240,7 +8242,7 @@ public final class ViewRootImpl implements ViewParent,
 
             if (stage != null) {
                 handleWindowFocusChanged();
-                // TODO: 获取事件
+                // TODO: 获取事件--我们的View事件是在 ViewPostImeInputStage 中
                 stage.deliver(q);
             } else {
                 finishInputEvent(q);

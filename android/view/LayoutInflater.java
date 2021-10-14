@@ -675,6 +675,9 @@ public abstract class LayoutInflater {
                                     root);
                         }
                         // Create layout params that match root, if supplied
+                        //xml解析时，用到的generateLayoutParams(AttributeSet),来解析的xml,返回LayoutParams
+                        //所以在自定义View时，使用margin时，需要重写generateLayoutParams(attributeSet)方法，
+                        //返回MarginLayoutParams(attr)
                         params = root.generateLayoutParams(attrs);
                         if (!attachToRoot) {
                             // Set the layout params for temp if we are not

@@ -7550,7 +7550,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         // the app has a click listener that changes the state of views the autofill service might
         // be interested on.
         notifyAutofillManagerOnClick();
-
+        //onClick点击事件
         return performClick();
     }
 
@@ -7575,6 +7575,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         if (li != null && li.mOnClickListener != null) {
             //播放音效
             playSoundEffect(SoundEffectConstants.CLICK);
+            //onClick点击事件
             li.mOnClickListener.onClick(this);
             result = true;
         } else {
@@ -14375,6 +14376,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final int actionMasked = event.getActionMasked();
         if (actionMasked == MotionEvent.ACTION_DOWN) {
             // Defensive cleanup for new gesture
+            //停止滚动
             stopNestedScroll();
         }
 
@@ -15809,6 +15811,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                                 }
                                 //onClick事件
                                 if (!post(mPerformClick)) {
+                                    //onClick点击事件
                                     performClickInternal();
                                 }
                             }
