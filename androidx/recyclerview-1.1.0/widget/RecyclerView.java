@@ -1863,7 +1863,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
             consumedX = mLayout.scrollHorizontallyBy(dx, mRecycler, mState);
         }
         if (dy != 0) {
-            // TODO: RecyclerView复用 - 滑动过程-->跳到LinearLayoutManager
+            // TODO: RecyclerView复用 - 滑动过程-->跳到 LinearLayoutManager
             consumedY = mLayout.scrollVerticallyBy(dy, mRecycler, mState);
         }
 
@@ -3310,6 +3310,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
+    // TODO: RecyclerView复用 - 滑动过程,从onTouchEvent开始
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         if (mLayoutSuppressed || mIgnoreMotionEventTillDown) {
@@ -3425,7 +3426,7 @@ public class RecyclerView extends ViewGroup implements ScrollingView,
 
                     mLastTouchX = x - mScrollOffset[0];
                     mLastTouchY = y - mScrollOffset[1];
-                    // TODO: RecyclerView复用 - 滑动过程
+// TODO: RecyclerView复用 - 滑动过程
                     if (scrollByInternal(
                             canScrollHorizontally ? dx : 0,
                             canScrollVertically ? dy : 0,

@@ -35,6 +35,7 @@ import androidx.core.os.TraceCompat;
 import androidx.core.view.ViewCompat;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * A {@link RecyclerView.LayoutManager} implementation which provides
@@ -1133,7 +1134,7 @@ public class LinearLayoutManager extends RecyclerView.LayoutManager implements
         if (mOrientation == HORIZONTAL) {
             return 0;
         }
-        // TODO: RecyclerView复用 - 滑动过程
+        //TODO: RecyclerView复用 - 滑动过程
         return scrollBy(dy, recycler, state);
     }
 
