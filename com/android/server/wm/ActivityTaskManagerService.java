@@ -903,17 +903,18 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
         mAppWarnings = createAppWarnings(mUiContext, mH, mUiHandler, systemDir);
         mCompatModePackages = new CompatModePackages(this, systemDir, mH);
         mPendingIntentController = intentController;
-        //todo 管理Activity栈
+//管理ActivityStack的重要类，这里面记录着activity状态信息，是AMS中的核心类
         mStackSupervisor = createStackSupervisor();
 
         mTaskChangeNotificationController =
                 new TaskChangeNotificationController(mGlobalLock, mStackSupervisor, mH);
         mLockTaskController = new LockTaskController(mContext, mStackSupervisor, mH);
-        // TODO:activity 启动相关的流程在这里面
+//这是activity启动的处理类，这里管理者activity启动中用到的intent信息和flag标识，也和stack和task有重要的联系
         mActivityStartController = new ActivityStartController(this);
         //最近打开的任务列表
         setRecentTasks(new RecentTasks(this, mStackSupervisor));
         mVrController = new VrController(mGlobalLock);
+        //根据当前可见的Activity类型，控制Keyguard遮挡，关闭和转换。 Keyguard就是我们的锁屏相关页面
         mKeyguardController = mStackSupervisor.getKeyguardController();
     }
 

@@ -96,11 +96,15 @@ public class Fragment implements ComponentCallbacks, OnCreateContextMenuListener
         ViewModelStoreOwner, SavedStateRegistryOwner {
 
     static final Object USE_DEFAULT_TRANSITION = new Object();
-
+    // 初始状态-fragment未创建
     static final int INITIALIZING = 0;     // Not yet created.
+    // 已创建状态，Fragment 视图未创建
     static final int CREATED = 1;          // Created.
+    //已视图创建状态，Fragment 不可见
     static final int ACTIVITY_CREATED = 2; // Fully created, not started.
+    // 可见状态，Fragment 不处于前台
     static final int STARTED = 3;          // Created and started, not resumed.
+    // 前台状态，可接受用户交互
     static final int RESUMED = 4;          // Created started and resumed.
 
     int mState = INITIALIZING;

@@ -2697,7 +2697,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 || mFirstTouchTarget != null) {
                 //调用父类requestDisallowInterceptTouchEvent(true)时，这里为true，表示请求父类不拦截
                 //但是在MotionEvent.ACTION_DOWN时没用，重置时resetTouchState()方法将这里标记为了false
-                //只有 mFirstTouchTarget != null时，disallowIntercept才有可能为true
+                //只有 mFirstTouchTarget != null时(MOVE时)，disallowIntercept才有可能为true
                 final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
                 if (!disallowIntercept) {
                     intercepted = onInterceptTouchEvent(ev);

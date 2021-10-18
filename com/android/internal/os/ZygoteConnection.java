@@ -266,7 +266,7 @@ class ZygoteConnection {
             if (pid == 0) {
                 // in child
                 zygoteServer.setForkChild();
-
+                //关闭zygoteServer连接
                 zygoteServer.closeServerSocket();
                 IoUtils.closeQuietly(serverPipeFd);
                 serverPipeFd = null;
@@ -277,6 +277,7 @@ class ZygoteConnection {
                 // handleParentProc.
                 IoUtils.closeQuietly(childPipeFd);
                 childPipeFd = null;
+                //父进程通过handleParentProc(pid) 把子进程的pid通过socket发送给AMS
                 handleParentProc(pid, serverPipeFd);
                 return null;
             }
@@ -486,7 +487,7 @@ class ZygoteConnection {
          * socket connections, and substituted /dev/null in their place.  The LocalSocket
          * objects still need to be closed properly.
          */
-
+        //关闭连接
         closeSocket();
 
         Zygote.setAppProcessName(parsedArgs, TAG);
@@ -494,6 +495,7 @@ class ZygoteConnection {
         // End of the postFork event.
         Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
         if (parsedArgs.mInvokeWith != null) {
+            // TODO: 走这还是走下面?
             // todo: 桌面startActivity流程--使用execShell执行的 WrapperInit#main方法
             WrapperInit.execApplication(parsedArgs.mInvokeWith,
                     parsedArgs.mNiceName, parsedArgs.mTargetSdkVersion,
@@ -504,6 +506,7 @@ class ZygoteConnection {
             throw new IllegalStateException("WrapperInit.execApplication unexpectedly returned");
         } else {
             if (!isZygote) {
+                // todo: 桌面startActivity流程-
                 return ZygoteInit.zygoteInit(parsedArgs.mTargetSdkVersion,
                         parsedArgs.mDisabledCompatChanges,
                         parsedArgs.mRemainingArgs, null /* classLoader */);

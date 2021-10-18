@@ -232,6 +232,7 @@ public class FragmentController {
      * @see Fragment#onCreate(Bundle)
      */
     public void dispatchCreate() {
+        //调用FragmentManagerImpl.dispatchCreate()
         mHost.mFragmentManager.dispatchCreate();
     }
 
