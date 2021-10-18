@@ -101,8 +101,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     ArrayList<BackStackRecord> mBackStack;
     ArrayList<Fragment> mCreatedMenus;
     private OnBackPressedDispatcher mOnBackPressedDispatcher;
-    private final OnBackPressedCallback mOnBackPressedCallback =
-            new OnBackPressedCallback(false) {
+    private final OnBackPressedCallback mOnBackPressedCallback = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
             FragmentManagerImpl.this.handleOnBackPressed();
@@ -172,6 +171,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
         throw ex;
     }
 
+    //创建一个事务对象
     @NonNull
     @Override
     public FragmentTransaction beginTransaction() {
@@ -1285,6 +1285,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
      * @param always If {@code true}, all fragments update their state, even
      *               if {@code newState} matches the current fragment manager's state.
      */
+    // TODO: 进行状态切换
     void moveToState(int newState, boolean always) {
         if (mHost == null && newState != Fragment.INITIALIZING) {
             throw new IllegalStateException("No activity");
@@ -2604,6 +2605,7 @@ final class FragmentManagerImpl extends FragmentManager implements LayoutInflate
     public void dispatchCreate() {
         mStateSaved = false;
         mStopped = false;
+        //Fragment状态CREATED
         dispatchStateChange(Fragment.CREATED);
     }
 

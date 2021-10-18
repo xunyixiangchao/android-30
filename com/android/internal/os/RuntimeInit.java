@@ -357,7 +357,7 @@ public class RuntimeInit {
 
         Method m;
         try {
-            // todo: 桌面startActivity流程--》ActivtyThread.main()
+            // todo: 桌面startActivity流程--》ActivityThread.main()
             m = cl.getMethod("main", new Class[] { String[].class });
         } catch (NoSuchMethodException ex) {
             throw new RuntimeException(

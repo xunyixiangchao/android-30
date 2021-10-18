@@ -988,6 +988,7 @@ public class ZygoteInit {
      *                              are enabled)
      * @param argv             arg strings
      */
+    // todo: 桌面startActivity流程-
     public static final Runnable zygoteInit(int targetSdkVersion, long[] disabledCompatChanges,
             String[] argv, ClassLoader classLoader) {
         if (RuntimeInit.DEBUG) {
@@ -999,6 +1000,7 @@ public class ZygoteInit {
 
         RuntimeInit.commonInit();
         ZygoteInit.nativeZygoteInit();
+        // todo: 桌面startActivity流程-
         return RuntimeInit.applicationInit(targetSdkVersion, disabledCompatChanges, argv,
                 classLoader);
     }

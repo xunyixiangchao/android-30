@@ -313,6 +313,7 @@ public class FragmentActivity extends ComponentActivity implements
         super.onCreate(savedInstanceState);
 
         mFragmentLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
+        //FragmentController进行分发
         mFragments.dispatchCreate();
     }
 
