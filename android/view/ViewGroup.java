@@ -2884,7 +2884,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     final TouchTarget next = target.next;
                     //有子View处理时，alreadyDispatchedToNewTouchTarget为true,target ==
                     // newTouchTarget成立，handled为true
-                    //if命中，直接返回handled不作处理，因为上面分发时，子View作了处理
+                    //if命中，直接返回handled不作处理，因为上面分发时，子View作了处理---只在Down的时候
                     if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
                         //这里返回给ViewGroup的父容器，表示事件处理了，但是是ViewGroup的子View处理了。
                         handled = true;
