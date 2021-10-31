@@ -47,21 +47,28 @@ public class RequestManagerRetriever implements Handler.Callback {
   // allow us to iterate over and retrieve all active Fragments in a FragmentManager.
   private static final String FRAGMENT_INDEX_KEY = "key";
 
-  /** The top application level RequestManager. */
+  /**
+   * The top application level RequestManager.
+   */
   private volatile RequestManager applicationManager;
 
-  /** Pending adds for RequestManagerFragments. */
+  /**
+   * Pending adds for RequestManagerFragments.
+   */
   @SuppressWarnings("deprecation")
   @VisibleForTesting
   final Map<android.app.FragmentManager, RequestManagerFragment> pendingRequestManagerFragments =
-      new HashMap<>();
+          new HashMap<>();
 
-  /** Pending adds for SupportRequestManagerFragments. */
-  @VisibleForTesting
-  final Map<FragmentManager, SupportRequestManagerFragment> pendingSupportRequestManagerFragments =
-      new HashMap<>();
+  /**
+   * Pending adds for SupportRequestManagerFragments.
+   */
+  @VisibleForTesting final Map<FragmentManager, SupportRequestManagerFragment> pendingSupportRequestManagerFragments =
+          new HashMap<>();
 
-  /** Main thread handler to handle cleaning up pending fragment maps. */
+  /**
+   * Main thread handler to handle cleaning up pending fragment maps.
+   */
   private final Handler handler;
 
   private final RequestManagerFactory factory;
@@ -76,7 +83,7 @@ public class RequestManagerRetriever implements Handler.Callback {
   private final FrameWaiter frameWaiter;
 
   public RequestManagerRetriever(
-      @Nullable RequestManagerFactory factory, GlideExperiments experiments) {
+          @Nullable RequestManagerFactory factory, GlideExperiments experiments) {
     this.factory = factory != null ? factory : DEFAULT_FACTORY;
     handler = new Handler(Looper.getMainLooper(), this /* Callback */);
 
@@ -85,12 +92,12 @@ public class RequestManagerRetriever implements Handler.Callback {
 
   private static FrameWaiter buildFrameWaiter(GlideExperiments experiments) {
     if (!HardwareConfigState.HARDWARE_BITMAPS_SUPPORTED
-        || !HardwareConfigState.BLOCK_HARDWARE_BITMAPS_WHEN_GL_CONTEXT_MIGHT_NOT_BE_INITIALIZED) {
+            || !HardwareConfigState.BLOCK_HARDWARE_BITMAPS_WHEN_GL_CONTEXT_MIGHT_NOT_BE_INITIALIZED) {
       return new DoNothingFirstFrameWaiter();
     }
     return experiments.isEnabled(WaitForFramesAfterTrimMemory.class)
-        ? new FirstFrameAndAfterTrimMemoryWaiter()
-        : new FirstFrameWaiter();
+            ? new FirstFrameAndAfterTrimMemoryWaiter()
+            : new FirstFrameWaiter();
   }
 
   @NonNull
@@ -107,11 +114,11 @@ public class RequestManagerRetriever implements Handler.Callback {
           // TODO(b/27524013): Factor out this Glide.get() call.
           Glide glide = Glide.get(context.getApplicationContext());
           applicationManager =
-              factory.build(
-                  glide,
-                  new ApplicationLifecycle(),
-                  new EmptyRequestManagerTreeNode(),
-                  context.getApplicationContext());
+                  factory.build(
+                          glide,
+                          new ApplicationLifecycle(),
+                          new EmptyRequestManagerTreeNode(),
+                          context.getApplicationContext());
         }
       }
     }
@@ -119,6 +126,7 @@ public class RequestManagerRetriever implements Handler.Callback {
     return applicationManager;
   }
 
+  // TODO: Glide源码-Glide.with(context)--调用RequestManagerRetriever.get()获取RequestManager
   @NonNull
   public RequestManager get(@NonNull Context context) {
     if (context == null) {
@@ -129,18 +137,20 @@ public class RequestManagerRetriever implements Handler.Callback {
       } else if (context instanceof Activity) {
         return get((Activity) context);
       } else if (context instanceof ContextWrapper
-          // Only unwrap a ContextWrapper if the baseContext has a non-null application context.
-          // Context#createPackageContext may return a Context without an Application instance,
-          // in which case a ContextWrapper may be used to attach one.
-          && ((ContextWrapper) context).getBaseContext().getApplicationContext() != null) {
+              // Only unwrap a ContextWrapper if the baseContext has a non-null application context.
+              // Context#createPackageContext may return a Context without an Application instance,
+              // in which case a ContextWrapper may be used to attach one.
+              && ((ContextWrapper) context).getBaseContext().getApplicationContext() != null) {
         return get(((ContextWrapper) context).getBaseContext());
       }
     }
-
+    //TODO: 子线程或ApplicationContext，直接创建ApplicationRequestManager->new RequestManager(glide, lifecycle, requestManagerTreeNode, context)
     return getApplicationManager(context);
   }
 
   @NonNull
+  // TODO: Glide源码-Glide.with(context)--调用RequestManagerRetriever.get()获取RequestManager
+  //androidx
   public RequestManager get(@NonNull FragmentActivity activity) {
     if (Util.isOnBackgroundThread()) {
       return get(activity.getApplicationContext());
@@ -155,8 +165,8 @@ public class RequestManagerRetriever implements Handler.Callback {
   @NonNull
   public RequestManager get(@NonNull Fragment fragment) {
     Preconditions.checkNotNull(
-        fragment.getContext(),
-        "You cannot start a load on a fragment before it is attached or after it is destroyed");
+            fragment.getContext(),
+            "You cannot start a load on a fragment before it is attached or after it is destroyed");
     if (Util.isOnBackgroundThread()) {
       return get(fragment.getContext().getApplicationContext());
     } else {
@@ -173,8 +183,11 @@ public class RequestManagerRetriever implements Handler.Callback {
   }
 
   @SuppressWarnings("deprecation")
+  // TODO: Glide源码-Glide.with(context)--调用RequestManagerRetriever.get()获取RequestManager
+  //app包
   @NonNull
   public RequestManager get(@NonNull Activity activity) {
+    //非主线程，传入applicationContext
     if (Util.isOnBackgroundThread()) {
       return get(activity.getApplicationContext());
     } else if (activity instanceof FragmentActivity) {
@@ -183,6 +196,9 @@ public class RequestManagerRetriever implements Handler.Callback {
       assertNotDestroyed(activity);
       frameWaiter.registerSelf(activity);
       android.app.FragmentManager fm = activity.getFragmentManager();
+      // 创建空白fragment绑定页面监听生命周期变化，
+      // 将requestManager传给fragment用来接收生命周期变化，
+      // 返回requestManager
       return fragmentGet(activity, fm, /*parentHint=*/ null, isActivityVisible(activity));
     }
   }
@@ -196,7 +212,7 @@ public class RequestManagerRetriever implements Handler.Callback {
 
     Preconditions.checkNotNull(view);
     Preconditions.checkNotNull(
-        view.getContext(), "Unable to obtain a request manager for a view without a Context");
+            view.getContext(), "Unable to obtain a request manager for a view without a Context");
     Activity activity = findActivity(view.getContext());
     // The view might be somewhere else, like a service.
     if (activity == null) {
@@ -221,7 +237,7 @@ public class RequestManagerRetriever implements Handler.Callback {
   }
 
   private static void findAllSupportFragmentsWithViews(
-      @Nullable Collection<Fragment> topLevelFragments, @NonNull Map<View, Fragment> result) {
+          @Nullable Collection<Fragment> topLevelFragments, @NonNull Map<View, Fragment> result) {
     if (topLevelFragments == null) {
       return;
     }
@@ -239,7 +255,7 @@ public class RequestManagerRetriever implements Handler.Callback {
   private Fragment findSupportFragment(@NonNull View target, @NonNull FragmentActivity activity) {
     tempViewToSupportFragment.clear();
     findAllSupportFragmentsWithViews(
-        activity.getSupportFragmentManager().getFragments(), tempViewToSupportFragment);
+            activity.getSupportFragmentManager().getFragments(), tempViewToSupportFragment);
     Fragment result = null;
     View activityRoot = activity.findViewById(android.R.id.content);
     View current = target;
@@ -291,8 +307,8 @@ public class RequestManagerRetriever implements Handler.Callback {
   @Deprecated
   @TargetApi(Build.VERSION_CODES.O)
   private void findAllFragmentsWithViews(
-      @NonNull android.app.FragmentManager fragmentManager,
-      @NonNull ArrayMap<View, android.app.Fragment> result) {
+          @NonNull android.app.FragmentManager fragmentManager,
+          @NonNull ArrayMap<View, android.app.Fragment> result) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       for (android.app.Fragment fragment : fragmentManager.getFragments()) {
         if (fragment.getView() != null) {
@@ -308,8 +324,8 @@ public class RequestManagerRetriever implements Handler.Callback {
   @SuppressWarnings("deprecation")
   @Deprecated
   private void findAllFragmentsWithViewsPreO(
-      @NonNull android.app.FragmentManager fragmentManager,
-      @NonNull ArrayMap<View, android.app.Fragment> result) {
+          @NonNull android.app.FragmentManager fragmentManager,
+          @NonNull ArrayMap<View, android.app.Fragment> result) {
     int index = 0;
     while (true) {
       tempBundle.putInt(FRAGMENT_INDEX_KEY, index++);
@@ -356,7 +372,7 @@ public class RequestManagerRetriever implements Handler.Callback {
   public RequestManager get(@NonNull android.app.Fragment fragment) {
     if (fragment.getActivity() == null) {
       throw new IllegalArgumentException(
-          "You cannot start a load on a fragment before it is attached");
+              "You cannot start a load on a fragment before it is attached");
     }
     if (Util.isOnBackgroundThread() || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
       return get(fragment.getActivity().getApplicationContext());
@@ -382,16 +398,27 @@ public class RequestManagerRetriever implements Handler.Callback {
 
   @SuppressWarnings("deprecation")
   @NonNull
+  // TODO: Glide源码-Glide.with(context)--创建空白fragment,绑定页面
+  //这里是app包下的Fragment
   private RequestManagerFragment getRequestManagerFragment(
-      @NonNull final android.app.FragmentManager fm, @Nullable android.app.Fragment parentHint) {
+          @NonNull final android.app.FragmentManager fm, @Nullable android.app.Fragment parentHint) {
+    //先根据tag获取，如果已经绑定过
     RequestManagerFragment current = (RequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
     if (current == null) {
+      //先从hashmap中获取，缓存作用，避免重复创建fragment
       current = pendingRequestManagerFragments.get(fm);
       if (current == null) {
+        //创建fragment
         current = new RequestManagerFragment();
+        //fragment中绑定fragmetn用--分支
         current.setParentFragmentHint(parentHint);
+        //放入hashMap缓存中
         pendingRequestManagerFragments.put(fm, current);
+        //绑定页面
         fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
+        //发送handler消息，因为绑定fragment是基于handler消息的，
+        //这里发送消息，一定会在绑定fragment消息之后，消费这个消息时说明绑定过程已经结束。
+        //所以hashMap防止重复创建就可以消除了，上面第一步直接可以从通过tag获取到了。
         handler.obtainMessage(ID_REMOVE_FRAGMENT_MANAGER, fm).sendToTarget();
       }
     }
@@ -400,26 +427,33 @@ public class RequestManagerRetriever implements Handler.Callback {
 
   @SuppressWarnings({"deprecation", "DeprecatedIsStillUsed"})
   @Deprecated
+  // TODO: Glide源码-Glide.with(context)--创建空白fragment,创建requestManager,传给fragment，返回requestManager
   @NonNull
   private RequestManager fragmentGet(
-      @NonNull Context context,
-      @NonNull android.app.FragmentManager fm,
-      @Nullable android.app.Fragment parentHint,
-      boolean isParentVisible) {
+          @NonNull Context context,
+          @NonNull android.app.FragmentManager fm,
+          @Nullable android.app.Fragment parentHint,
+          boolean isParentVisible) {
+    //创建fragment
     RequestManagerFragment current = getRequestManagerFragment(fm, parentHint);
+    //先获取frag中的requestManager,因为这里的frag有可能是通过byTag获取已经绑定过的frag.
     RequestManager requestManager = current.getRequestManager();
     if (requestManager == null) {
-      // TODO(b/27524013): Factor out this Glide.get() call.
       Glide glide = Glide.get(context);
+      //通过建造者创建requestManager，传入glide和frag在创建时创建的lifecycle，用于生命周期变化通知。
+      //调用requestManager构造方法，将rm作为LifecycleListener,传给frag的lifecycle中->
       requestManager =
-          factory.build(
-              glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+              factory.build(
+                      glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
       // This is a bit of hack, we're going to start the RequestManager, but not the
       // corresponding Lifecycle. It's safe to start the RequestManager, but starting the
       // Lifecycle might trigger memory leaks. See b/154405040
+      //activity可见的，则调用rm的onStart方法
+      //如果已经有执行的请求就开始
       if (isParentVisible) {
         requestManager.onStart();
       }
+      //将rm设置给fragment
       current.setRequestManager(requestManager);
     }
     return requestManager;
@@ -437,11 +471,13 @@ public class RequestManagerRetriever implements Handler.Callback {
     return activity == null || !activity.isFinishing();
   }
 
+  // TODO: Glide源码-Glide.with(context)--创建空白fragment,绑定页面
+  //这里是androidX包下的Fragment
   @NonNull
   private SupportRequestManagerFragment getSupportRequestManagerFragment(
-      @NonNull final FragmentManager fm, @Nullable Fragment parentHint) {
+          @NonNull final FragmentManager fm, @Nullable Fragment parentHint) {
     SupportRequestManagerFragment current =
-        (SupportRequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
+            (SupportRequestManagerFragment) fm.findFragmentByTag(FRAGMENT_TAG);
     if (current == null) {
       current = pendingSupportRequestManagerFragments.get(fm);
       if (current == null) {
@@ -456,19 +492,20 @@ public class RequestManagerRetriever implements Handler.Callback {
   }
 
   @NonNull
+  // TODO: Glide源码-Glide.with(context)--创建空白fragment,创建requestManager,传给fragment，返回requestManager
   private RequestManager supportFragmentGet(
-      @NonNull Context context,
-      @NonNull FragmentManager fm,
-      @Nullable Fragment parentHint,
-      boolean isParentVisible) {
+          @NonNull Context context,
+          @NonNull FragmentManager fm,
+          @Nullable Fragment parentHint,
+          boolean isParentVisible) {
+    //创建空白fragment
     SupportRequestManagerFragment current = getSupportRequestManagerFragment(fm, parentHint);
     RequestManager requestManager = current.getRequestManager();
     if (requestManager == null) {
-      // TODO(b/27524013): Factor out this Glide.get() call.
       Glide glide = Glide.get(context);
       requestManager =
-          factory.build(
-              glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
+              factory.build(
+                      glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);
       // This is a bit of hack, we're going to start the RequestManager, but not the
       // corresponding Lifecycle. It's safe to start the RequestManager, but starting the
       // Lifecycle might trigger memory leaks. See b/154405040
@@ -506,26 +543,29 @@ public class RequestManagerRetriever implements Handler.Callback {
     return handled;
   }
 
-  /** Used internally to create {@link RequestManager}s. */
+  /**
+   * Used internally to create {@link RequestManager}s.
+   */
   public interface RequestManagerFactory {
     @NonNull
     RequestManager build(
-        @NonNull Glide glide,
-        @NonNull Lifecycle lifecycle,
-        @NonNull RequestManagerTreeNode requestManagerTreeNode,
-        @NonNull Context context);
-  }
-
-  private static final RequestManagerFactory DEFAULT_FACTORY =
-      new RequestManagerFactory() {
-        @NonNull
-        @Override
-        public RequestManager build(
             @NonNull Glide glide,
             @NonNull Lifecycle lifecycle,
             @NonNull RequestManagerTreeNode requestManagerTreeNode,
-            @NonNull Context context) {
-          return new RequestManager(glide, lifecycle, requestManagerTreeNode, context);
-        }
-      };
+            @NonNull Context context);
+  }
+
+  private static final RequestManagerFactory DEFAULT_FACTORY =
+          new RequestManagerFactory() {
+            @NonNull
+            @Override
+            public RequestManager build(
+                    @NonNull Glide glide,
+                    @NonNull Lifecycle lifecycle,
+                    @NonNull RequestManagerTreeNode requestManagerTreeNode,
+                    @NonNull Context context) {
+              //调用构造方法
+              return new RequestManager(glide, lifecycle, requestManagerTreeNode, context);
+            }
+          };
 }

@@ -55,12 +55,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see Glide#with(Context)
  */
 public class RequestManager
-    implements ComponentCallbacks2, LifecycleListener, ModelTypes<RequestBuilder<Drawable>> {
+        implements ComponentCallbacks2, LifecycleListener, ModelTypes<RequestBuilder<Drawable>> {
 
   private static final RequestOptions DECODE_TYPE_BITMAP = decodeTypeOf(Bitmap.class).lock();
   private static final RequestOptions DECODE_TYPE_GIF = decodeTypeOf(GifDrawable.class).lock();
   private static final RequestOptions DOWNLOAD_ONLY_OPTIONS =
-      diskCacheStrategyOf(DiskCacheStrategy.DATA).priority(Priority.LOW).skipMemoryCache(true);
+          diskCacheStrategyOf(DiskCacheStrategy.DATA).priority(Priority.LOW).skipMemoryCache(true);
 
   protected final Glide glide;
   protected final Context context;
@@ -79,12 +79,12 @@ public class RequestManager
   private final TargetTracker targetTracker = new TargetTracker();
 
   private final Runnable addSelfToLifecycle =
-      new Runnable() {
-        @Override
-        public void run() {
-          lifecycle.addListener(RequestManager.this);
-        }
-      };
+          new Runnable() {
+            @Override
+            public void run() {
+              lifecycle.addListener(RequestManager.this);
+            }
+          };
   private final ConnectivityMonitor connectivityMonitor;
   // Adding default listeners should be much less common than starting new requests. We want
   // some way of making sure that requests don't mutate our listeners without creating a new copy of
@@ -95,30 +95,30 @@ public class RequestManager
   private RequestOptions requestOptions;
 
   private boolean pauseAllRequestsOnTrimMemoryModerate;
-
+  // TODO: Glide源码-Glide.with(context)-->RequestManager的创建
   public RequestManager(
-      @NonNull Glide glide,
-      @NonNull Lifecycle lifecycle,
-      @NonNull RequestManagerTreeNode treeNode,
-      @NonNull Context context) {
+          @NonNull Glide glide,
+          @NonNull Lifecycle lifecycle,
+          @NonNull RequestManagerTreeNode treeNode,
+          @NonNull Context context) {
     this(
-        glide,
-        lifecycle,
-        treeNode,
-        new RequestTracker(),
-        glide.getConnectivityMonitorFactory(),
-        context);
+            glide,
+            lifecycle,
+            treeNode,
+            new RequestTracker(),
+            glide.getConnectivityMonitorFactory(),
+            context);
   }
 
-  // Our usage is safe here.
+  // TODO: Glide源码-Glide.with(context)-->RequestManager的创建
   @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
   RequestManager(
-      Glide glide,
-      Lifecycle lifecycle,
-      RequestManagerTreeNode treeNode,
-      RequestTracker requestTracker,
-      ConnectivityMonitorFactory factory,
-      Context context) {
+          Glide glide,
+          Lifecycle lifecycle,
+          RequestManagerTreeNode treeNode,
+          RequestTracker requestTracker,
+          ConnectivityMonitorFactory factory,
+          Context context) {
     this.glide = glide;
     this.lifecycle = lifecycle;
     this.treeNode = treeNode;
@@ -126,25 +126,28 @@ public class RequestManager
     this.context = context;
 
     connectivityMonitor =
-        factory.build(
-            context.getApplicationContext(),
-            new RequestManagerConnectivityListener(requestTracker));
+            factory.build(
+                    context.getApplicationContext(),
+                    new RequestManagerConnectivityListener(requestTracker));
 
     // If we're the application level request manager, we may be created on a background thread.
     // In that case we cannot risk synchronously pausing or resuming requests, so we hack around the
     // issue by delaying adding ourselves as a lifecycle listener by posting to the main thread.
     // This should be entirely safe.
+    //子线程通过主线程 post添加到lifecycle中
     if (Util.isOnBackgroundThread()) {
       Util.postOnUiThread(addSelfToLifecycle);
     } else {
+      //将rm添加到lifecycle，该lifecycle在frag中
       lifecycle.addListener(this);
     }
+    //添加了一个网络变化监听
     lifecycle.addListener(connectivityMonitor);
 
     defaultRequestListeners =
-        new CopyOnWriteArrayList<>(glide.getGlideContext().getDefaultRequestListeners());
+            new CopyOnWriteArrayList<>(glide.getGlideContext().getDefaultRequestListeners());
     setRequestOptions(glide.getGlideContext().getDefaultRequestOptions());
-
+    //最后将rm添加到glide的managers集合中--用于内存管理 ，onDestroy时，清除
     glide.registerRequestManager(this);
   }
 
@@ -175,7 +178,7 @@ public class RequestManager
    */
   @NonNull
   public synchronized RequestManager applyDefaultRequestOptions(
-      @NonNull RequestOptions requestOptions) {
+          @NonNull RequestOptions requestOptions) {
     updateRequestOptions(requestOptions);
     return this;
   }
@@ -197,7 +200,7 @@ public class RequestManager
    */
   @NonNull
   public synchronized RequestManager setDefaultRequestOptions(
-      @NonNull RequestOptions requestOptions) {
+          @NonNull RequestOptions requestOptions) {
     setRequestOptions(requestOptions);
     return this;
   }
@@ -588,7 +591,7 @@ public class RequestManager
   @NonNull
   @CheckResult
   public <ResourceType> RequestBuilder<ResourceType> as(
-      @NonNull Class<ResourceType> resourceClass) {
+          @NonNull Class<ResourceType> resourceClass) {
     return new RequestBuilder<>(glide, this, resourceClass, context);
   }
 
@@ -703,7 +706,7 @@ public class RequestManager
   public void onConfigurationChanged(Configuration newConfig) {}
 
   private class RequestManagerConnectivityListener
-      implements ConnectivityMonitor.ConnectivityListener {
+          implements ConnectivityMonitor.ConnectivityListener {
     @GuardedBy("RequestManager.this")
     private final RequestTracker requestTracker;
 
@@ -739,7 +742,7 @@ public class RequestManager
 
     @Override
     public void onResourceReady(
-        @NonNull Object resource, @Nullable Transition<? super Object> transition) {
+            @NonNull Object resource, @Nullable Transition<? super Object> transition) {
       // Do nothing.
     }
   }

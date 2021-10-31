@@ -153,7 +153,7 @@ public class Glide implements ComponentCallbacks2 {
    * Returns a directory with the given name in the private cache directory of the application to
    * use to store retrieved media and thumbnails.
    *
-   * @param context A context.
+   * @param context   A context.
    * @param cacheName The name of the subdirectory in which to store the cache.
    * @see #getPhotoCacheDir(android.content.Context)
    */
@@ -181,13 +181,16 @@ public class Glide implements ComponentCallbacks2 {
    */
   @NonNull
   // Double checked locking is safe here.
+  // TODO: Glide源码-Glide.with(context)--获取单例Glide
   @SuppressWarnings("GuardedBy")
   public static Glide get(@NonNull Context context) {
+    //双重检查锁DCL
     if (glide == null) {
       GeneratedAppGlideModule annotationGeneratedModule =
-          getAnnotationGeneratedGlideModules(context.getApplicationContext());
+              getAnnotationGeneratedGlideModules(context.getApplicationContext());
       synchronized (Glide.class) {
         if (glide == null) {
+          //检查并初始化Glide
           checkAndInitializeGlide(context, annotationGeneratedModule);
         }
       }
@@ -196,25 +199,27 @@ public class Glide implements ComponentCallbacks2 {
     return glide;
   }
 
+  // TODO: Glide源码-Glide.with(context)--获取单例Glide
   @GuardedBy("Glide.class")
   private static void checkAndInitializeGlide(
-      @NonNull Context context, @Nullable GeneratedAppGlideModule generatedAppGlideModule) {
+          @NonNull Context context, @Nullable GeneratedAppGlideModule generatedAppGlideModule) {
     // In the thread running initGlide(), one or more classes may call Glide.get(context).
     // Without this check, those calls could trigger infinite recursion.
     if (isInitializing) {
       throw new IllegalStateException(
-          "You cannot call Glide.get() in registerComponents(),"
-              + " use the provided Glide instance instead");
+              "You cannot call Glide.get() in registerComponents(),"
+                      + " use the provided Glide instance instead");
     }
     isInitializing = true;
+    // TODO: Glide源码-Glide.with(context)--获取单例Glide-初始化
     initializeGlide(context, generatedAppGlideModule);
     isInitializing = false;
   }
 
   /**
    * @deprecated Use {@link #init(Context, GlideBuilder)} to get a singleton compatible with Glide's
-   *     generated API.
-   *     <p>This method will be removed in a future version of Glide.
+   * generated API.
+   * <p>This method will be removed in a future version of Glide.
    */
   @VisibleForTesting
   @Deprecated
@@ -260,18 +265,21 @@ public class Glide implements ComponentCallbacks2 {
     }
   }
 
+  // TODO: Glide源码-Glide.with(context)--获取单例Glide-初始化
   @GuardedBy("Glide.class")
   private static void initializeGlide(
-      @NonNull Context context, @Nullable GeneratedAppGlideModule generatedAppGlideModule) {
+          @NonNull Context context, @Nullable GeneratedAppGlideModule generatedAppGlideModule) {
+    //使用 GlideBuilder 建造者模式创建glide
     initializeGlide(context, new GlideBuilder(), generatedAppGlideModule);
   }
 
+  // TODO: Glide源码-Glide.with(context)--获取单例Glide-初始化
   @GuardedBy("Glide.class")
   @SuppressWarnings("deprecation")
   private static void initializeGlide(
-      @NonNull Context context,
-      @NonNull GlideBuilder builder,
-      @Nullable GeneratedAppGlideModule annotationGeneratedModule) {
+          @NonNull Context context,
+          @NonNull GlideBuilder builder,
+          @Nullable GeneratedAppGlideModule annotationGeneratedModule) {
     Context applicationContext = context.getApplicationContext();
     List<com.bumptech.glide.module.GlideModule> manifestModules = Collections.emptyList();
     if (annotationGeneratedModule == null || annotationGeneratedModule.isManifestParsingEnabled()) {
@@ -279,7 +287,7 @@ public class Glide implements ComponentCallbacks2 {
     }
 
     if (annotationGeneratedModule != null
-        && !annotationGeneratedModule.getExcludedModuleClasses().isEmpty()) {
+            && !annotationGeneratedModule.getExcludedModuleClasses().isEmpty()) {
       Set<Class<?>> excludedModuleClasses = annotationGeneratedModule.getExcludedModuleClasses();
       Iterator<com.bumptech.glide.module.GlideModule> iterator = manifestModules.iterator();
       while (iterator.hasNext()) {
@@ -301,9 +309,10 @@ public class Glide implements ComponentCallbacks2 {
     }
 
     RequestManagerRetriever.RequestManagerFactory factory =
-        annotationGeneratedModule != null
-            ? annotationGeneratedModule.getRequestManagerFactory()
-            : null;
+            annotationGeneratedModule != null
+                    ? annotationGeneratedModule.getRequestManagerFactory()
+                    : null;
+    //设置RequestManagerFactory工厂
     builder.setRequestManagerFactory(factory);
     for (com.bumptech.glide.module.GlideModule module : manifestModules) {
       module.applyOptions(applicationContext, builder);
@@ -311,18 +320,19 @@ public class Glide implements ComponentCallbacks2 {
     if (annotationGeneratedModule != null) {
       annotationGeneratedModule.applyOptions(applicationContext, builder);
     }
+    // TODO: Glide源码-Glide.with(context)--获取单例Glide-建造者模式->build
     Glide glide = builder.build(applicationContext);
     for (com.bumptech.glide.module.GlideModule module : manifestModules) {
       try {
         module.registerComponents(applicationContext, glide, glide.registry);
       } catch (AbstractMethodError e) {
         throw new IllegalStateException(
-            "Attempting to register a Glide v3 module. If you see this, you or one of your"
-                + " dependencies may be including Glide v3 even though you're using Glide v4."
-                + " You'll need to find and remove (or update) the offending dependency."
-                + " The v3 module name is: "
-                + module.getClass().getName(),
-            e);
+                "Attempting to register a Glide v3 module. If you see this, you or one of your"
+                        + " dependencies may be including Glide v3 even though you're using Glide v4."
+                        + " You'll need to find and remove (or update) the offending dependency."
+                        + " The v3 module name is: "
+                        + module.getClass().getName(),
+                e);
       }
     }
     if (annotationGeneratedModule != null) {
@@ -338,18 +348,18 @@ public class Glide implements ComponentCallbacks2 {
     GeneratedAppGlideModule result = null;
     try {
       Class<GeneratedAppGlideModule> clazz =
-          (Class<GeneratedAppGlideModule>)
-              Class.forName("com.bumptech.glide.GeneratedAppGlideModuleImpl");
+              (Class<GeneratedAppGlideModule>)
+                      Class.forName("com.bumptech.glide.GeneratedAppGlideModuleImpl");
       result =
-          clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
+              clazz.getDeclaredConstructor(Context.class).newInstance(context.getApplicationContext());
     } catch (ClassNotFoundException e) {
       if (Log.isLoggable(TAG, Log.WARN)) {
         Log.w(
-            TAG,
-            "Failed to find GeneratedAppGlideModule. You should include an"
-                + " annotationProcessor compile dependency on com.github.bumptech.glide:compiler"
-                + " in your application and a @GlideModule annotated AppGlideModule implementation"
-                + " or LibraryGlideModules will be silently ignored");
+                TAG,
+                "Failed to find GeneratedAppGlideModule. You should include an"
+                        + " annotationProcessor compile dependency on com.github.bumptech.glide:compiler"
+                        + " in your application and a @GlideModule annotated AppGlideModule implementation"
+                        + " or LibraryGlideModules will be silently ignored");
       }
       // These exceptions can't be squashed across all versions of Android.
     } catch (InstantiationException e) {
@@ -366,26 +376,27 @@ public class Glide implements ComponentCallbacks2 {
 
   private static void throwIncorrectGlideModule(Exception e) {
     throw new IllegalStateException(
-        "GeneratedAppGlideModuleImpl is implemented incorrectly."
-            + " If you've manually implemented this class, remove your implementation. The"
-            + " Annotation processor will generate a correct implementation.",
-        e);
+            "GeneratedAppGlideModuleImpl is implemented incorrectly."
+                    + " If you've manually implemented this class, remove your implementation. The"
+                    + " Annotation processor will generate a correct implementation.",
+            e);
   }
 
+  // TODO: Glide源码-Glide.with(context)--获取单例Glide-构造函数
   @SuppressWarnings("PMD.UnusedFormalParameter")
   Glide(
-      @NonNull Context context,
-      @NonNull Engine engine,
-      @NonNull MemoryCache memoryCache,
-      @NonNull BitmapPool bitmapPool,
-      @NonNull ArrayPool arrayPool,
-      @NonNull RequestManagerRetriever requestManagerRetriever,
-      @NonNull ConnectivityMonitorFactory connectivityMonitorFactory,
-      int logLevel,
-      @NonNull RequestOptionsFactory defaultRequestOptionsFactory,
-      @NonNull Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions,
-      @NonNull List<RequestListener<Object>> defaultRequestListeners,
-      GlideExperiments experiments) {
+          @NonNull Context context,
+          @NonNull Engine engine,
+          @NonNull MemoryCache memoryCache,
+          @NonNull BitmapPool bitmapPool,
+          @NonNull ArrayPool arrayPool,
+          @NonNull RequestManagerRetriever requestManagerRetriever,
+          @NonNull ConnectivityMonitorFactory connectivityMonitorFactory,
+          int logLevel,
+          @NonNull RequestOptionsFactory defaultRequestOptionsFactory,
+          @NonNull Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions,
+          @NonNull List<RequestListener<Object>> defaultRequestListeners,
+          GlideExperiments experiments) {
     this.engine = engine;
     this.bitmapPool = bitmapPool;
     this.arrayPool = arrayPool;
@@ -395,7 +406,7 @@ public class Glide implements ComponentCallbacks2 {
     this.defaultRequestOptionsFactory = defaultRequestOptionsFactory;
 
     final Resources resources = context.getResources();
-
+    //组件注册
     registry = new Registry();
     registry.register(new DefaultImageHeaderParser());
     // Right now we're only using this parser for HEIF images, which are only supported on OMR1+.
@@ -407,19 +418,19 @@ public class Glide implements ComponentCallbacks2 {
     List<ImageHeaderParser> imageHeaderParsers = registry.getImageHeaderParsers();
 
     ByteBufferGifDecoder byteBufferGifDecoder =
-        new ByteBufferGifDecoder(context, imageHeaderParsers, bitmapPool, arrayPool);
+            new ByteBufferGifDecoder(context, imageHeaderParsers, bitmapPool, arrayPool);
     ResourceDecoder<ParcelFileDescriptor, Bitmap> parcelFileDescriptorVideoDecoder =
-        VideoDecoder.parcel(bitmapPool);
+            VideoDecoder.parcel(bitmapPool);
 
     // TODO(judds): Make ParcelFileDescriptorBitmapDecoder work with ImageDecoder.
     Downsampler downsampler =
-        new Downsampler(
-            registry.getImageHeaderParsers(), resources.getDisplayMetrics(), bitmapPool, arrayPool);
+            new Downsampler(
+                    registry.getImageHeaderParsers(), resources.getDisplayMetrics(), bitmapPool, arrayPool);
 
     ResourceDecoder<ByteBuffer, Bitmap> byteBufferBitmapDecoder;
     ResourceDecoder<InputStream, Bitmap> streamBitmapDecoder;
     if (experiments.isEnabled(EnableImageDecoderForBitmaps.class)
-        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       streamBitmapDecoder = new InputStreamBitmapImageDecoderResourceDecoder();
       byteBufferBitmapDecoder = new ByteBufferBitmapImageDecoderResourceDecoder();
     } else {
@@ -429,12 +440,12 @@ public class Glide implements ComponentCallbacks2 {
 
     ResourceDrawableDecoder resourceDrawableDecoder = new ResourceDrawableDecoder(context);
     ResourceLoader.StreamFactory resourceLoaderStreamFactory =
-        new ResourceLoader.StreamFactory(resources);
+            new ResourceLoader.StreamFactory(resources);
     ResourceLoader.UriFactory resourceLoaderUriFactory = new ResourceLoader.UriFactory(resources);
     ResourceLoader.FileDescriptorFactory resourceLoaderFileDescriptorFactory =
-        new ResourceLoader.FileDescriptorFactory(resources);
+            new ResourceLoader.FileDescriptorFactory(resources);
     ResourceLoader.AssetFileDescriptorFactory resourceLoaderAssetFileDescriptorFactory =
-        new ResourceLoader.AssetFileDescriptorFactory(resources);
+            new ResourceLoader.AssetFileDescriptorFactory(resources);
     BitmapEncoder bitmapEncoder = new BitmapEncoder(arrayPool);
 
     BitmapBytesTranscoder bitmapBytesTranscoder = new BitmapBytesTranscoder();
@@ -443,169 +454,183 @@ public class Glide implements ComponentCallbacks2 {
     ContentResolver contentResolver = context.getContentResolver();
 
     registry
-        .append(ByteBuffer.class, new ByteBufferEncoder())
-        .append(InputStream.class, new StreamEncoder(arrayPool))
-        /* Bitmaps */
-        .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class, byteBufferBitmapDecoder)
-        .append(Registry.BUCKET_BITMAP, InputStream.class, Bitmap.class, streamBitmapDecoder);
+            //encoderRegistry
+            //byte写入文件File
+            .append(ByteBuffer.class, new ByteBufferEncoder())
+            //encoderRegistry
+            //将流写入磁盘的Encoder
+            .append(InputStream.class, new StreamEncoder(arrayPool))
+
+            /* Bitmaps */
+            //decoderRegistry
+            //byte->Bitmap
+            .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class, byteBufferBitmapDecoder)
+            //decoderRegistry
+            //Stream->Bitmap
+            .append(Registry.BUCKET_BITMAP, InputStream.class, Bitmap.class, streamBitmapDecoder);
 
     if (ParcelFileDescriptorRewinder.isSupported()) {
       registry.append(
-          Registry.BUCKET_BITMAP,
-          ParcelFileDescriptor.class,
-          Bitmap.class,
-          new ParcelFileDescriptorBitmapDecoder(downsampler));
+              Registry.BUCKET_BITMAP,
+              ParcelFileDescriptor.class,
+              Bitmap.class,
+              new ParcelFileDescriptorBitmapDecoder(downsampler));
     }
 
     registry
-        .append(
-            Registry.BUCKET_BITMAP,
-            ParcelFileDescriptor.class,
-            Bitmap.class,
-            parcelFileDescriptorVideoDecoder)
-        .append(
-            Registry.BUCKET_BITMAP,
-            AssetFileDescriptor.class,
-            Bitmap.class,
-            VideoDecoder.asset(bitmapPool))
-        .append(Bitmap.class, Bitmap.class, UnitModelLoader.Factory.<Bitmap>getInstance())
-        .append(Registry.BUCKET_BITMAP, Bitmap.class, Bitmap.class, new UnitBitmapDecoder())
-        .append(Bitmap.class, bitmapEncoder)
-        /* BitmapDrawables */
-        .append(
-            Registry.BUCKET_BITMAP_DRAWABLE,
-            ByteBuffer.class,
-            BitmapDrawable.class,
-            new BitmapDrawableDecoder<>(resources, byteBufferBitmapDecoder))
-        .append(
-            Registry.BUCKET_BITMAP_DRAWABLE,
-            InputStream.class,
-            BitmapDrawable.class,
-            new BitmapDrawableDecoder<>(resources, streamBitmapDecoder))
-        .append(
-            Registry.BUCKET_BITMAP_DRAWABLE,
-            ParcelFileDescriptor.class,
-            BitmapDrawable.class,
-            new BitmapDrawableDecoder<>(resources, parcelFileDescriptorVideoDecoder))
-        .append(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, bitmapEncoder))
-        /* GIFs */
-        .append(
-            Registry.BUCKET_GIF,
-            InputStream.class,
-            GifDrawable.class,
-            new StreamGifDecoder(imageHeaderParsers, byteBufferGifDecoder, arrayPool))
-        .append(Registry.BUCKET_GIF, ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
-        .append(GifDrawable.class, new GifDrawableEncoder())
-        /* GIF Frames */
-        // Compilation with Gradle requires the type to be specified for UnitModelLoader here.
-        .append(
-            GifDecoder.class, GifDecoder.class, UnitModelLoader.Factory.<GifDecoder>getInstance())
-        .append(
-            Registry.BUCKET_BITMAP,
-            GifDecoder.class,
-            Bitmap.class,
-            new GifFrameResourceDecoder(bitmapPool))
-        /* Drawables */
-        .append(Uri.class, Drawable.class, resourceDrawableDecoder)
-        .append(
-            Uri.class, Bitmap.class, new ResourceBitmapDecoder(resourceDrawableDecoder, bitmapPool))
-        /* Files */
-        .register(new ByteBufferRewinder.Factory())
-        .append(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
-        .append(File.class, InputStream.class, new FileLoader.StreamFactory())
-        .append(File.class, File.class, new FileDecoder())
-        .append(File.class, ParcelFileDescriptor.class, new FileLoader.FileDescriptorFactory())
-        // Compilation with Gradle requires the type to be specified for UnitModelLoader here.
-        .append(File.class, File.class, UnitModelLoader.Factory.<File>getInstance())
-        /* Models */
-        .register(new InputStreamRewinder.Factory(arrayPool));
+            .append(
+                    Registry.BUCKET_BITMAP,
+                    ParcelFileDescriptor.class,
+                    Bitmap.class,
+                    parcelFileDescriptorVideoDecoder)
+            .append(
+                    Registry.BUCKET_BITMAP,
+                    AssetFileDescriptor.class,
+                    Bitmap.class,
+                    VideoDecoder.asset(bitmapPool))
+            .append(Bitmap.class, Bitmap.class, UnitModelLoader.Factory.<Bitmap>getInstance())
+            .append(Registry.BUCKET_BITMAP, Bitmap.class, Bitmap.class, new UnitBitmapDecoder())
+            .append(Bitmap.class, bitmapEncoder)
+            /* BitmapDrawables */
+            .append(
+                    Registry.BUCKET_BITMAP_DRAWABLE,
+                    ByteBuffer.class,
+                    BitmapDrawable.class,
+                    new BitmapDrawableDecoder<>(resources, byteBufferBitmapDecoder))
+            .append(
+                    Registry.BUCKET_BITMAP_DRAWABLE,
+                    InputStream.class,
+                    BitmapDrawable.class,
+                    new BitmapDrawableDecoder<>(resources, streamBitmapDecoder))
+            .append(
+                    Registry.BUCKET_BITMAP_DRAWABLE,
+                    ParcelFileDescriptor.class,
+                    BitmapDrawable.class,
+                    new BitmapDrawableDecoder<>(resources, parcelFileDescriptorVideoDecoder))
+            .append(BitmapDrawable.class, new BitmapDrawableEncoder(bitmapPool, bitmapEncoder))
+            /* GIFs */
+            .append(
+                    Registry.BUCKET_GIF,
+                    InputStream.class,
+                    GifDrawable.class,
+                    new StreamGifDecoder(imageHeaderParsers, byteBufferGifDecoder, arrayPool))
+            .append(Registry.BUCKET_GIF, ByteBuffer.class, GifDrawable.class, byteBufferGifDecoder)
+            .append(GifDrawable.class, new GifDrawableEncoder())
+            /* GIF Frames */
+            // Compilation with Gradle requires the type to be specified for UnitModelLoader here.
+            .append(
+                    GifDecoder.class, GifDecoder.class, UnitModelLoader.Factory.<GifDecoder>getInstance())
+            .append(
+                    Registry.BUCKET_BITMAP,
+                    GifDecoder.class,
+                    Bitmap.class,
+                    new GifFrameResourceDecoder(bitmapPool))
+            /* Drawables */
+            .append(Uri.class, Drawable.class, resourceDrawableDecoder)
+            .append(
+                    Uri.class, Bitmap.class, new ResourceBitmapDecoder(resourceDrawableDecoder, bitmapPool))
+            /* Files */
+            .register(new ByteBufferRewinder.Factory())
+            .append(File.class, ByteBuffer.class, new ByteBufferFileLoader.Factory())
+            .append(File.class, InputStream.class, new FileLoader.StreamFactory())
+            .append(File.class, File.class, new FileDecoder())
+            .append(File.class, ParcelFileDescriptor.class, new FileLoader.FileDescriptorFactory())
+            // Compilation with Gradle requires the type to be specified for UnitModelLoader here.
+            .append(File.class, File.class, UnitModelLoader.Factory.<File>getInstance())
+            /* Models */
+            .register(new InputStreamRewinder.Factory(arrayPool));
 
     if (ParcelFileDescriptorRewinder.isSupported()) {
       registry.register(new ParcelFileDescriptorRewinder.Factory());
     }
 
     registry
-        .append(int.class, InputStream.class, resourceLoaderStreamFactory)
-        .append(int.class, ParcelFileDescriptor.class, resourceLoaderFileDescriptorFactory)
-        .append(Integer.class, InputStream.class, resourceLoaderStreamFactory)
-        .append(Integer.class, ParcelFileDescriptor.class, resourceLoaderFileDescriptorFactory)
-        .append(Integer.class, Uri.class, resourceLoaderUriFactory)
-        .append(int.class, AssetFileDescriptor.class, resourceLoaderAssetFileDescriptorFactory)
-        .append(Integer.class, AssetFileDescriptor.class, resourceLoaderAssetFileDescriptorFactory)
-        .append(int.class, Uri.class, resourceLoaderUriFactory)
-        .append(String.class, InputStream.class, new DataUrlLoader.StreamFactory<String>())
-        .append(Uri.class, InputStream.class, new DataUrlLoader.StreamFactory<Uri>())
-        .append(String.class, InputStream.class, new StringLoader.StreamFactory())
-        .append(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
-        .append(
-            String.class, AssetFileDescriptor.class, new StringLoader.AssetFileDescriptorFactory())
-        .append(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-        .append(
-            Uri.class,
-            ParcelFileDescriptor.class,
-            new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
-        .append(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
-        .append(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context));
+            //用于从 Android 资源 ID 加载InputStream的工厂
+            .append(int.class, InputStream.class, resourceLoaderStreamFactory)
+            .append(int.class, ParcelFileDescriptor.class, resourceLoaderFileDescriptorFactory)
+            .append(Integer.class, InputStream.class, resourceLoaderStreamFactory)
+            .append(Integer.class, ParcelFileDescriptor.class, resourceLoaderFileDescriptorFactory)
+            .append(Integer.class, Uri.class, resourceLoaderUriFactory)
+            .append(int.class, AssetFileDescriptor.class, resourceLoaderAssetFileDescriptorFactory)
+            .append(Integer.class, AssetFileDescriptor.class, resourceLoaderAssetFileDescriptorFactory)
+            .append(int.class, Uri.class, resourceLoaderUriFactory)
+            //从Uri加载
+            .append(String.class, InputStream.class, new DataUrlLoader.StreamFactory<String>())
+            .append(Uri.class, InputStream.class, new DataUrlLoader.StreamFactory<Uri>())
+            //从String加载InputStream
+            .append(String.class, InputStream.class, new StringLoader.StreamFactory())
+            .append(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
+            .append(
+                    String.class, AssetFileDescriptor.class, new StringLoader.AssetFileDescriptorFactory())
+            .append(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
+            .append(
+                    Uri.class,
+                    ParcelFileDescriptor.class,
+                    new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
+            .append(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
+            .append(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       registry.append(
-          Uri.class, InputStream.class, new QMediaStoreUriLoader.InputStreamFactory(context));
+              Uri.class, InputStream.class, new QMediaStoreUriLoader.InputStreamFactory(context));
       registry.append(
-          Uri.class,
-          ParcelFileDescriptor.class,
-          new QMediaStoreUriLoader.FileDescriptorFactory(context));
+              Uri.class,
+              ParcelFileDescriptor.class,
+              new QMediaStoreUriLoader.FileDescriptorFactory(context));
     }
     registry
-        .append(Uri.class, InputStream.class, new UriLoader.StreamFactory(contentResolver))
-        .append(
-            Uri.class,
-            ParcelFileDescriptor.class,
-            new UriLoader.FileDescriptorFactory(contentResolver))
-        .append(
-            Uri.class,
-            AssetFileDescriptor.class,
-            new UriLoader.AssetFileDescriptorFactory(contentResolver))
-        .append(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
-        .append(URL.class, InputStream.class, new UrlLoader.StreamFactory())
-        .append(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
-        .append(GlideUrl.class, InputStream.class, new HttpGlideUrlLoader.Factory())
-        .append(byte[].class, ByteBuffer.class, new ByteArrayLoader.ByteBufferFactory())
-        .append(byte[].class, InputStream.class, new ByteArrayLoader.StreamFactory())
-        .append(Uri.class, Uri.class, UnitModelLoader.Factory.<Uri>getInstance())
-        .append(Drawable.class, Drawable.class, UnitModelLoader.Factory.<Drawable>getInstance())
-        .append(Drawable.class, Drawable.class, new UnitDrawableDecoder())
-        /* Transcoders */
-        .register(Bitmap.class, BitmapDrawable.class, new BitmapDrawableTranscoder(resources))
-        .register(Bitmap.class, byte[].class, bitmapBytesTranscoder)
-        .register(
-            Drawable.class,
-            byte[].class,
-            new DrawableBytesTranscoder(
-                bitmapPool, bitmapBytesTranscoder, gifDrawableBytesTranscoder))
-        .register(GifDrawable.class, byte[].class, gifDrawableBytesTranscoder);
+            .append(Uri.class, InputStream.class, new UriLoader.StreamFactory(contentResolver))
+            .append(
+                    Uri.class,
+                    ParcelFileDescriptor.class,
+                    new UriLoader.FileDescriptorFactory(contentResolver))
+            .append(
+                    Uri.class,
+                    AssetFileDescriptor.class,
+                    new UriLoader.AssetFileDescriptorFactory(contentResolver))
+            .append(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
+            .append(URL.class, InputStream.class, new UrlLoader.StreamFactory())
+            .append(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
+            //用于平移GlideUrl （HTTP / HTTPS URLS）到InputStream数据。
+            .append(GlideUrl.class, InputStream.class, new HttpGlideUrlLoader.Factory())
+            .append(byte[].class, ByteBuffer.class, new ByteArrayLoader.ByteBufferFactory())
+            .append(byte[].class, InputStream.class, new ByteArrayLoader.StreamFactory())
+            .append(Uri.class, Uri.class, UnitModelLoader.Factory.<Uri>getInstance())
+            .append(Drawable.class, Drawable.class, UnitModelLoader.Factory.<Drawable>getInstance())
+            .append(Drawable.class, Drawable.class, new UnitDrawableDecoder())
+            /* Transcoders */
+            .register(Bitmap.class, BitmapDrawable.class, new BitmapDrawableTranscoder(resources))
+            .register(Bitmap.class, byte[].class, bitmapBytesTranscoder)
+            .register(
+                    Drawable.class,
+                    byte[].class,
+                    new DrawableBytesTranscoder(
+                            bitmapPool, bitmapBytesTranscoder, gifDrawableBytesTranscoder))
+            .register(GifDrawable.class, byte[].class, gifDrawableBytesTranscoder);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       ResourceDecoder<ByteBuffer, Bitmap> byteBufferVideoDecoder =
-          VideoDecoder.byteBuffer(bitmapPool);
+              VideoDecoder.byteBuffer(bitmapPool);
       registry.append(ByteBuffer.class, Bitmap.class, byteBufferVideoDecoder);
       registry.append(
-          ByteBuffer.class,
-          BitmapDrawable.class,
-          new BitmapDrawableDecoder<>(resources, byteBufferVideoDecoder));
+              ByteBuffer.class,
+              BitmapDrawable.class,
+              new BitmapDrawableDecoder<>(resources, byteBufferVideoDecoder));
     }
-
+    //创建了一个ImageViewTargetFactory
     ImageViewTargetFactory imageViewTargetFactory = new ImageViewTargetFactory();
+    //创建了一个GlideContext对象
     glideContext =
-        new GlideContext(
-            context,
-            arrayPool,
-            registry,
-            imageViewTargetFactory,
-            defaultRequestOptionsFactory,
-            defaultTransitionOptions,
-            defaultRequestListeners,
-            engine,
-            experiments,
-            logLevel);
+            new GlideContext(
+                    context,
+                    arrayPool,
+                    registry,
+                    imageViewTargetFactory,
+                    defaultRequestOptionsFactory,
+                    defaultTransitionOptions,
+                    defaultRequestListeners,
+                    engine,
+                    experiments,
+                    logLevel);
   }
 
   /**
@@ -636,7 +661,9 @@ public class Glide implements ComponentCallbacks2 {
     return arrayPool;
   }
 
-  /** @return The context associated with this instance. */
+  /**
+   * @return The context associated with this instance.
+   */
   @NonNull
   public Context getContext() {
     return glideContext.getBaseContext();
@@ -669,14 +696,14 @@ public class Glide implements ComponentCallbacks2 {
    * every rotation.
    *
    * @param bitmapAttributeBuilders The list of {@link Builder Builders} representing individual
-   *     sizes and configurations of {@link Bitmap}s to be pre-filled.
+   *                                sizes and configurations of {@link Bitmap}s to be pre-filled.
    */
   @SuppressWarnings("unused") // Public API
   public synchronized void preFillBitmapPool(
-      @NonNull PreFillType.Builder... bitmapAttributeBuilders) {
+          @NonNull PreFillType.Builder... bitmapAttributeBuilders) {
     if (bitmapPreFiller == null) {
       DecodeFormat decodeFormat =
-          defaultRequestOptionsFactory.build().getOptions().get(Downsampler.DECODE_FORMAT);
+              defaultRequestOptionsFactory.build().getOptions().get(Downsampler.DECODE_FORMAT);
       bitmapPreFiller = new BitmapPreFiller(memoryCache, bitmapPool, decodeFormat);
     }
 
@@ -731,7 +758,9 @@ public class Glide implements ComponentCallbacks2 {
     engine.clearDiskCache();
   }
 
-  /** Internal method. */
+  /**
+   * Internal method.
+   */
   @NonNull
   public RequestManagerRetriever getRequestManagerRetriever() {
     return requestManagerRetriever;
@@ -762,15 +791,17 @@ public class Glide implements ComponentCallbacks2 {
     return oldCategory;
   }
 
+  // TODO: Glide源码-Glide.with(context)--获取RequestManagerRetriever
   @NonNull
   private static RequestManagerRetriever getRetriever(@Nullable Context context) {
     // Context could be null for other reasons (ie the user passes in null), but in practice it will
     // only occur due to errors with the Fragment lifecycle.
     Preconditions.checkNotNull(
-        context,
-        "You cannot start a load on a not yet attached View or a Fragment where getActivity() "
-            + "returns null (which usually occurs when getActivity() is called before the Fragment "
-            + "is attached or after the Fragment is destroyed).");
+            context,
+            "You cannot start a load on a not yet attached View or a Fragment where getActivity() "
+                    + "returns null (which usually occurs when getActivity() is called before the Fragment "
+                    + "is attached or after the Fragment is destroyed).");
+    // TODO: Glide源码-Glide.with(context)--获取单例Glide并且获取其对应的retriever
     return Glide.get(context).getRequestManagerRetriever();
   }
 
@@ -786,7 +817,8 @@ public class Glide implements ComponentCallbacks2 {
    * the same vein, if the resource will be used in a view in an activity, the load should be
    * started with {@link #with(android.app.Activity)}}.
    *
-   * <p>This method is appropriate for resources that will be used outside of the normal fragment or
+   * <p>This method is appropriate for resources that will be used outside of the normal fragment
+   * or
    * activity lifecycle (For example in services, or for notification thumbnails).
    *
    * @param context Any context, will not be retained.
@@ -796,6 +828,7 @@ public class Glide implements ComponentCallbacks2 {
    * @see #with(androidx.fragment.app.Fragment)
    * @see #with(androidx.fragment.app.FragmentActivity)
    */
+  // TODO: Glide源码-Glide.with(context)返回RequestManager流程
   @NonNull
   public static RequestManager with(@NonNull Context context) {
     return getRetriever(context).get(context);
@@ -808,15 +841,20 @@ public class Glide implements ComponentCallbacks2 {
    * @param activity The activity to use.
    * @return A RequestManager for the given activity that can be used to start a load.
    */
+
+  // TODO: Glide源码-Glide.with(context)--返回RequestManager流程
   @NonNull
   public static RequestManager with(@NonNull Activity activity) {
-    return getRetriever(activity).get(activity);
+    // TODO: Glide源码-Glide.with(context)--获取RequestManagerRetriever，然后获取RequestManager
+    return getRetriever(activity)
+            // TODO: Glide源码-Glide.with(context)--调用RequestManagerRetriever.get()获取RequestManager
+            .get(activity);
   }
 
   /**
-   * Begin a load with Glide that will tied to the give {@link
-   * androidx.fragment.app.FragmentActivity}'s lifecycle and that uses the given {@link
-   * androidx.fragment.app.FragmentActivity}'s default options.
+   * Begin a load with Glide that will tied to the give {@link androidx.fragment.app.FragmentActivity}'s
+   * lifecycle and that uses the given {@link androidx.fragment.app.FragmentActivity}'s default
+   * options.
    *
    * @param activity The activity to use.
    * @return A RequestManager for the given FragmentActivity that can be used to start a load.
@@ -845,8 +883,7 @@ public class Glide implements ComponentCallbacks2 {
    * @param fragment The fragment to use.
    * @return A RequestManager for the given Fragment that can be used to start a load.
    * @deprecated Prefer support Fragments and {@link #with(Fragment)} instead, {@link
-   *     android.app.Fragment} will be deprecated. See
-   *     https://github.com/android/android-ktx/pull/161#issuecomment-363270555.
+   * android.app.Fragment} will be deprecated. See https://github.com/android/android-ktx/pull/161#issuecomment-363270555.
    */
   @SuppressWarnings("deprecation")
   @Deprecated
@@ -935,10 +972,14 @@ public class Glide implements ComponentCallbacks2 {
     clearMemory();
   }
 
-  /** Creates a new instance of {@link RequestOptions}. */
+  /**
+   * Creates a new instance of {@link RequestOptions}.
+   */
   public interface RequestOptionsFactory {
 
-    /** Returns a non-null {@link RequestOptions} object. */
+    /**
+     * Returns a non-null {@link RequestOptions} object.
+     */
     @NonNull
     RequestOptions build();
   }
