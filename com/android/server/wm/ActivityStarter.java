@@ -854,7 +854,7 @@ class ActivityStarter {
         Intent intent = request.intent;
         NeededUriGrants intentGrants = request.intentGrants;
         String resolvedType = request.resolvedType;
-        //aInfo为空为报-是不是在AndroidManifest中注册错误
+        //aInfo为空会报-是不是在AndroidManifest中注册错误
         ActivityInfo aInfo = request.activityInfo;
         ResolveInfo rInfo = request.resolveInfo;
         final IVoiceInteractionSession voiceSession = request.voiceSession;
@@ -1643,6 +1643,7 @@ class ActivityStarter {
                 ? null : targetTask.getTopNonFinishingActivity();
         if (targetTaskTop != null) {
             // Recycle the target task for this launch.
+            //回收
             startResult = recycleTask(targetTask, targetTaskTop, reusedTask, intentGrants);
             if (startResult != START_SUCCESS) {
                 return startResult;
@@ -1928,7 +1929,7 @@ class ActivityStarter {
             resumeTargetStackIfNeeded();
             return START_RETURN_INTENT_TO_CALLER;
         }
-
+        //匹配Task，根据不同的Task操作栈，standerd,singeTop,singeTask,singeInstance
         complyActivityFlags(targetTask,
                 reusedTask != null ? reusedTask.getTopNonFinishingActivity() : null, intentGrants);
 

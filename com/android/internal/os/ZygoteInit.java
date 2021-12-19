@@ -921,6 +921,7 @@ public class ZygoteInit {
 
                 // {@code r == null} in the parent (zygote) process, and {@code r != null} in the
                 // child (system_server) process.
+                //这个runnable运行，执行的SystemServer.main方法
                 if (r != null) {
                     r.run();
                     return;
@@ -1000,6 +1001,7 @@ public class ZygoteInit {
         RuntimeInit.redirectLogStreams();
 
         RuntimeInit.commonInit();
+        // 启动Binder线程池
         ZygoteInit.nativeZygoteInit();
         // todo: 桌面startActivity流程
         return RuntimeInit.applicationInit(targetSdkVersion, disabledCompatChanges, argv,

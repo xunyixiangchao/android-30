@@ -1964,7 +1964,7 @@ class ActivityStack extends Task {
                 if (DEBUG_SWITCH) Slog.v(TAG_SWITCH, "Restarting: " + next);
             }
             if (DEBUG_STATES) Slog.d(TAG_STATES, "resumeTopActivityLocked: Restarting " + next);
-// todo: 桌面startActivity流程
+// todo: 桌面startActivity流程-ActivityStackSupervisor#startSpecificActivity
             mStackSupervisor.startSpecificActivity(next, true, true);
         }
 
